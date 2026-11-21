@@ -13,14 +13,15 @@ Práctica de Visión por Computador del Grado en Inteligencia Artificial de la U
 
 Los JSON declaran nueve categorías (ID y nombre): 0 `pills`, 1 `Cipro 500`, 2 `Ibuphil 600 mg`, 3 `Ibuphil Cold 400-60`, 4 `Xyzall 5mg`, 5 `blue`, 6 `pink`, 7 `red` y 8 `white`. Hay ocho categorías con anotaciones en el conjunto completo (IDs 1–8), frente a las siete clases del guion. El ID 0 no aparece en las anotaciones y el ID 2 aparece una vez en `train` y una vez en `valid`.
 
-Desde la raíz del repositorio, con Python y pip disponibles:
+Desde la raíz del repositorio, con `uv` instalado:
 
 ```bash
-python -m pip install huggingface_hub
-python scripts/download_dataset.py
+uv sync --locked
+uv run --locked python scripts/download_dataset.py
+uv run --locked jupyter lab notebooks/01_eda.ipynb
 ```
 
-El script descarga `dataset.tar.gz` de una revisión fija y extrae las particiones originales en `data/pills-sxdht/`.
+El entorno usa Python 3.11 y las versiones de dependencias fijadas en `uv.lock`. El script extrae el archivo original en `data/pills-sxdht/`. En JupyterLab, ejecuta todas las celdas del [notebook de EDA](notebooks/01_eda.ipynb) para generar las tablas, los gráficos y el visor. El notebook admite un kernel iniciado en la raíz o en `notebooks/`. Limpia las salidas antes de guardarlo para Git.
 
 ## Objetivos
 

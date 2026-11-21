@@ -1,0 +1,17 @@
+[project]
+name = "vc-object-detection-pills"
+version = "0.1.0"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "huggingface-hub",
+    "ipykernel",
+    "ipywidgets",
+    "jupyterlab",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "pillow",
+]
+
+[tool.uv]
+package = false
