@@ -1,0 +1,33 @@
+# Python y entornos locales
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.env
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Datos y resultados locales
+data/*
+!data/.gitkeep
+results/*
+!results/.gitkeep
+runs/
+wandb/
+lightning_logs/
+
+# Pesos, checkpoints y registros
+*.pt
+*.pth
+*.pkl
+*.ckpt
+*.onnx
+*.log
+events.out.tfevents.*
