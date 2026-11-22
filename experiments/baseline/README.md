@@ -99,63 +99,13 @@ La preparación reutiliza la auditoría del descargador. Comprueba IDs, referenc
 
 Con una sola anotación en train y otra en validación, Ibuphil 600 mg tiene soporte muy escaso; en test su AP será indefinido. Solo 23 imágenes tienen varias cajas (19/3/1). La mediana de luminancia media fue 136,32 en train frente a 128,27 y 128,80 en validación y test. Es una comparación descriptiva. dHash señaló seis pares candidatos a similitud perceptual, tres entre splits, con cero grupos idénticos por bytes o píxeles. Revisad visualmente esos tres pares antes de interpretar como definitiva la evaluación. Las métricas por clase, tamaño y subconjunto deben leerse junto a sus recuentos. [EDA del repositorio](../../notebooks/01_eda.ipynb)
 
-## I. Reproducibilidad y ejecución en FinisTerrae III
+## I. Protocolo experimental en FinisTerrae III
 
-Los siguientes comandos son para la persona que vaya a verificar el baseline. Usad un filesystem persistente de la cuenta para pesos, entorno y checkpoints. Ejecutad las tareas de cómputo en una asignación SLURM. Antes de preparar entornos, consultad `module spider Python`, `module spider CUDA` y `module spider GCC`. Cargad los módulos disponibles que proporcionen Python 3.11 y `nvcc` 11.8 con un compilador compatible. Si necesitáis esos módulos en batch, cargadlos en el entorno de envío o añadid las líneas `module load` verificadas por vuestra cuenta. Dentro de la asignación comprobad `nvidia-smi`, `nvcc --version` y `module list`. La documentación del centro indica 32 CPU por A100 en el nodo estándar. Los scripts solicitan una A100, 32 CPU, 64 GiB y seis horas. Revisad QOS, límites y acceso al almacenamiento antes de enviar. [Guía FT3](https://cesga-docs.gitlab.io/ft3-user-guide/index.html) · [Nodos GPU](https://cesga-docs.gitlab.io/ft3-user-guide/gpu_nodes.html) · [Comandos de SLURM](https://cesga-docs.gitlab.io/ft3-user-guide/batch_basic_commands.html)
-
-### Entornos y pesos
-
-La combinación propuesta es CPython 3.11, PyTorch 2.5.1 + torchvision 0.20.1 del índice cu118, Detectron2 compilado con CUDA 11.8 al commit indicado y Ultralytics 8.3.161 en un entorno aparte. Se fija `sm_80` para A100. Compilar Detectron2 exige que toolkit y PyTorch sean compatibles. El driver real de vuestra GPU y la disponibilidad de módulos quedan para la fase B. `uv.lock` sigue perteneciendo al EDA. `constraints.txt` fija componentes críticos de los entornos GPU, y cada `run.json` guarda todas las versiones instaladas y los hashes de código para reconstrucción posterior. [PyTorch cu118](https://pytorch.org/get-started/previous-versions/#v251) · [Instalación de Detectron2](https://github.com/facebookresearch/detectron2/blob/main/INSTALL.md) · [Commit fijado](https://github.com/facebookresearch/detectron2/commit/fd27788985af0f4ca800bca563acdb700bb890e2) · [Compatibilidad CUDA](https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html)
-
-Desde la raíz del repositorio. Cambiad `BASELINE_WORK` si vuestra cuenta recomienda otra ubicación persistente.
-
-```bash
-export BASELINE_WORK="$HOME/pills-baseline"
-export CASCADE_ENV="$BASELINE_WORK/envs/cascade"
-export YOLO_ENV="$BASELINE_WORK/envs/yolo"
-export BASELINE_DATA="$BASELINE_WORK/data/pills-prepared"
-export BASELINE_RESULTS="$BASELINE_WORK/results"
-export CASCADE_WEIGHTS="$BASELINE_WORK/checkpoints/model_final_480dd8.pkl"
-export YOLO_WEIGHTS="$BASELINE_WORK/checkpoints/yolov10s.pt"
-export YOLO_CONFIG_DIR="$BASELINE_WORK/ultralytics"
-mkdir -p "$BASELINE_WORK/checkpoints" "$BASELINE_RESULTS" "$YOLO_CONFIG_DIR" results/slurm
-```
-
-Preparad los entornos en un nodo de cómputo y con los módulos ya elegidos. Para compilar, podéis iniciar una sesión CPU con `srun -c 4 --mem=16G -t 02:00:00 --pty bash`, ajustando los recursos a vuestro proyecto. Si la red de los nodos está restringida, preparad el caché o un wheelhouse en un entorno autorizado y trasladadlo.
-
-```bash
-uv venv --python 3.11 "$CASCADE_ENV"
-uv venv --python 3.11 "$YOLO_ENV"
-for env_path in "$CASCADE_ENV" "$YOLO_ENV"; do
-  uv pip install --python "$env_path/bin/python" \
-    --index-url https://download.pytorch.org/whl/cu118 torch==2.5.1+cu118 torchvision==0.20.1+cu118
-  uv pip install --python "$env_path/bin/python" -c configs/baseline/constraints.txt \
-    numpy opencv-python pycocotools Pillow matplotlib setuptools wheel ninja
-done
-FORCE_CUDA=1 TORCH_CUDA_ARCH_LIST=8.0 MAX_JOBS=4 \
-  uv pip install --python "$CASCADE_ENV/bin/python" --no-build-isolation \
-    -c configs/baseline/constraints.txt fvcore \
-    'detectron2 @ git+https://github.com/facebookresearch/detectron2.git@fd27788985af0f4ca800bca563acdb700bb890e2'
-uv pip install --python "$YOLO_ENV/bin/python" -c configs/baseline/constraints.txt 'ultralytics==8.3.161'
-uv pip check --python "$CASCADE_ENV/bin/python"
-uv pip check --python "$YOLO_ENV/bin/python"
-uv pip freeze --python "$CASCADE_ENV/bin/python" > "$BASELINE_WORK/cascade.freeze.txt"
-uv pip freeze --python "$YOLO_ENV/bin/python" > "$BASELINE_WORK/yolo.freeze.txt"
-```
-
-Aprovisionad los pesos oficiales antes de enviar trabajos. Se pueden copiar desde una máquina con acceso a Internet. El archivo de Cascade corresponde a la URL que resuelve el zoo. La documentación de YOLOv10 enlaza la familia de pesos distribuida por Ultralytics. La fuente Arial es una necesidad del verificador de datasets de Ultralytics 8.3.161, incluso con gráficos nativos desactivados, y se puede preparar en su caché para trabajar sin acceso al exterior.
-
-```bash
-curl -fL https://dl.fbaipublicfiles.com/detectron2/Misc/cascade_mask_rcnn_R_50_FPN_3x/144998488/model_final_480dd8.pkl \
-  -o "$CASCADE_WEIGHTS"
-curl -fL https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov10s.pt -o "$YOLO_WEIGHTS"
-curl -fL https://github.com/ultralytics/assets/releases/download/v0.0.0/Arial.ttf -o "$YOLO_CONFIG_DIR/Arial.ttf"
-sha256sum "$CASCADE_WEIGHTS" "$YOLO_WEIGHTS"
-```
+La [guía de CESGA](../../docs/cesga.md) documenta los entornos Conda con CUDA 12.1, las rutas persistentes, los pesos y el envío de trabajos. Define allí las variables de rutas y las opciones `SLURM_LOGS` antes de ejecutar este protocolo.
 
 ### Protocolo previo al commit
 
-**Fase A. Sintaxis, entornos y datos.** Si faltan los datos originales, usad el flujo existente con `uv sync --locked` y `uv run --locked python scripts/download_dataset.py`, o copiad la revisión fijada al repositorio. En una asignación de CPU ejecutad lo siguiente.
+**Fase A. Sintaxis, entornos y datos.** Localiza los originales de la revisión fijada según la [guía de datos de CESGA](../../docs/cesga.md#datos-y-pesos-pendientes). En un nodo CPU, con los módulos cargados y desde la raíz del repositorio, ejecuta lo siguiente.
 
 ```bash
 "$CASCADE_ENV/bin/python" -m compileall -q scripts tests
@@ -165,8 +115,8 @@ bash -n slurm/cascade.sh && bash -n slurm/yolo.sh
 "$CASCADE_ENV/bin/python" -m scripts.train_baseline cascade --check-config
 "$YOLO_ENV/bin/python" -m scripts.train_baseline yolo --check-config
 "$CASCADE_ENV/bin/python" -m unittest discover -s tests -v
-"$CASCADE_ENV/bin/python" -m scripts.baseline_data --data data/pills-sxdht --output "$BASELINE_DATA"
-"$CASCADE_ENV/bin/python" -m scripts.baseline_data --data data/pills-sxdht --output "$BASELINE_DATA"
+"$CASCADE_ENV/bin/python" -m scripts.baseline_data --data "$BASELINE_WORK/data/pills-sxdht" --output "$BASELINE_DATA"
+"$CASCADE_ENV/bin/python" -m scripts.baseline_data --data "$BASELINE_WORK/data/pills-sxdht" --output "$BASELINE_DATA"
 ```
 
 - [ ] Importan las extensiones en sus respectivos entornos y los tests pasan. Los sintéticos comprueban cajas límite, IDs inválidos, mapeo e inversa, AP perfecto, AP cero, GT ausente y detecciones vacías.
@@ -175,11 +125,13 @@ bash -n slurm/cascade.sh && bash -n slurm/yolo.sh
 **Fase B. Inicialización en GPU.** Las dos sondas leen un lote real, hacen inferencia y retropropagación, y registran los gradientes sin ejecutar un paso de optimizador.
 
 ```bash
-sbatch --time=01:00:00 slurm/cascade.sh --data "$BASELINE_DATA" --weights "$CASCADE_WEIGHTS" \
-  --output "$BASELINE_RESULTS/init-cascade" --initialize
-sbatch --time=01:00:00 slurm/yolo.sh --data "$BASELINE_DATA" --weights "$YOLO_WEIGHTS" \
-  --output "$BASELINE_RESULTS/init-yolo" --initialize
-squeue -u "$USER"
+export VERIFY_ROOT="$(mktemp -d "$BASELINE_RESULTS/verify-XXXXXX")"
+printf '%s\n' "$VERIFY_ROOT"
+sbatch "${SLURM_LOGS[@]}" --time=01:00:00 slurm/cascade.sh --data "$BASELINE_DATA" --weights "$CASCADE_WEIGHTS" \
+  --output "$VERIFY_ROOT/init-cascade" --initialize
+sbatch "${SLURM_LOGS[@]}" --time=01:00:00 slurm/yolo.sh --data "$BASELINE_DATA" --weights "$YOLO_WEIGHTS" \
+  --output "$VERIFY_ROOT/init-yolo" --initialize
+squeue --me
 ```
 
 - [ ] SLURM informa `COMPLETED` y `0:0`. `run.json` identifica la GPU, CUDA, configuración, código y hash de los pesos.
@@ -189,45 +141,35 @@ squeue -u "$USER"
 **Fase C. Smoke test y reanudación.** Pedid dos épocas y una pausa controlada después del primer checkpoint. Cada pareja de comandos usa un directorio exclusivo y el mismo presupuesto. Lanzad las reanudaciones al terminar las pausas.
 
 ```bash
-sbatch --time=02:00:00 slurm/cascade.sh --data "$BASELINE_DATA" --weights "$CASCADE_WEIGHTS" \
-  --output "$BASELINE_RESULTS/smoke-cascade" --epochs 2 --pause-after 1
-sbatch --time=02:00:00 slurm/yolo.sh --data "$BASELINE_DATA" --weights "$YOLO_WEIGHTS" \
-  --output "$BASELINE_RESULTS/smoke-yolo" --epochs 2 --pause-after 1
-squeue -u "$USER"
+sbatch "${SLURM_LOGS[@]}" --time=02:00:00 slurm/cascade.sh --data "$BASELINE_DATA" --weights "$CASCADE_WEIGHTS" \
+  --output "$VERIFY_ROOT/smoke-cascade" --epochs 2 --pause-after 1
+sbatch "${SLURM_LOGS[@]}" --time=02:00:00 slurm/yolo.sh --data "$BASELINE_DATA" --weights "$YOLO_WEIGHTS" \
+  --output "$VERIFY_ROOT/smoke-yolo" --epochs 2 --pause-after 1
+squeue --me
 
-sbatch --time=02:00:00 slurm/cascade.sh --data "$BASELINE_DATA" --weights "$CASCADE_WEIGHTS" \
-  --output "$BASELINE_RESULTS/smoke-cascade" --epochs 2 --resume
-sbatch --time=02:00:00 slurm/yolo.sh --data "$BASELINE_DATA" --weights "$YOLO_WEIGHTS" \
-  --output "$BASELINE_RESULTS/smoke-yolo" --epochs 2 --resume
+sbatch "${SLURM_LOGS[@]}" --time=02:00:00 slurm/cascade.sh --data "$BASELINE_DATA" --weights "$CASCADE_WEIGHTS" \
+  --output "$VERIFY_ROOT/smoke-cascade" --epochs 2 --resume
+sbatch "${SLURM_LOGS[@]}" --time=02:00:00 slurm/yolo.sh --data "$BASELINE_DATA" --weights "$YOLO_WEIGHTS" \
+  --output "$VERIFY_ROOT/smoke-yolo" --epochs 2 --resume
 ```
 
-Para cada ID devuelto por `sbatch`, comprobad el estado, salida, tiempo y memoria.
-
-```bash
-sacct -j JOBID --format=JobID,JobName,State,ExitCode,Elapsed,MaxRSS,AllocTRES
-```
+Consulta el estado y el consumo de cada trabajo con [los comandos de SLURM](../../docs/cesga.md#envío-y-recuperación-de-trabajos). Si cambias de sesión, recupera el valor de `VERIFY_ROOT` antes de reanudar.
 
 - [ ] Después de la pausa, `status.json` dice `paused` y existen best y last con una validación. Tras reanudar dice `complete` y el historial contiene las dos validaciones con pasos crecientes. Revisad logs, cargas de dataloader, LR, pérdidas finitas y presencia de estados del optimizador. Un fallo real del proceso debe dar código distinto de cero.
 - [ ] El modelo se actualiza. `parameter_updates.json` comprueba que cambian un tensor del backbone y uno de clasificación después de la primera época de cada sesión. Revisad los pasos y pérdidas de ambas épocas. El warm-up de YOLO abarca todo este smoke test.
 
-**Fase D. Métricas, procedencia y artefactos.** Tras la fase C, ejecutad ambos comandos de evaluación en **la misma** sesión GPU interactiva. Usad los dos entornos mediante sus ejecutables absolutos.
-
-```bash
-srun --gres=gpu:a100:1 -c 32 --mem=64G -t 01:30:00 --pty bash
-```
-
-Dentro de la sesión, desde el repositorio:
+**Fase D. Métricas, procedencia y artefactos.** Tras la fase C, ejecuta ambas evaluaciones en **la misma** sesión GPU interactiva. Carga los módulos dentro del nodo, recupera `VERIFY_ROOT` si has cambiado de terminal y sitúate en la raíz del repositorio. [Sesión GPU](../../docs/cesga.md#gpu-y-comprobación-cuda)
 
 ```bash
 "$CASCADE_ENV/bin/python" -m scripts.evaluate_baseline --data "$BASELINE_DATA" \
-  --run "$BASELINE_RESULTS/smoke-cascade" --split valid --checkpoint best \
-  --output "$BASELINE_RESULTS/smoke-eval-cascade" --benchmark --warmup 20 --iterations 100
+  --run "$VERIFY_ROOT/smoke-cascade" --split valid --checkpoint best \
+  --output "$VERIFY_ROOT/smoke-eval-cascade" --benchmark --warmup 20 --iterations 100
 "$YOLO_ENV/bin/python" -m scripts.evaluate_baseline --data "$BASELINE_DATA" \
-  --run "$BASELINE_RESULTS/smoke-yolo" --split valid --checkpoint best \
-  --output "$BASELINE_RESULTS/smoke-eval-yolo" --benchmark --warmup 20 --iterations 100
+  --run "$VERIFY_ROOT/smoke-yolo" --split valid --checkpoint best \
+  --output "$VERIFY_ROOT/smoke-eval-yolo" --benchmark --warmup 20 --iterations 100
 "$CASCADE_ENV/bin/python" -m scripts.verify_baseline --data "$BASELINE_DATA" --split valid \
-  --runs "$BASELINE_RESULTS/smoke-cascade" "$BASELINE_RESULTS/smoke-yolo" \
-  --evaluations "$BASELINE_RESULTS/smoke-eval-cascade" "$BASELINE_RESULTS/smoke-eval-yolo"
+  --runs "$VERIFY_ROOT/smoke-cascade" "$VERIFY_ROOT/smoke-yolo" \
+  --evaluations "$VERIFY_ROOT/smoke-eval-cascade" "$VERIFY_ROOT/smoke-eval-yolo"
 ```
 
 - [ ] El verificador reproduce las métricas desde predicciones, comprueba el mismo COCO, IDs, rango de coordenadas, soportes, checkpoint, AP definido o nulo y condiciones de latencia.
@@ -236,39 +178,33 @@ Dentro de la sesión, desde el repositorio:
 
 ### Entrenamiento definitivo, evaluación y recuperación
 
-Tras aceptar A–D, lanzad trabajos nuevos con la receta base y salidas nuevas.
+Tras aceptar A–D, lanza trabajos nuevos con la receta base. Conserva la ruta de `RUN_ROOT` para consultar, reanudar o evaluar.
 
 ```bash
-sbatch slurm/cascade.sh --data "$BASELINE_DATA" --weights "$CASCADE_WEIGHTS" \
-  --output "$BASELINE_RESULTS/baseline-cascade"
-sbatch slurm/yolo.sh --data "$BASELINE_DATA" --weights "$YOLO_WEIGHTS" \
-  --output "$BASELINE_RESULTS/baseline-yolo"
-squeue -u "$USER"
+export RUN_ROOT="$(mktemp -d "$BASELINE_RESULTS/baseline-XXXXXX")"
+printf '%s\n' "$RUN_ROOT"
+sbatch "${SLURM_LOGS[@]}" slurm/cascade.sh --data "$BASELINE_DATA" --weights "$CASCADE_WEIGHTS" \
+  --output "$RUN_ROOT/cascade"
+sbatch "${SLURM_LOGS[@]}" slurm/yolo.sh --data "$BASELINE_DATA" --weights "$YOLO_WEIGHTS" \
+  --output "$RUN_ROOT/yolo"
+squeue --me
 ```
 
-Ante una interrupción, repetid el comando correspondiente con `--resume`, los mismos argumentos de configuración, datos, pesos y salida. Verificad que el último checkpoint exista. Cascade usa `last_checkpoint` y recupera optimizador, scheduler, iteración y el estado del hook del mejor AP. YOLO recupera su formato nativo `weights/last.pt`, que guarda EMA, época y optimizador y reconstruye la agenda. El final automático de Ultralytics que despoja al checkpoint del optimizador se sustituye por la evaluación común separada. La reanudación desde un checkpoint no restaura todos los estados RNG, del sampler o las copias FP32 de YOLO que el formato nativo no guarda. No se espera equivalencia bit a bit. `status.json` acumula tiempos de sesiones que alcanzaron el cierre; tras una terminación abrupta, consultad también `sacct` para contabilizar esa sesión. La recuperación empieza en el último límite completo de checkpoint.
+Sigue el [procedimiento de reanudación](../../docs/cesga.md#envío-y-recuperación-de-trabajos) con el último checkpoint disponible. Cascade usa `last_checkpoint` y recupera optimizador, scheduler, iteración y el estado del hook del mejor AP. YOLO recupera su formato nativo `weights/last.pt`, que guarda EMA, época y optimizador y reconstruye la agenda. El final automático de Ultralytics que despoja al checkpoint del optimizador se sustituye por la evaluación común separada. La reanudación desde un checkpoint no restaura todos los estados RNG, del sampler o las copias FP32 de YOLO que el formato nativo no guarda. No se espera equivalencia bit a bit. `status.json` acumula tiempos de sesiones que alcanzaron el cierre; tras una terminación abrupta, consultad también `sacct` para contabilizar esa sesión. La recuperación empieza en el último límite completo de checkpoint.
 
 En una asignación A100 como la de la fase D, ejecutad lo siguiente para evaluar validación. Repetidlo con `EVALUATION_SPLIT=test` exclusivamente cuando el protocolo y los modelos estén cerrados. Los checkpoints se seleccionan en validación en ambos casos.
 
 ```bash
 EVALUATION_SPLIT=valid
 "$CASCADE_ENV/bin/python" -m scripts.evaluate_baseline --data "$BASELINE_DATA" \
-  --run "$BASELINE_RESULTS/baseline-cascade" --split "$EVALUATION_SPLIT" \
-  --output "$BASELINE_RESULTS/eval-cascade-$EVALUATION_SPLIT" --benchmark --warmup 20 --iterations 100
+  --run "$RUN_ROOT/cascade" --split "$EVALUATION_SPLIT" \
+  --output "$RUN_ROOT/eval-cascade-$EVALUATION_SPLIT" --benchmark --warmup 20 --iterations 100
 "$YOLO_ENV/bin/python" -m scripts.evaluate_baseline --data "$BASELINE_DATA" \
-  --run "$BASELINE_RESULTS/baseline-yolo" --split "$EVALUATION_SPLIT" \
-  --output "$BASELINE_RESULTS/eval-yolo-$EVALUATION_SPLIT" --benchmark --warmup 20 --iterations 100
+  --run "$RUN_ROOT/yolo" --split "$EVALUATION_SPLIT" \
+  --output "$RUN_ROOT/eval-yolo-$EVALUATION_SPLIT" --benchmark --warmup 20 --iterations 100
 ```
 
-En cada run, `run.json` registra procedencia y configuración declarada, los archivos del framework conservan valores efectivos y `status.json` indica el mejor paso, duración, memoria y rutas relativas de best/last. Cascade escribe su `metrics.json` nativo en JSON Lines y YOLO su `results.csv`. Para análisis conjunto se guardan `history.csv` y `training.png`. La evaluación produce `metrics.json`, `predictions.json`, `pr_curves.json`, `pr_curves.png` y hasta cinco ejemplos por tipo. Para copiar resultados ligeros, definid el acceso y la ruta remota de vuestro proyecto. Los pesos se pueden recuperar quitando los filtros de `rsync`; los logs están en `results/slurm/` del checkout de CESGA. En YOLO los checkpoints serializan EMA y estado en el formato nativo, lo que puede dar pequeñas diferencias entre AP observado en la selección y AP del archivo vuelto a cargar. Revisad en A–D si representan un problema. Los modelos, pesos y módulos de CESGA quedan pendientes de prueba real.
-
-```bash
-CESGA_LOGIN='usuario@host-cesga'
-CESGA_RESULTS='/ruta/persistente/pills-baseline/results'
-mkdir -p results/cesga
-rsync -av --exclude='*.pt' --exclude='*.pth' --exclude='*.tfevents.*' \
-  "$CESGA_LOGIN:$CESGA_RESULTS/" results/cesga/
-```
+En cada run, `run.json` registra procedencia y configuración declarada, los archivos del framework conservan valores efectivos y `status.json` indica el mejor paso, duración, memoria y rutas relativas de best/last. Cascade escribe su `metrics.json` nativo en JSON Lines y YOLO su `results.csv`. Para análisis conjunto se guardan `history.csv` y `training.png`. La evaluación produce `metrics.json`, `predictions.json`, `pr_curves.json`, `pr_curves.png` y hasta cinco ejemplos por tipo. Consulta la [recuperación de resultados](../../docs/cesga.md#envío-y-recuperación-de-trabajos) para copiarlos al equipo local. En YOLO los checkpoints serializan EMA y estado en el formato nativo, lo que puede dar pequeñas diferencias entre AP observado en la selección y AP del archivo vuelto a cargar. Revisad en A–D si representan un problema. En CESGA están comprobados los entornos y las operaciones CUDA básicas. La carga de los pesos y la ejecución completa de las fases B–D quedan pendientes.
 
 ## J. Hipótesis para futuros experimentos
 
