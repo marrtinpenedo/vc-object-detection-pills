@@ -29,3 +29,7 @@ El entorno usa Python 3.11 y las versiones de dependencias fijadas en `uv.lock`.
 2. Proponer, implementar y evaluar mejoras técnicamente justificadas.
 3. Comparar la evolución y el rendimiento de ambos modelos, cuantitativa y cualitativamente. La comparación incluirá curvas precisión-recall, mAP@0.5, mAP@0.5:0.95, tiempos de inferencia y ejemplos de aciertos y fallos.
 
+
+## Baselines reproducibles en CESGA
+
+La [metodología y el protocolo de verificación](experiments/baseline/README.md) documentan la preparación de datos, los dos entrenamientos y la evaluación COCO común en FinisTerrae III.
