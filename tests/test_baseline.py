@@ -9,7 +9,7 @@ from types import SimpleNamespace
 from unittest.mock import DEFAULT, Mock, patch
 
 from scripts.baseline_data import class_mapping, coco_to_yolo, convert_split, index_records
-from scripts.baseline_metrics import coco_eval, prediction_rows, report
+from scripts.baseline_metrics import coco_eval, prediction_rows, report, validate_predictions
 from scripts.baseline_run import load_config
 
 
@@ -72,6 +72,30 @@ class ConversionTest(unittest.TestCase):
 
 
 class EvaluationTest(unittest.TestCase):
+    def test_float32_box_preserves_clipped_image_edges(self):
+        import numpy as np
+
+        image = {"id": 9, "file_name": "edge.jpg", "width": 640, "height": 640}
+        classes = [{"internal_id": 0, "original_id": 1}]
+        truth = {"images": [image], "categories": [{"id": 1}]}
+        detection = np.array(
+            [119.85000610351562, 34.116180419921875, 640, 486.21728515625, 0.1357076, 0],
+            dtype=np.float32,
+        )
+        for axis, extent, row in (("x", 2, detection), ("y", 3, detection[[1, 0, 3, 2, 4, 5]])):
+            with self.subTest(axis=axis):
+                predictions = prediction_rows(image, [row], classes)
+                validate_predictions(truth, predictions)
+                x, y, width, height = predictions[0]["bbox"]
+                self.assertEqual([x, y, x + width, y + height], list(map(float, row[:4])))
+                self.assertLessEqual(x + width, image["width"])
+                self.assertLessEqual(y + height, image["height"])
+
+                outside = predictions[0]["bbox"].copy()
+                outside[extent] += 0.01
+                with self.assertRaisesRegex(ValueError, "fuera de los límites"):
+                    validate_predictions(truth, [{**predictions[0], "bbox": outside}])
+
     def test_perfect_detection_uses_original_ids_and_absent_ap_is_null(self):
         raw, classes = fixture()
         coco, _ = convert_split(raw, classes)

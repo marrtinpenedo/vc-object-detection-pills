@@ -21,15 +21,16 @@ def prediction_rows(image, detections, classes):
             raise ValueError(f"Predicción no finita en {image['file_name']}")
         if int(cls) != cls or int(cls) not in original_ids or not 0 <= score <= 1:
             raise ValueError(f"Clase o confianza inválida en {image['file_name']}")
-        x1, x2 = np.clip([x1, x2], 0, image["width"])
-        y1, y2 = np.clip([y1, y2], 0, image["height"])
+        # Subtract in double precision so the COCO extents preserve the clipped edges.
+        x1, x2 = map(float, np.clip([x1, x2], 0, image["width"]))
+        y1, y2 = map(float, np.clip([y1, y2], 0, image["height"]))
         if x2 <= x1 or y2 <= y1:
             continue
         if score >= MIN_SCORE:
             rows.append({
                 "image_id": image["id"],
                 "category_id": original_ids[int(cls)],
-                "bbox": [float(x1), float(y1), float(x2 - x1), float(y2 - y1)],
+                "bbox": [x1, y1, x2 - x1, y2 - y1],
                 "score": float(score),
             })
     return sorted(rows, key=lambda row: -row["score"])[:MAX_DETECTIONS]
