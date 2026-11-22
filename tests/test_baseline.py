@@ -1,7 +1,12 @@
-"""Synthetic checks for dataset conversion and the shared evaluator."""
+"""Synthetic checks for the baseline pipeline."""
 
 import unittest
 from copy import deepcopy
+from importlib.util import find_spec
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from types import SimpleNamespace
+from unittest.mock import DEFAULT, Mock, patch
 
 from scripts.baseline_data import class_mapping, coco_to_yolo, convert_split, index_records
 from scripts.baseline_metrics import coco_eval, prediction_rows, report
@@ -112,3 +117,54 @@ class ConfigurationTest(unittest.TestCase):
             self.assertEqual((spec["epochs"], spec["batch"], spec["imgsz"]), (2, batch, 640))
             with self.assertRaises(ValueError):
                 load_config(model, None, {"imgsz": 601})
+
+
+@unittest.skipUnless(find_spec("detectron2"), "requires the Cascade environment")
+class CascadeInitializationTest(unittest.TestCase):
+    def test_training_forward_has_event_storage(self):
+        import numpy as np
+        import torch
+        from detectron2.utils.events import get_event_storage
+        from PIL import Image
+
+        from scripts import baseline_cascade
+
+        class ProbeModel(torch.nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.backbone = torch.nn.Linear(1, 1, bias=False)
+                self.roi_heads = torch.nn.Module()
+                self.roi_heads.num_classes = 1
+                self.roi_heads.box_predictor = torch.nn.Linear(1, 1, bias=False)
+                self.proposal_generator = torch.nn.Linear(1, 1, bias=False)
+
+            def forward(self, batch):
+                get_event_storage().put_scalar("probe/inputs", len(batch))
+                return {"loss": sum(parameter.sum() for parameter in self.parameters())}
+
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            image = output / "probe.png"
+            Image.new("RGB", (2, 2)).save(image)
+            trainer = Mock(model=ProbeModel(), data_loader=[[{"file_name": str(image)}]])
+            args = SimpleNamespace(
+                output=output, data=output, weights=output / "model_final_480dd8.pkl",
+                initialize=True, resume=False, pause_after=None,
+            )
+            manifest = {"classes": [1], "splits": {"train": {"images": 1}}}
+            with patch.object(torch, "use_deterministic_algorithms"), patch.multiple(
+                baseline_cascade,
+                seed_all_rng=DEFAULT,
+                register_training_data=DEFAULT,
+                CascadeTrainer=Mock(return_value=trainer),
+                CheckedWeights=DEFAULT,
+                make_predictor=Mock(return_value=lambda image: np.empty((0, 6))),
+            ):
+                baseline_cascade.train(args, load_config("cascade", None, {}), manifest)
+            trainer.train.assert_not_called()
+            report = baseline_cascade.read_json(output / "initialization.json")
+            self.assertEqual(report["gradients"], {
+                "backbone.weight": "nonzero",
+                "roi_heads.box_predictor.weight": "nonzero",
+                "proposal_generator.weight": "nonzero",
+            })

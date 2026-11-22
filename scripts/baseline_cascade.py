@@ -17,6 +17,7 @@ from detectron2.engine import DefaultTrainer, HookBase, hooks
 from detectron2.evaluation import DatasetEvaluator
 from detectron2.modeling import build_model
 from detectron2.utils.env import seed_all_rng
+from detectron2.utils.events import EventStorage
 from detectron2.utils.logger import setup_logger
 
 from scripts.baseline_data import read_json, write_json
@@ -319,7 +320,8 @@ def train(args, spec, manifest):
         if result.ndim != 2 or result.shape[1] != 6 or not np.isfinite(result).all():
             raise RuntimeError("Salida de inferencia Cascade inválida")
         model.train()
-        losses = model(batch)
+        with EventStorage(0):
+            losses = model(batch)
         loss = sum(losses.values())
         if not torch.isfinite(loss).item():
             raise RuntimeError("Pérdida Cascade no finita")

@@ -117,7 +117,7 @@ for env_path in "$CASCADE_ENV" "$YOLO_ENV"; do
 done
 
 "$CASCADE_ENV/bin/python" -m pip install -c configs/baseline/constraints.txt \
-  fvcore ninja setuptools wheel \
+  fvcore ninja 'setuptools==80.9.0' wheel \
   'termcolor>=1.1' 'yacs>=0.1.8' tabulate cloudpickle 'tqdm>4.29.0' tensorboard \
   'iopath>=0.1.7,<0.1.10' 'omegaconf>=2.1,<2.4' 'hydra-core>=1.1' black packaging
 "$YOLO_ENV/bin/python" -m pip install -c configs/baseline/constraints.txt \
@@ -125,6 +125,8 @@ done
 ```
 
 ### Compilación de Detectron2
+
+El `model_zoo` del commit fijado importa `pkg_resources`. Mantén `setuptools==80.9.0` en Cascade, la versión comprobada en CESGA que proporciona ese módulo.
 
 Detectron2 0.6 quedó instalado desde el commit `fd27788985af0f4ca800bca563acdb700bb890e2`, con PyTorch 2.5.1+cu121, el toolkit CUDA 12.1.1 y código para `sm_80` (A100). GCC/G++ 11 y el sysroot 2.17 de Conda proporcionan la compatibilidad necesaria con el sistema. Instala primero las dependencias del bloque anterior. Después activa Cascade en un subshell y compila con su intérprete y sus compiladores. `--no-deps` y `--no-build-isolation` mantienen la compilación en el entorno preparado. [Dependencias del commit fijado](https://github.com/facebookresearch/detectron2/blob/fd27788985af0f4ca800bca563acdb700bb890e2/setup.py#L146-L180)
 
@@ -156,7 +158,7 @@ for env_path in "$CASCADE_ENV" "$YOLO_ENV"; do
   "$env_path/bin/python" -m pip check
   "$env_path/bin/python" -c 'import torch, torchvision; print(torch.__version__, torchvision.__version__, torch.version.cuda); assert (torch.__version__, torchvision.__version__, torch.version.cuda) == ("2.5.1+cu121", "0.20.1+cu121", "12.1")'
 done
-"$CASCADE_ENV/bin/python" -c 'import detectron2, detectron2._C; print(detectron2.__version__); assert detectron2.__version__ == "0.6"'
+"$CASCADE_ENV/bin/python" -c 'import detectron2, detectron2._C; from detectron2 import model_zoo; print(detectron2.__version__); assert detectron2.__version__ == "0.6"'
 "$YOLO_ENV/bin/python" -c 'import ultralytics; print(ultralytics.__version__); assert ultralytics.__version__ == "8.3.161"'
 ```
 
