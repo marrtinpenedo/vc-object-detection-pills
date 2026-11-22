@@ -145,7 +145,7 @@ class ConfigurationTest(unittest.TestCase):
 
 @unittest.skipUnless(find_spec("detectron2"), "requires the Cascade environment")
 class CascadeInitializationTest(unittest.TestCase):
-    def test_training_forward_has_event_storage(self):
+    def test_initialization_has_event_storage_and_disables_determinism(self):
         import numpy as np
         import torch
         from detectron2.utils.events import get_event_storage
@@ -176,15 +176,19 @@ class CascadeInitializationTest(unittest.TestCase):
                 initialize=True, resume=False, pause_after=None,
             )
             manifest = {"classes": [1], "splits": {"train": {"images": 1}}}
-            with patch.object(torch, "use_deterministic_algorithms"), patch.multiple(
-                baseline_cascade,
-                seed_all_rng=DEFAULT,
-                register_training_data=DEFAULT,
-                CascadeTrainer=Mock(return_value=trainer),
-                CheckedWeights=DEFAULT,
-                make_predictor=Mock(return_value=lambda image: np.empty((0, 6))),
+            with (
+                patch.object(torch, "use_deterministic_algorithms") as set_determinism,
+                patch.multiple(
+                    baseline_cascade,
+                    seed_all_rng=DEFAULT,
+                    register_training_data=DEFAULT,
+                    CascadeTrainer=Mock(return_value=trainer),
+                    CheckedWeights=DEFAULT,
+                    make_predictor=Mock(return_value=lambda image: np.empty((0, 6))),
+                ),
             ):
                 baseline_cascade.train(args, load_config("cascade", None, {}), manifest)
+            set_determinism.assert_called_once_with(False)
             trainer.train.assert_not_called()
             report = baseline_cascade.read_json(output / "initialization.json")
             self.assertEqual(report["gradients"], {

@@ -273,7 +273,7 @@ def predictor(spec, manifest, weights, output):
 def train(args, spec, manifest):
     setup_logger(name="detectron2")
     seed_all_rng(spec["seed"])
-    torch.use_deterministic_algorithms(True, warn_only=True)
+    torch.use_deterministic_algorithms(False)
     cfg, iterations, official_url = configure(
         spec, len(manifest["classes"]), manifest["splits"]["train"]["images"], args.weights, args.output,
     )
