@@ -95,14 +95,18 @@ nvcc --version
 
 Los dos entornos ya están instalados con Python 3.11. Para reutilizarlos, carga los módulos y llama directamente a `"$CASCADE_ENV/bin/python"` o `"$YOLO_ENV/bin/python"`. Ve al bloque de comprobación de versiones de esta sección. Usa los comandos de creación cuando los prefijos estén libres.
 
-Desde la raíz del repositorio, crea los entornos con Conda e instala paquetes Python con pip. El fichero de restricciones fija las versiones confirmadas. El sufijo `+cu121` selecciona los wheels CUDA 12.1 y la restricción se aplica también a las instalaciones posteriores. [Restricciones del baseline](../configs/baseline/constraints.txt) · [Wheels de PyTorch 2.5.1](https://pytorch.org/get-started/previous-versions/#v251)
+Para reconstruirlos, ejecuta los bloques siguientes en el nodo CPU, desde la raíz del repositorio, con los módulos cargados y las variables de [acceso y almacenamiento](#acceso-y-almacenamiento) definidas. Crea los entornos y prepara los compiladores de Cascade con Conda. Con pip, instala primero PyTorch y torchvision desde el índice `cu121`. El fichero de restricciones mantiene esas versiones al instalar los demás paquetes. [Restricciones del baseline](../configs/baseline/constraints.txt) · [Wheels de PyTorch 2.5.1](https://pytorch.org/get-started/previous-versions/#v251)
 
 ```bash
 conda create --yes --prefix "$CASCADE_ENV" python=3.11 pip
 conda create --yes --prefix "$YOLO_ENV" python=3.11 pip
 
-conda install --yes --prefix "$CASCADE_ENV" -c conda-forge \
-  'gcc_linux-64=11' 'gxx_linux-64=11' 'sysroot_linux-64=2.17'
+conda install -y \
+  --prefix "$BASELINE_WORK/envs/cascade" \
+  --override-channels -c conda-forge \
+  "gcc_linux-64=11" \
+  "gxx_linux-64=11" \
+  "sysroot_linux-64=2.17"
 
 for env_path in "$CASCADE_ENV" "$YOLO_ENV"; do
   "$env_path/bin/python" -m pip install -c configs/baseline/constraints.txt \
@@ -113,29 +117,34 @@ for env_path in "$CASCADE_ENV" "$YOLO_ENV"; do
 done
 
 "$CASCADE_ENV/bin/python" -m pip install -c configs/baseline/constraints.txt \
-  fvcore ninja setuptools wheel
+  fvcore ninja setuptools wheel \
+  'termcolor>=1.1' 'yacs>=0.1.8' tabulate cloudpickle 'tqdm>4.29.0' tensorboard \
+  'iopath>=0.1.7,<0.1.10' 'omegaconf>=2.1,<2.4' 'hydra-core>=1.1' black packaging
 "$YOLO_ENV/bin/python" -m pip install -c configs/baseline/constraints.txt \
   'ultralytics==8.3.161'
 ```
 
 ### Compilación de Detectron2
 
-Detectron2 0.6 quedó instalado desde el commit `fd27788985af0f4ca800bca563acdb700bb890e2`, con PyTorch 2.5.1+cu121, el toolkit CUDA 12.1.1 y código para `sm_80` (A100). GCC/G++ 11 y el sysroot 2.17 de Conda proporcionan la compatibilidad necesaria con el sistema. Activa el prefijo de Cascade en un subshell para aplicar también los ajustes de los paquetes de compilación. [Commit de Detectron2](https://github.com/facebookresearch/detectron2/commit/fd27788985af0f4ca800bca563acdb700bb890e2)
+Detectron2 0.6 quedó instalado desde el commit `fd27788985af0f4ca800bca563acdb700bb890e2`, con PyTorch 2.5.1+cu121, el toolkit CUDA 12.1.1 y código para `sm_80` (A100). GCC/G++ 11 y el sysroot 2.17 de Conda proporcionan la compatibilidad necesaria con el sistema. Instala primero las dependencias del bloque anterior. Después activa Cascade en un subshell y compila con su intérprete y sus compiladores. `--no-deps` y `--no-build-isolation` mantienen la compilación en el entorno preparado. [Dependencias del commit fijado](https://github.com/facebookresearch/detectron2/blob/fd27788985af0f4ca800bca563acdb700bb890e2/setup.py#L146-L180)
 
 ```bash
 (
   set -e
   eval "$(conda shell.bash hook)"
-  conda activate "$CASCADE_ENV"
+  conda activate "$BASELINE_WORK/envs/cascade"
   export CC="$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc"
   export CXX="$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++"
   export CUDAHOSTCXX="$CXX"
-  export FORCE_CUDA=1 TORCH_CUDA_ARCH_LIST="8.0" MAX_JOBS=4
+  export FORCE_CUDA=1
+  export TORCH_CUDA_ARCH_LIST="8.0"
+  export MAX_JOBS=4
   "$CC" --version
   "$CXX" --version
-  "$CASCADE_ENV/bin/python" -m pip install --no-build-isolation \
-    -c configs/baseline/constraints.txt \
-    'detectron2 @ git+https://github.com/facebookresearch/detectron2.git@fd27788985af0f4ca800bca563acdb700bb890e2'
+  python -m pip install \
+    --force-reinstall --no-cache-dir \
+    --no-build-isolation --no-deps \
+    "detectron2 @ git+https://github.com/facebookresearch/detectron2.git@fd27788985af0f4ca800bca563acdb700bb890e2"
 )
 ```
 
@@ -207,7 +216,7 @@ fi
 
 ## GPU y comprobación CUDA
 
-La asignación comprobada fue una NVIDIA A100 PCIe de 40 GB, 32 CPU, 64 GB de memoria y partición `short`. La petición de una A100 con 4 CPU fue rechazada. La de 32 CPU fue aceptada.
+La asignación comprobada en la partición `short` fue una NVIDIA A100 PCIe de 40 GB, con 32 CPU y 64 GB de RAM. Los módulos se cargaron dentro del trabajo SLURM.
 
 ```bash
 srun --partition=short --gres=gpu:a100:1 \
@@ -242,7 +251,7 @@ PY
 
 ## Envío y recuperación de trabajos
 
-Desde la raíz del repositorio, crea el directorio de logs **antes** de enviar. Las opciones de Bash `SLURM_LOGS` se usan en el [protocolo de verificación](../experiments/baseline/README.md#protocolo-de-verificación). Si omites esas opciones, los scripts escriben los logs en el directorio de envío, que ya existe.
+Guarda los logs persistentes en `$BASELINE_WORK/results/slurm/`. Desde la raíz del repositorio, crea el directorio **antes** de enviar y define las opciones de Bash `SLURM_LOGS` que usa el [protocolo de verificación](../experiments/baseline/README.md#protocolo-de-verificación). Si omites esas opciones, los scripts escriben los logs en el directorio de envío.
 
 ```bash
 mkdir -p "$BASELINE_RESULTS/slurm"

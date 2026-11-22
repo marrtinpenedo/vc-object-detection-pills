@@ -23,6 +23,12 @@ runs/
 wandb/
 lightning_logs/
 
+# Logs SLURM del baseline en la raíz
+/pills-cascade-[0-9]*.out
+/pills-cascade-[0-9]*.err
+/pills-yolo-[0-9]*.out
+/pills-yolo-[0-9]*.err
+
 # Pesos, checkpoints y registros
 *.pt
 *.pth
