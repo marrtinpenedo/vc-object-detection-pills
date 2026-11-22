@@ -2,10 +2,11 @@
 
 ## Acceso y almacenamiento
 
-Conecta con el acceso SSH autorizado de la cuenta.
+Define `CESGA_SSH` en la terminal local. Sustituye `USUARIO_CESGA` por tu usuario autorizado o usa un alias de `~/.ssh/config` con `User` y `HostName` configurados.
 
 ```bash
-ssh ft3.cesga.es
+export CESGA_SSH='USUARIO_CESGA@ft3.cesga.es'
+ssh "$CESGA_SSH"
 ```
 
 Usa el nodo de login para transferir archivos, actualizar el repositorio y enviar o consultar trabajos. Solicita un nodo CPU mediante `srun` para instalar o compilar y un nodo GPU para las comprobaciones CUDA, la inferencia y el entrenamiento.
@@ -21,11 +22,10 @@ Si ya hay un checkout en CESGA, usa su ubicación. Para transferir una primera c
   set -e
   stage=$(mktemp -d)
   trap 'rm -rf -- "$stage"' EXIT
-  git clone --no-local --single-branch --branch feat/baseline-training \
-    "$PWD" "$stage/vc-object-detection-pills"
-  git -C "$stage/vc-object-detection-pills" remote set-url origin "$(git remote get-url origin)"
-  ssh ft3.cesga.es 'test ! -e "$HOME/vc-object-detection-pills"'
-  rsync -a "$stage/vc-object-detection-pills/" ft3.cesga.es:vc-object-detection-pills/
+  git clone --no-local --single-branch --branch feat/baseline-training "$PWD" "$stage"
+  git -C "$stage" remote set-url origin "$(git remote get-url origin)"
+  ssh "$CESGA_SSH" 'test ! -e "$HOME/vc-object-detection-pills"'
+  rsync -a -e ssh "$stage/" "$CESGA_SSH:vc-object-detection-pills/"
 )
 ```
 
@@ -62,7 +62,7 @@ export BASELINE_RESULTS="$BASELINE_WORK/results"
 export CASCADE_WEIGHTS="$BASELINE_WORK/checkpoints/model_final_480dd8.pkl"
 export YOLO_WEIGHTS="$BASELINE_WORK/checkpoints/yolov10s.pt"
 export PIP_CACHE_DIR="$BASELINE_WORK/cache/pip"
-export CONDA_PKGS_DIRS="$BASELINE_WORK/cache/conda"
+export CONDA_PKGS_DIRS="$BASELINE_WORK/cache/conda-pkgs"
 export YOLO_CONFIG_DIR="$BASELINE_WORK/cache/ultralytics"
 mkdir -p "$BASELINE_WORK"/{envs,data,checkpoints,results} \
   "$PIP_CACHE_DIR" "$CONDA_PKGS_DIRS" "$YOLO_CONFIG_DIR"
@@ -153,7 +153,24 @@ done
 
 ## Datos y pesos pendientes
 
-El dataset asignado es [Francesco/pills-sxdht](https://huggingface.co/datasets/Francesco/pills-sxdht). Comprueba primero qué hay en `$BASELINE_WORK/data`. La presencia del dataset preparado en CESGA está pendiente de confirmación. Si faltan los originales, sigue la [descarga de la revisión fijada](../README.md#datos-y-modelos) o transfiere esa misma revisión. Coloca la copia original en `$BASELINE_WORK/data/pills-sxdht` y usa la [preparación de la fase A](../experiments/baseline/README.md#protocolo-previo-al-commit) para generar `$BASELINE_DATA`. Se mantiene el [mapeo de ocho clases activas](../experiments/baseline/README.md#h-dataset-mapeo-e-integridad). El ID 0 `pills` carece de instancias.
+El dataset asignado es [Francesco/pills-sxdht](https://huggingface.co/datasets/Francesco/pills-sxdht). Comprueba primero qué hay en `$BASELINE_WORK/data`. La presencia del dataset preparado en CESGA está pendiente de confirmación. Si faltan los originales, sigue la [descarga de la revisión fijada](../README.md#datos-y-modelos). El descargador escribe en `data/pills-sxdht/` dentro del repositorio.
+
+Si descargaste el dataset en CESGA, copia los originales desde la raíz del repositorio a `$STORE/pills-baseline/data/pills-sxdht`.
+
+```bash
+mkdir -p "$BASELINE_WORK/data/pills-sxdht" &&
+  rsync -a data/pills-sxdht/ "$BASELINE_WORK/data/pills-sxdht/"
+```
+
+Si lo descargaste en tu equipo, ejecuta este bloque desde la raíz del repositorio local con `CESGA_SSH` ya definido.
+
+```bash
+remote_data=$(ssh "$CESGA_SSH" 'mkdir -p "$STORE/pills-baseline/data/pills-sxdht" &&
+  printf "%s\n" "$STORE/pills-baseline/data/pills-sxdht"') &&
+  rsync -a -e ssh data/pills-sxdht/ "$CESGA_SSH:$remote_data/"
+```
+
+Usa la [preparación de la fase A](../experiments/baseline/README.md#protocolo-de-verificación) para generar `$BASELINE_DATA`. Se mantiene el [mapeo de ocho clases activas](../experiments/baseline/README.md#h-dataset-mapeo-e-integridad). El ID 0 `pills` carece de instancias.
 
 Los frameworks están instalados. Quedan pendientes la descarga de los pesos preentrenados, su carga y la ejecución completa de los detectores.
 
@@ -225,7 +242,7 @@ PY
 
 ## Envío y recuperación de trabajos
 
-Desde la raíz del repositorio, crea el directorio de logs **antes** de enviar. Las opciones de Bash `SLURM_LOGS` se usan en el [protocolo del baseline](../experiments/baseline/README.md#protocolo-previo-al-commit). Si omites esas opciones, los scripts escriben los logs en el directorio de envío, que ya existe.
+Desde la raíz del repositorio, crea el directorio de logs **antes** de enviar. Las opciones de Bash `SLURM_LOGS` se usan en el [protocolo de verificación](../experiments/baseline/README.md#protocolo-de-verificación). Si omites esas opciones, los scripts escriben los logs en el directorio de envío, que ya existe.
 
 ```bash
 mkdir -p "$BASELINE_RESULTS/slurm"
@@ -250,13 +267,13 @@ sacct -j ID_DEL_TRABAJO --format=JobID,JobName,State,ExitCode,Elapsed,MaxRSS,All
 
 Cada `--output` contiene `status.json`, el historial y los artefactos de la ejecución. Cascade usa `last_checkpoint` para localizar el último peso y conserva `best/model_best.pth`. YOLO escribe `weights/last.pt` y `weights/best.pt`. `status.json` recoge las rutas relativas cuando se registra el cierre de la sesión.
 
-Para interrumpir un entrenamiento, espera a que exista un checkpoint si quieres recuperar el progreso y usa `scancel ID_DEL_TRABAJO`. Cuando termine, vuelve a enviar el mismo comando con `--resume` y las mismas rutas de datos, pesos y salida, así como la misma configuración y presupuesto. Para una pausa prevista, usa `--pause-after EPOCH` al iniciar, con una época anterior al final, y retira esa opción al reanudar. Consulta el [smoke test y los comandos de evaluación](../experiments/baseline/README.md#protocolo-previo-al-commit).
+Para interrumpir un entrenamiento, espera a que exista un checkpoint si quieres recuperar el progreso y usa `scancel ID_DEL_TRABAJO`. Cuando termine, vuelve a enviar el mismo comando con `--resume` y las mismas rutas de datos, pesos y salida, así como la misma configuración y presupuesto. Para una pausa prevista, usa `--pause-after EPOCH` al iniciar, con una época anterior al final, y retira esa opción al reanudar. Consulta el [smoke test y los comandos de evaluación](../experiments/baseline/README.md#protocolo-de-verificación).
 
-Desde el equipo local puedes recuperar los resultados por SSH. Ajusta la ruta remota si el checkout o las salidas están en otra ubicación.
+Recupera los resultados desde tu equipo con `CESGA_SSH` ya definido. Ajusta la ruta remota si las salidas están en otra ubicación.
 
 ```bash
-remote_results=$(ssh ft3.cesga.es 'printf "%s\n" "$STORE/pills-baseline/results"')
-mkdir -p results/cesga
-rsync -av --exclude='*.pt' --exclude='*.pth' \
-  "ft3.cesga.es:$remote_results/" results/cesga/
+remote_results=$(ssh "$CESGA_SSH" 'printf "%s\n" "$STORE/pills-baseline/results"') &&
+  mkdir -p results/cesga &&
+  rsync -av -e ssh --exclude='*.pt' --exclude='*.pth' \
+    "$CESGA_SSH:$remote_results/" results/cesga/
 ```

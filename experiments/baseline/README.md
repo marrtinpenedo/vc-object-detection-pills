@@ -13,7 +13,7 @@ El baseline es la primera referencia con una receta explícita por detector. Com
 | Cascade R-CNN, ResNet-50 + FPN | Detectron2 usa `Misc/cascade_mask_rcnn_R_50_FPN_3x.yaml` para definir la arquitectura. Ese YAML declara pesos de ImageNet. Se comprueba la URL de `model_zoo.get_checkpoint_url` y se carga explícitamente su copia local COCO `model_final_480dd8.pkl`. `MASK_ON=False` omite la rama de máscaras. Se conservan las tres etapas de cajas, el RPN y la regresión agnóstica a clase. Las tres capas `cls_score` pasan de 81 a 9 salidas (ocho clases y fondo). Sus pesos y sesgos son las seis incompatibilidades esperadas. Las claves sobrantes de la rama de máscaras son esperadas. Cualquier otra incompatibilidad de carga es un error. |
 | YOLOv10-S | Ultralytics usa el archivo oficial `yolov10s.pt`. Se exige una cabeza `v10Detect` end-to-end de 80 clases en la inicialización. El YAML incluido en el checkpoint reconstruye ambas ramas de predicción con ocho clases. Se comprueba la transferencia de todos los tensores compatibles y se registran los que se reinicializan en las ramas de clasificación `cv3` y `one2one_cv3`. La anchura de sus subredes puede depender del número de clases. Una incompatibilidad fuera de esas ramas es un error. |
 
-Los binarios de pesos se cargan mediante los deserializadores nativos de cada proyecto. Usad archivos de las fuentes oficiales y checkpoints propios. El SHA-256 de cada peso usado queda registrado. [Zoo de Detectron2](https://github.com/facebookresearch/detectron2/blob/main/MODEL_ZOO.md) · [YAML asignado](https://github.com/facebookresearch/detectron2/blob/main/configs/Misc/cascade_mask_rcnn_R_50_FPN_3x.yaml) · [YOLOv10 y pesos oficiales](https://docs.ultralytics.com/models/yolov10/) · [Cabezas de Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/nn/modules/head.py)
+Los binarios de pesos se cargan mediante los deserializadores nativos de cada proyecto. Usa archivos de las fuentes oficiales y checkpoints propios. El SHA-256 de cada peso usado queda registrado. [Zoo de Detectron2](https://github.com/facebookresearch/detectron2/blob/main/MODEL_ZOO.md) · [YAML asignado](https://github.com/facebookresearch/detectron2/blob/main/configs/Misc/cascade_mask_rcnn_R_50_FPN_3x.yaml) · [YOLOv10 y pesos oficiales](https://docs.ultralytics.com/models/yolov10/) · [Cabezas de Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/nn/modules/head.py)
 
 ## C. Fine-tuning completo
 
@@ -74,7 +74,7 @@ Los adaptadores convierten las cajas a COCO `[x, y, ancho, alto]` en píxeles de
 - Las **curvas PR** conservan la precisión interpolada por clase y umbral de IoU. En el punto operativo ilustrativo fijado a score 0,25 e IoU 0,50, se reportan precision y recall micro, TP, FP y FN con el emparejamiento COCO por clase. Las visualizaciones acotadas usan ese mismo punto. No se eligen umbrales con test.
 - **AP por tamaño** usa los rangos absolutos en px² de COCO con cortes `32²` y `96²`. El EDA usa cocientes caja/imagen con cortes de 1 % y 10 %. Conviene leer ambas medidas con sus respectivas definiciones.
 - Las **curvas de entrenamiento** muestran pérdidas y AP de validación. Las pérdidas son interpretables dentro de cada detector y provienen de objetivos, asignaciones y escalas diferentes.
-- Para **latencia** se mide el mismo conjunto ordenado de hasta 16 imágenes ya decodificadas, en una sola A100, batch 1, 640 nominal, FP32, un hilo host, 20 warm-ups y 100 iteraciones por defecto. El intervalo, sincronizado con CUDA antes y después, incluye preprocesado desde BGR en RAM, transferencia, forward, posprocesado nativo y retorno del array Nx6 a RAM. La decodificación, exportación COCO, scoring y figuras quedan fuera del intervalo. Se guardan los tiempos, media, mediana, p95, FPS como 1000/media_ms, versión CUDA, driver, GPU y memoria de PyTorch asignada y reservada. Para comparar, ejecutad ambos en el mismo nodo y con la misma asignación y carga. La memoria medida representa el allocator de PyTorch.
+- Para **latencia** se mide el mismo conjunto ordenado de hasta 16 imágenes ya decodificadas, en una sola A100, batch 1, 640 nominal, FP32, un hilo host, 20 warm-ups y 100 iteraciones por defecto. El intervalo, sincronizado con CUDA antes y después, incluye preprocesado desde BGR en RAM, transferencia, forward, posprocesado nativo y retorno del array Nx6 a RAM. La decodificación, exportación COCO, scoring y figuras quedan fuera del intervalo. Se guardan los tiempos, media, mediana, p95, FPS como 1000/media_ms, versión CUDA, driver, GPU y memoria de PyTorch asignada y reservada. Para comparar, ejecuta ambos en el mismo nodo y con la misma asignación y carga. La memoria medida representa el allocator de PyTorch.
 
 [Implementación de COCOeval](https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/cocoeval.py) · [Posprocesado end-to-end en Ultralytics](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/utils/ops.py)
 
@@ -97,13 +97,13 @@ El EDA y los JSON COCO de la revisión fijada confirman 451 imágenes y 496 inst
 
 La preparación reutiliza la auditoría del descargador. Comprueba IDs, referencias, dimensiones, JPEG, cajas, duplicados a precisión YOLO y recuentos, y falla detalladamente ante una discrepancia. El derivado contiene copias íntegras de JPEG, un COCO con las ocho categorías y TXT YOLO normalizados. Las anotaciones del COCO derivado se numeran desde 1 porque COCOeval emplea el 0 como centinela de emparejamiento. Se conservan los IDs de imagen y categoría, el área y las coordenadas originales. `manifest.json` contiene recuentos y huellas SHA-256. Repetir la preparación comprueba la equivalencia del derivado existente.
 
-Con una sola anotación en train y otra en validación, Ibuphil 600 mg tiene soporte muy escaso; en test su AP será indefinido. Solo 23 imágenes tienen varias cajas (19/3/1). La mediana de luminancia media fue 136,32 en train frente a 128,27 y 128,80 en validación y test. Es una comparación descriptiva. dHash señaló seis pares candidatos a similitud perceptual, tres entre splits, con cero grupos idénticos por bytes o píxeles. Revisad visualmente esos tres pares antes de interpretar como definitiva la evaluación. Las métricas por clase, tamaño y subconjunto deben leerse junto a sus recuentos. [EDA del repositorio](../../notebooks/01_eda.ipynb)
+Con una sola anotación en train y otra en validación, Ibuphil 600 mg tiene soporte muy escaso; en test su AP será indefinido. Solo 23 imágenes tienen varias cajas (19/3/1). La mediana de luminancia media fue 136,32 en train frente a 128,27 y 128,80 en validación y test. Es una comparación descriptiva. dHash señaló seis pares candidatos a similitud perceptual, tres entre splits, con cero grupos idénticos por bytes o píxeles. Revisa visualmente esos tres pares antes de interpretar como definitiva la evaluación. Las métricas por clase, tamaño y subconjunto deben leerse junto a sus recuentos. [EDA del repositorio](../../notebooks/01_eda.ipynb)
 
 ## I. Protocolo experimental en FinisTerrae III
 
 La [guía de CESGA](../../docs/cesga.md) documenta los entornos Conda con CUDA 12.1, las rutas persistentes, los pesos y el envío de trabajos. Define allí las variables de rutas y las opciones `SLURM_LOGS` antes de ejecutar este protocolo.
 
-### Protocolo previo al commit
+### Protocolo de verificación
 
 **Fase A. Sintaxis, entornos y datos.** Localiza los originales de la revisión fijada según la [guía de datos de CESGA](../../docs/cesga.md#datos-y-pesos-pendientes). En un nodo CPU, con los módulos cargados y desde la raíz del repositorio, ejecuta lo siguiente.
 
@@ -120,7 +120,7 @@ bash -n slurm/cascade.sh && bash -n slurm/yolo.sh
 ```
 
 - [ ] Importan las extensiones en sus respectivos entornos y los tests pasan. Los sintéticos comprueban cajas límite, IDs inválidos, mapeo e inversa, AP perfecto, AP cero, GT ausente y detecciones vacías.
-- [ ] Las dos preparaciones informan de 316/90/45 imágenes y 351/98/47 instancias. Inspectad `manifest.json` y el YAML portable. Las imágenes se copian byte a byte y los splits y los originales se conservan. Usad rutas exportadas de vuestra cuenta.
+- [ ] Las dos preparaciones informan de 316/90/45 imágenes y 351/98/47 instancias. Inspecciona `manifest.json` y el YAML portable. Las imágenes se copian byte a byte y los splits y los originales se conservan. Usa las rutas exportadas de tu cuenta.
 
 **Fase B. Inicialización en GPU.** Las dos sondas leen un lote real, hacen inferencia y retropropagación, y registran los gradientes sin ejecutar un paso de optimizador.
 
@@ -135,10 +135,10 @@ squeue --me
 ```
 
 - [ ] SLURM informa `COMPLETED` y `0:0`. `run.json` identifica la GPU, CUDA, configuración, código y hash de los pesos.
-- [ ] Ambos `initialization.json` informan ocho clases, pérdidas finitas e inferencia completada. Revisad `weight_transfer.json` y el log. En Cascade solo clasificadores y rama de máscaras. En YOLO solo incompatibilidades de clasificación de las dos ramas.
+- [ ] Ambos `initialization.json` informan ocho clases, pérdidas finitas e inferencia completada. Revisa `weight_transfer.json` y el log. En Cascade solo clasificadores y rama de máscaras. En YOLO solo incompatibilidades de clasificación de las dos ramas.
 - [ ] Los gradientes alcanzan backbone, RPN y cabezas de Cascade, y backbone y ambos clasificadores de YOLO. `parameters.json` refleja que DFL y buffers FrozenBN siguen la política de cada arquitectura.
 
-**Fase C. Smoke test y reanudación.** Pedid dos épocas y una pausa controlada después del primer checkpoint. Cada pareja de comandos usa un directorio exclusivo y el mismo presupuesto. Lanzad las reanudaciones al terminar las pausas.
+**Fase C. Smoke test y reanudación.** Pide dos épocas y una pausa controlada después del primer checkpoint. Cada pareja de comandos usa un directorio exclusivo y el mismo presupuesto. Lanza las reanudaciones al terminar las pausas.
 
 ```bash
 sbatch "${SLURM_LOGS[@]}" --time=02:00:00 slurm/cascade.sh --data "$BASELINE_DATA" --weights "$CASCADE_WEIGHTS" \
@@ -155,8 +155,8 @@ sbatch "${SLURM_LOGS[@]}" --time=02:00:00 slurm/yolo.sh --data "$BASELINE_DATA" 
 
 Consulta el estado y el consumo de cada trabajo con [los comandos de SLURM](../../docs/cesga.md#envío-y-recuperación-de-trabajos). Si cambias de sesión, recupera el valor de `VERIFY_ROOT` antes de reanudar.
 
-- [ ] Después de la pausa, `status.json` dice `paused` y existen best y last con una validación. Tras reanudar dice `complete` y el historial contiene las dos validaciones con pasos crecientes. Revisad logs, cargas de dataloader, LR, pérdidas finitas y presencia de estados del optimizador. Un fallo real del proceso debe dar código distinto de cero.
-- [ ] El modelo se actualiza. `parameter_updates.json` comprueba que cambian un tensor del backbone y uno de clasificación después de la primera época de cada sesión. Revisad los pasos y pérdidas de ambas épocas. El warm-up de YOLO abarca todo este smoke test.
+- [ ] Después de la pausa, `status.json` dice `paused` y existen best y last con una validación. Tras reanudar dice `complete` y el historial contiene las dos validaciones con pasos crecientes. Revisa logs, cargas de dataloader, LR, pérdidas finitas y presencia de estados del optimizador. Un fallo real del proceso debe dar código distinto de cero.
+- [ ] El modelo se actualiza. `parameter_updates.json` comprueba que cambian un tensor del backbone y uno de clasificación después de la primera época de cada sesión. Revisa los pasos y pérdidas de ambas épocas. El warm-up de YOLO abarca todo este smoke test.
 
 **Fase D. Métricas, procedencia y artefactos.** Tras la fase C, ejecuta ambas evaluaciones en **la misma** sesión GPU interactiva. Carga los módulos dentro del nodo, recupera `VERIFY_ROOT` si has cambiado de terminal y sitúate en la raíz del repositorio. [Sesión GPU](../../docs/cesga.md#gpu-y-comprobación-cuda)
 
@@ -173,7 +173,7 @@ Consulta el estado y el consumo de cada trabajo con [los comandos de SLURM](../.
 ```
 
 - [ ] El verificador reproduce las métricas desde predicciones, comprueba el mismo COCO, IDs, rango de coordenadas, soportes, checkpoint, AP definido o nulo y condiciones de latencia.
-- [ ] Abrid `training.png`, `pr_curves.png` y los JPEG de ejemplos. Comprobad su legibilidad y que cajas TP, FP y FN se dibujan en la escala original. Las cantidades TP/FP/FN y las curvas corresponden a sus umbrales declarados.
+- [ ] Abre `training.png`, `pr_curves.png` y los JPEG de ejemplos. Comprueba su legibilidad y que cajas TP, FP y FN se dibujan en la escala original. Las cantidades TP/FP/FN y las curvas corresponden a sus umbrales declarados.
 - [ ] La inicialización, pausa, reanudación y evaluación han sido ejecutadas en CESGA y revisadas antes de aceptar los cambios. El smoke test solo valida el circuito.
 
 ### Entrenamiento definitivo, evaluación y recuperación
@@ -190,9 +190,9 @@ sbatch "${SLURM_LOGS[@]}" slurm/yolo.sh --data "$BASELINE_DATA" --weights "$YOLO
 squeue --me
 ```
 
-Sigue el [procedimiento de reanudación](../../docs/cesga.md#envío-y-recuperación-de-trabajos) con el último checkpoint disponible. Cascade usa `last_checkpoint` y recupera optimizador, scheduler, iteración y el estado del hook del mejor AP. YOLO recupera su formato nativo `weights/last.pt`, que guarda EMA, época y optimizador y reconstruye la agenda. El final automático de Ultralytics que despoja al checkpoint del optimizador se sustituye por la evaluación común separada. La reanudación desde un checkpoint no restaura todos los estados RNG, del sampler o las copias FP32 de YOLO que el formato nativo no guarda. No se espera equivalencia bit a bit. `status.json` acumula tiempos de sesiones que alcanzaron el cierre; tras una terminación abrupta, consultad también `sacct` para contabilizar esa sesión. La recuperación empieza en el último límite completo de checkpoint.
+Sigue el [procedimiento de reanudación](../../docs/cesga.md#envío-y-recuperación-de-trabajos) con el último checkpoint disponible. Cascade usa `last_checkpoint` y recupera optimizador, scheduler, iteración y el estado del hook del mejor AP. YOLO recupera su formato nativo `weights/last.pt`, que guarda EMA, época y optimizador y reconstruye la agenda. El final automático de Ultralytics que despoja al checkpoint del optimizador se sustituye por la evaluación común separada. La reanudación desde un checkpoint no restaura todos los estados RNG, del sampler o las copias FP32 de YOLO que el formato nativo no guarda. No se espera equivalencia bit a bit. `status.json` acumula tiempos de sesiones que alcanzaron el cierre; tras una terminación abrupta, consulta también `sacct` para contabilizar esa sesión. La recuperación empieza en el último límite completo de checkpoint.
 
-En una asignación A100 como la de la fase D, ejecutad lo siguiente para evaluar validación. Repetidlo con `EVALUATION_SPLIT=test` exclusivamente cuando el protocolo y los modelos estén cerrados. Los checkpoints se seleccionan en validación en ambos casos.
+En una asignación A100 como la de la fase D, ejecuta lo siguiente para evaluar validación. Repítelo con `EVALUATION_SPLIT=test` exclusivamente cuando el protocolo y los modelos estén cerrados. Los checkpoints se seleccionan en validación en ambos casos.
 
 ```bash
 EVALUATION_SPLIT=valid
@@ -204,7 +204,7 @@ EVALUATION_SPLIT=valid
   --output "$RUN_ROOT/eval-yolo-$EVALUATION_SPLIT" --benchmark --warmup 20 --iterations 100
 ```
 
-En cada run, `run.json` registra procedencia y configuración declarada, los archivos del framework conservan valores efectivos y `status.json` indica el mejor paso, duración, memoria y rutas relativas de best/last. Cascade escribe su `metrics.json` nativo en JSON Lines y YOLO su `results.csv`. Para análisis conjunto se guardan `history.csv` y `training.png`. La evaluación produce `metrics.json`, `predictions.json`, `pr_curves.json`, `pr_curves.png` y hasta cinco ejemplos por tipo. Consulta la [recuperación de resultados](../../docs/cesga.md#envío-y-recuperación-de-trabajos) para copiarlos al equipo local. En YOLO los checkpoints serializan EMA y estado en el formato nativo, lo que puede dar pequeñas diferencias entre AP observado en la selección y AP del archivo vuelto a cargar. Revisad en A–D si representan un problema. En CESGA están comprobados los entornos y las operaciones CUDA básicas. La carga de los pesos y la ejecución completa de las fases B–D quedan pendientes.
+En cada run, `run.json` registra procedencia y configuración declarada, los archivos del framework conservan valores efectivos y `status.json` indica el mejor paso, duración, memoria y rutas relativas de best/last. Cascade escribe su `metrics.json` nativo en JSON Lines y YOLO su `results.csv`. Para análisis conjunto se guardan `history.csv` y `training.png`. La evaluación produce `metrics.json`, `predictions.json`, `pr_curves.json`, `pr_curves.png` y hasta cinco ejemplos por tipo. Consulta la [recuperación de resultados](../../docs/cesga.md#envío-y-recuperación-de-trabajos) para copiarlos al equipo local. En YOLO los checkpoints serializan EMA y estado en el formato nativo, lo que puede dar pequeñas diferencias entre AP observado en la selección y AP del archivo vuelto a cargar. Revisa en A–D si representan un problema. En CESGA están comprobados los entornos y las operaciones CUDA básicas. La carga de los pesos y la ejecución completa de las fases B–D quedan pendientes.
 
 ## J. Hipótesis para futuros experimentos
 
