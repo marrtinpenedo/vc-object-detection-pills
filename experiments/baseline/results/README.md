@@ -12,14 +12,12 @@ Los checkpoints entrenados se conservan fuera del repositorio.
 
 ## Historial de YOLOv10-S
 
-Se conserva [la figura original](yolo/training/training.png) como registro de la ejecución. La [figura de lectura](yolo/training/training-readable.png) usa dos paneles logarítmicos de pérdidas. Un panel reúne `val/cls_loss` y `val/dfl_loss` para mostrar sus picos sin comprimir las demás curvas. La figura conserva todas las épocas y las curvas de AP de validación.
+La figura [`training.png`](yolo/training/training.png) se regeneró a partir del [`history.csv`](yolo/training/history.csv) original, sin alterar los datos. Se representan las pérdidas en escala logarítmica y el AP de validación. Se señala el pico de `val/cls_loss` de 50 317 300 en la época 2; la selección del checkpoint se basó en el mAP de validación.
 
-En la segunda época, `val/cls_loss` alcanzó 50 317 300. Este valor condiciona la lectura de la pérdida en escala lineal. La selección del checkpoint se basó en mAP de validación.
-
-Para regenerar la figura, ejecute desde la raíz del repositorio con Matplotlib disponible, por ejemplo en el entorno Cascade. Indique un PNG de salida nuevo.
+Para regenerarla desde la raíz del repositorio, con Matplotlib instalado, indique una ruta de salida nueva:
 
 ```bash
 python experiments/baseline/plot_yolo_history.py \
   --history experiments/baseline/results/yolo/training/history.csv \
-  --output /tmp/yolo-training-readable.png
+  --output /tmp/yolo-training.png
 ```
