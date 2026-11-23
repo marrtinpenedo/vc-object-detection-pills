@@ -1,44 +1,17 @@
-# Baseline en CESGA FinisTerrae III
+# Ejecución de los baselines en CESGA FinisTerrae III
 
 ## Acceso y almacenamiento
 
-Define `CESGA_SSH` en la terminal local. Sustituye `USUARIO_CESGA` por tu usuario autorizado o usa un alias de `~/.ssh/config` con `User` y `HostName` configurados.
+En el equipo local, defina `CESGA_SSH` con el usuario autorizado y el servidor o con un alias de SSH.
 
 ```bash
 export CESGA_SSH='USUARIO_CESGA@ft3.cesga.es'
 ssh "$CESGA_SSH"
 ```
 
-Usa el nodo de login para transferir archivos, actualizar el repositorio y enviar o consultar trabajos. Solicita un nodo CPU mediante `srun` para instalar o compilar y un nodo GPU para las comprobaciones CUDA, la inferencia y el entrenamiento.
+Utilice el nodo de login para transferencias, envío y consulta de trabajos. Reserve nodos de cómputo para compilar, entrenar y evaluar.
 
-- `$HOME` se conserva entre sesiones. Es adecuado para el checkout y la configuración personal.
-- `$STORE` se conserva entre sesiones. Aquí están los entornos y el espacio de trabajo del baseline.
-- `/scratch` es temporal. Para un trabajo, usa las rutas asignadas por SLURM, como `$LOCAL_SCRATCH` o `$TMPDIR`. Guarda los resultados que quieras conservar en `$STORE` antes de que termine el trabajo. [Almacenamiento de FT3](https://cesga-docs.gitlab.io/ft3-user-guide/storage.html) · [Scratch de FT3](https://cesga-docs.gitlab.io/ft3-user-guide/scratch_dirs.html)
-
-Si ya hay un checkout en CESGA, usa su ubicación. Para transferir una primera copia a `$HOME`, ejecuta esto en Bash desde el repositorio local. La copia temporal contiene el historial de la rama y los archivos versionados.
-
-```bash
-(
-  set -e
-  stage=$(mktemp -d)
-  trap 'rm -rf -- "$stage"' EXIT
-  git clone --no-local --single-branch --branch feat/baseline-training "$PWD" "$stage"
-  git -C "$stage" remote set-url origin "$(git remote get-url origin)"
-  ssh "$CESGA_SSH" 'test ! -e "$HOME/vc-object-detection-pills"'
-  rsync -a -e ssh "$stage/" "$CESGA_SSH:vc-object-detection-pills/"
-)
-```
-
-En CESGA, comprueba que el checkout esté limpio antes de actualizarlo.
-
-```bash
-cd "$HOME/vc-object-detection-pills"
-git status --short
-git switch feat/baseline-training
-git pull --ff-only origin feat/baseline-training
-```
-
-El directorio de trabajo de la cuenta es `$STORE/pills-baseline`. Sus subdirectorios se crearon para lo siguiente.
+`$HOME` y `$STORE` son persistentes. Conserve el código en `$HOME` y los datos, entornos, pesos y resultados en `$STORE/pills-baseline`. Reserve `$LOCAL_SCRATCH` y `$TMPDIR` para archivos temporales. [Almacenamiento permanente](https://cesga-docs.gitlab.io/ft3-user-guide/storage.html) · [Almacenamiento temporal](https://cesga-docs.gitlab.io/ft3-user-guide/scratch_dirs.html)
 
 ```text
 pills-baseline/
@@ -51,7 +24,7 @@ pills-baseline/
 └── cache/            # Cachés de Conda y pip, configuración y fuente de Ultralytics
 ```
 
-Define estas variables en la terminal Bash que vayas a usar.
+Defina las rutas siguientes en las sesiones Bash de CESGA desde las que vaya a preparar o ejecutar el protocolo.
 
 ```bash
 export BASELINE_WORK="$STORE/pills-baseline"
@@ -68,9 +41,31 @@ mkdir -p "$BASELINE_WORK"/{envs,data,checkpoints,results} \
   "$PIP_CACHE_DIR" "$CONDA_PKGS_DIRS" "$YOLO_CONFIG_DIR"
 ```
 
-## Sesión CPU y módulos
+## Transferencia y actualización del código
 
-Se utilizó esta asignación para preparar los entornos. Ejecuta `srun` desde la raíz del repositorio.
+Las ejecuciones de referencia utilizaron una copia transferida con `rsync` sin directorio `.git`. Desde la raíz del repositorio local, empaquete la revisión versionada de `feat/baseline-training` y transfiérala a `$HOME` en CESGA.
+
+```bash
+(
+  set -euo pipefail
+  commit=$(git rev-parse --verify feat/baseline-training)
+  remote_project="vc-object-detection-pills-${commit:0:12}"
+  stage=$(mktemp -d)
+  trap 'rm -rf -- "$stage"' EXIT
+  git archive "$commit" | tar -x -C "$stage"
+  ssh "$CESGA_SSH" "mkdir -- '$remote_project'"
+  rsync -a -e ssh "$stage/" "$CESGA_SSH:$remote_project/"
+  printf 'En CESGA, usa ~/%s\n' "$remote_project"
+)
+```
+
+En CESGA, sitúese en la carpeta indicada al finalizar la transferencia. Para actualizar el código, transfiera la nueva revisión a otra carpeta y mantenga las copias de los trabajos activos. En estas copias `git_head` puede quedar nulo. El registro de procedencia incluye los SHA-256 de los scripts Python y el nombre de la carpeta identifica la revisión del proyecto.
+
+## Entornos y dependencias
+
+La instalación de referencia utiliza dos entornos Conda con Python 3.11, PyTorch 2.5.1+cu121 y torchvision 0.20.1+cu121. Los comandos siguientes documentan su preparación. La instalación completa desde cero en otra cuenta queda por comprobar.
+
+Desde la raíz del proyecto en CESGA, solicite un nodo CPU para crear los entornos y compilar Detectron2.
 
 ```bash
 srun --partition=short \
@@ -80,7 +75,7 @@ srun --partition=short \
   --pty bash
 ```
 
-Una vez dentro del nodo asignado, carga los módulos. Repite este bloque en cada sesión interactiva, CPU o GPU. Comprueba también que las variables de rutas estén definidas en esa sesión.
+En la sesión de cómputo, cargue los módulos y compruebe que las variables de [almacenamiento](#acceso-y-almacenamiento) estén definidas. Utilice el mismo bloque de módulos para las sesiones GPU interactivas.
 
 ```bash
 module --force purge
@@ -91,11 +86,7 @@ module list
 nvcc --version
 ```
 
-## Reutilización y reinstalación de los entornos
-
-Los dos entornos ya están instalados con Python 3.11. Para reutilizarlos, carga los módulos y llama directamente a `"$CASCADE_ENV/bin/python"` o `"$YOLO_ENV/bin/python"`. Ve al bloque de comprobación de versiones de esta sección. Usa los comandos de creación cuando los prefijos estén libres.
-
-Para reconstruirlos, ejecuta los bloques siguientes en el nodo CPU, desde la raíz del repositorio, con los módulos cargados y las variables de [acceso y almacenamiento](#acceso-y-almacenamiento) definidas. Crea los entornos y prepara los compiladores de Cascade con Conda. Con pip, instala primero PyTorch y torchvision desde el índice `cu121`. El fichero de restricciones mantiene esas versiones al instalar los demás paquetes. [Restricciones del baseline](../configs/baseline/constraints.txt) · [Wheels de PyTorch 2.5.1](https://pytorch.org/get-started/previous-versions/#v251)
+Si los entornos existen en su cuenta, compruebe las versiones al final de esta sección y use sus intérpretes. Para crearlos, ejecute desde la raíz del proyecto los siguientes comandos. [Restricciones del baseline](../configs/baseline/constraints.txt) · [Wheels de PyTorch 2.5.1](https://pytorch.org/get-started/previous-versions/#v251)
 
 ```bash
 conda create --yes --prefix "$CASCADE_ENV" python=3.11 pip
@@ -126,9 +117,7 @@ done
 
 ### Compilación de Detectron2
 
-El `model_zoo` del commit fijado importa `pkg_resources`. Mantén `setuptools==80.9.0` en Cascade, la versión comprobada en CESGA que proporciona ese módulo.
-
-Detectron2 0.6 quedó instalado desde el commit `fd27788985af0f4ca800bca563acdb700bb890e2`, con PyTorch 2.5.1+cu121, el toolkit CUDA 12.1.1 y código para `sm_80` (A100). GCC/G++ 11 y el sysroot 2.17 de Conda proporcionan la compatibilidad necesaria con el sistema. Instala primero las dependencias del bloque anterior. Después activa Cascade en un subshell y compila con su intérprete y sus compiladores. `--no-deps` y `--no-build-isolation` mantienen la compilación en el entorno preparado. [Dependencias del commit fijado](https://github.com/facebookresearch/detectron2/blob/fd27788985af0f4ca800bca563acdb700bb890e2/setup.py#L146-L180)
+Compile Detectron2 0.6 en el entorno Cascade con GCC/G++ 11, sysroot 2.17, CUDA 12.1.1 y arquitectura `sm_80`. El pin de setuptools conserva `pkg_resources`, requerido por `model_zoo`. [Dependencias del commit fijado](https://github.com/facebookresearch/detectron2/blob/fd27788985af0f4ca800bca563acdb700bb890e2/setup.py#L146-L180)
 
 ```bash
 (
@@ -150,7 +139,7 @@ Detectron2 0.6 quedó instalado desde el commit `fd27788985af0f4ca800bca563acdb7
 )
 ```
 
-Comprueba la coherencia de dependencias y las versiones de ambos entornos. Estas comprobaciones de importación pueden hacerse en el nodo CPU con los módulos cargados.
+Compruebe las versiones y dependencias con los módulos cargados.
 
 ```bash
 for env_path in "$CASCADE_ENV" "$YOLO_ENV"; do
@@ -162,18 +151,18 @@ done
 "$YOLO_ENV/bin/python" -c 'import ultralytics; print(ultralytics.__version__); assert ultralytics.__version__ == "8.3.161"'
 ```
 
-## Datos y pesos pendientes
+## Datos y pesos
 
-El dataset asignado es [Francesco/pills-sxdht](https://huggingface.co/datasets/Francesco/pills-sxdht). Comprueba primero qué hay en `$BASELINE_WORK/data`. La presencia del dataset preparado en CESGA está pendiente de confirmación. Si faltan los originales, sigue la [descarga de la revisión fijada](../README.md#datos-y-modelos). El descargador escribe en `data/pills-sxdht/` dentro del repositorio.
+El descargador de la revisión fijada de [Francesco/pills-sxdht](https://huggingface.co/datasets/Francesco/pills-sxdht) escribe en `data/pills-sxdht/`. Siga las [instrucciones de descarga](../README.md#datos-y-modelos) y traslade los archivos originales al almacenamiento persistente.
 
-Si descargaste el dataset en CESGA, copia los originales desde la raíz del repositorio a `$STORE/pills-baseline/data/pills-sxdht`.
+Si realizó la descarga en CESGA, ejecute desde la raíz del proyecto en CESGA el siguiente bloque.
 
 ```bash
 mkdir -p "$BASELINE_WORK/data/pills-sxdht" &&
   rsync -a data/pills-sxdht/ "$BASELINE_WORK/data/pills-sxdht/"
 ```
 
-Si lo descargaste en tu equipo, ejecuta este bloque desde la raíz del repositorio local con `CESGA_SSH` ya definido.
+Si realizó la descarga en el equipo local, ejecute desde la raíz del repositorio local el siguiente bloque.
 
 ```bash
 remote_data=$(ssh "$CESGA_SSH" 'mkdir -p "$STORE/pills-baseline/data/pills-sxdht" &&
@@ -181,14 +170,13 @@ remote_data=$(ssh "$CESGA_SSH" 'mkdir -p "$STORE/pills-baseline/data/pills-sxdht
   rsync -a -e ssh data/pills-sxdht/ "$CESGA_SSH:$remote_data/"
 ```
 
-Usa la [preparación de la fase A](../experiments/baseline/README.md#protocolo-de-verificación) para generar `$BASELINE_DATA`. Se mantiene el [mapeo de ocho clases activas](../experiments/baseline/README.md#h-dataset-mapeo-e-integridad). El ID 0 `pills` carece de instancias.
+Prepare el dataset en el nodo CPU con el entorno Cascade disponible. El manifiesto resultante identifica los datos utilizados para el entrenamiento y la evaluación. [Particiones y categorías](../experiments/baseline/README.md#h-dataset-mapeo-e-integridad)
 
-Los frameworks están instalados. Quedan pendientes la descarga de los pesos preentrenados, su carga y la ejecución completa de los detectores.
+```bash
+"$CASCADE_ENV/bin/python" -m scripts.baseline_data --data "$BASELINE_WORK/data/pills-sxdht" --output "$BASELINE_DATA"
+```
 
-- **Cascade R-CNN** usa ResNet-50 + FPN, `Misc/cascade_mask_rcnn_R_50_FPN_3x.yaml`, `cfg.MODEL.MASK_ON=False` y los pesos COCO `model_final_480dd8.pkl` del zoo de Detectron2. [Zoo de Detectron2](https://github.com/facebookresearch/detectron2/blob/main/MODEL_ZOO.md)
-- **YOLOv10-S** usa Ultralytics y los pesos COCO `yolov10s.pt` del tamaño S. GitHub lista el archivo de la release `v8.4.0` del guion y publica el SHA-256 que se comprueba abajo. La referencia previa del baseline era `v8.3.0`. [Asset publicado en v8.4.0](https://github.com/ultralytics/assets/releases/expanded_assets/v8.4.0)
-
-Cuando aprovisiones los pesos por primera vez, descárgalos en el directorio persistente. El SHA-256 publicado permite contrastar el binario de YOLO con GitHub. Para Cascade, la suma calculada desde la descarga oficial se guarda como referencia local para detectar cambios posteriores y verificar copias.
+Descargue los pesos COCO en `$BASELINE_WORK/checkpoints` si aún no están disponibles. El archivo de YOLOv10-S se comprueba con el SHA-256 publicado. Para Cascade, se registra la suma del archivo descargado del zoo oficial. [Zoo de Detectron2](https://github.com/facebookresearch/detectron2/blob/main/MODEL_ZOO.md) · [Pesos de Ultralytics v8.4.0](https://github.com/ultralytics/assets/releases/expanded_assets/v8.4.0)
 
 ```bash
 (
@@ -206,7 +194,7 @@ Cuando aprovisiones los pesos por primera vez, descárgalos en el directorio per
 )
 ```
 
-Verifica los pesos conservados y prepara, si hace falta, la fuente que busca el validador de Ultralytics.
+Verifique los pesos y prepare la fuente utilizada por el validador de Ultralytics.
 
 ```bash
 (cd "$BASELINE_WORK/checkpoints" && sha256sum -c SHA256SUMS)
@@ -216,75 +204,57 @@ if [ ! -s "$YOLO_CONFIG_DIR/Arial.ttf" ]; then
 fi
 ```
 
-## GPU y comprobación CUDA
+## Ejecución de trabajos SLURM
 
-La asignación comprobada en la partición `short` fue una NVIDIA A100 PCIe de 40 GB, con 32 CPU y 64 GB de RAM. Los módulos se cargaron dentro del trabajo SLURM.
+Envíe los trabajos desde la raíz del proyecto. [slurm/cascade.sh](../slurm/cascade.sh), [slurm/yolo.sh](../slurm/yolo.sh) y [slurm/evaluate.sh](../slurm/evaluate.sh) cargan los módulos y usan los intérpretes de `$STORE/pills-baseline/envs` dentro de la asignación. Cada trabajo usa la partición `short`, una NVIDIA A100 PCIe de 40 GB, 32 CPU por GPU y 64 GB de RAM. El límite de los entrenamientos es de seis horas y el de la evaluación, una hora.
 
-```bash
-srun --partition=short --gres=gpu:a100:1 \
-  --cpus-per-task=32 --mem=64G --time=01:30:00 --pty bash
-```
-
-El trabajo de comprobación terminó correctamente tras cargar los módulos, detectar la A100, ejecutar `nms_rotated` de Detectron2 en CUDA e importar Ultralytics y realizar un producto matricial de PyTorch en CUDA. Se validaron estas operaciones. La carga de checkpoints, la inferencia completa y el entrenamiento quedan pendientes.
-
-Para repetir esas comprobaciones, carga los tres módulos dentro del nodo y ejecuta lo siguiente.
-
-```bash
-nvidia-smi
-"$CASCADE_ENV/bin/python" - <<'PY'
-import torch
-from detectron2.layers import nms_rotated
-
-print(torch.cuda.get_device_name(0))
-boxes = torch.tensor([[10., 10., 5., 5., 0.]], device="cuda")
-scores = torch.tensor([0.9], device="cuda")
-assert nms_rotated(boxes, scores, 0.5).tolist() == [0]
-PY
-
-"$YOLO_ENV/bin/python" - <<'PY'
-import torch
-import ultralytics
-
-print(ultralytics.__version__, torch.cuda.get_device_name(0))
-matrix = torch.eye(2, device="cuda")
-torch.testing.assert_close(matrix @ matrix, matrix)
-PY
-```
-
-## Envío y recuperación de trabajos
-
-Guarda los logs persistentes en `$BASELINE_WORK/results/slurm/`. Desde la raíz del repositorio, crea el directorio **antes** de enviar y define las opciones de Bash `SLURM_LOGS` que usa el [protocolo de verificación](../experiments/baseline/README.md#protocolo-de-verificación). Si omites esas opciones, los scripts escriben los logs en el directorio de envío.
+Configure los logs persistentes antes de enviar las fases de [inicialización, prueba corta y entrenamiento](../experiments/baseline/README.md#protocolo-de-verificación). Conserve el ID que devuelve `sbatch` y la ruta de cada ejecución.
 
 ```bash
 mkdir -p "$BASELINE_RESULTS/slurm"
 SLURM_LOGS=(--output="$BASELINE_RESULTS/slurm/%x-%j.out" --error="$BASELINE_RESULTS/slurm/%x-%j.err")
 ```
 
-Los scripts batch cargan los módulos dentro del trabajo y usan los intérpretes instalados en `$STORE/pills-baseline/envs`. Piden 1 A100, 32 CPU, 64 GB y un máximo de seis horas en `short`. Para probar la inicialización, elige salidas independientes mediante un directorio nuevo para cada tanda. Crea el directorio padre, dejando que Python cree los subdirectorios de ejecución.
-
-```bash
-export VERIFY_ROOT="$(mktemp -d "$BASELINE_RESULTS/verify-XXXXXX")"
-printf '%s\n' "$VERIFY_ROOT"
-sbatch "${SLURM_LOGS[@]}" --time=01:00:00 slurm/cascade.sh \
-  --data "$BASELINE_DATA" --weights "$CASCADE_WEIGHTS" --output "$VERIFY_ROOT/init-cascade" --initialize
-```
-
-Cuando `sbatch` devuelve el ID, puedes cerrar SSH y el trabajo batch sigue en cola o en ejecución. Una sesión interactiva de `srun --pty` está ligada a la conexión. Conserva el ID y la ruta de salida para volver a consultarlos. Los ficheros `%x-%j.out` y `%x-%j.err` contienen stdout y stderr, con el nombre del trabajo y su ID. [Comandos SLURM en FT3](https://cesga-docs.gitlab.io/ft3-user-guide/batch_basic_commands.html)
+Consulte los trabajos en cola y el estado de la ejecución. Sustituya `ID_DEL_TRABAJO` por el identificador devuelto al enviar el trabajo. [Comandos SLURM en FT3](https://cesga-docs.gitlab.io/ft3-user-guide/batch_basic_commands.html)
 
 ```bash
 squeue --me
 sacct -j ID_DEL_TRABAJO --format=JobID,JobName,State,ExitCode,Elapsed,MaxRSS,AllocTRES
 ```
 
-Cada `--output` contiene `status.json`, el historial y los artefactos de la ejecución. Cascade usa `last_checkpoint` para localizar el último peso y conserva `best/model_best.pth`. YOLO escribe `weights/last.pt` y `weights/best.pt`. `status.json` recoge las rutas relativas cuando se registra el cierre de la sesión.
+Para interrumpir un entrenamiento con `scancel ID_DEL_TRABAJO`, compruebe antes que haya un checkpoint disponible. Al reanudar, conserve los argumentos de datos, pesos, configuración y salida del trabajo original y añada `--resume`. Para una pausa planificada, use la secuencia del [protocolo de verificación](../experiments/baseline/README.md#protocolo-de-verificación).
 
-Para interrumpir un entrenamiento, espera a que exista un checkpoint si quieres recuperar el progreso y usa `scancel ID_DEL_TRABAJO`. Cuando termine, vuelve a enviar el mismo comando con `--resume` y las mismas rutas de datos, pesos y salida, así como la misma configuración y presupuesto. Para una pausa prevista, usa `--pause-after EPOCH` al iniciar, con una época anterior al final, y retira esa opción al reanudar. Consulta el [smoke test y los comandos de evaluación](../experiments/baseline/README.md#protocolo-de-verificación).
+### Sesión GPU interactiva
 
-Recupera los resultados desde tu equipo con `CESGA_SSH` ya definido. Ajusta la ruta remota si las salidas están en otra ubicación.
+Para operaciones interactivas que requieran CUDA, solicite la misma clase de GPU y cargue los módulos dentro de la asignación.
+
+```bash
+srun --partition=short --gres=gpu:a100:1 \
+  --cpus-per-task=32 --mem=64G --time=01:30:00 --pty bash
+```
+
+## Evaluación conjunta
+
+Defina `CASCADE_RUN` y `YOLO_RUN` con dos ejecuciones completas que usaron el mismo `$BASELINE_DATA`. Indique en `EVAL_ROOT` un directorio nuevo fuera de los datos y de ambas ejecuciones, con el directorio padre ya creado. El [protocolo experimental](../experiments/baseline/README.md#protocolo-de-verificación) proporciona las rutas de cada fase.
+
+```bash
+eval_job=$(sbatch --parsable "${SLURM_LOGS[@]}" slurm/evaluate.sh \
+  "$BASELINE_DATA" "$CASCADE_RUN" "$YOLO_RUN" "$EVAL_ROOT") &&
+  printf '%s\n' "${eval_job%%;*}"
+```
+
+El lanzador evalúa secuencialmente los checkpoints `best` en `valid` sobre la GPU asignada y ejecuta `scripts.verify_baseline`. Las salidas quedan en `$EVAL_ROOT/cascade` y `$EVAL_ROOT/yolo`. Confirme el estado `COMPLETED`, el código `0:0` y el mensaje final del verificador en el log. Para repetir una evaluación, utilice otra salida. [Protocolo de medición](../experiments/baseline/README.md#g-métricas-y-protocolo-de-inferencia) · [Resultados observados](../experiments/baseline/README.md#resultados-observados-en-cesga)
+
+## Recuperar resultados
+
+Conserve los checkpoints entrenados en `$BASELINE_RESULTS`. Desde el equipo local, use `rsync` para recuperar en `results/cesga/` los informes, historiales, configuraciones, figuras, ejemplos y logs. Ajuste la ruta remota si almacenó los resultados en otro directorio.
 
 ```bash
 remote_results=$(ssh "$CESGA_SSH" 'printf "%s\n" "$STORE/pills-baseline/results"') &&
   mkdir -p results/cesga &&
-  rsync -av -e ssh --exclude='*.pt' --exclude='*.pth' \
+  rsync -av -e ssh --prune-empty-dirs \
+    --include='*/' --include='*.json' --include='*.csv' --include='*.yaml' --include='*.yml' \
+    --include='*.png' --include='*.jpg' --include='*.jpeg' --include='*.out' --include='*.err' \
+    --exclude='*' \
     "$CESGA_SSH:$remote_results/" results/cesga/
 ```

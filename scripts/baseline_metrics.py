@@ -129,7 +129,7 @@ def report(ev):
         valid = values[values >= 0]
         name = ev.cocoGt.cats[cid]["name"]
         per_class.append({
-            "category_id": cid, "name": name, "ground_truth": counts[cid],
+            "category_id": int(cid), "name": name, "ground_truth": counts[cid],
             "ap": float(valid.mean()) if len(valid) else None,
         })
         curves[str(cid)] = {

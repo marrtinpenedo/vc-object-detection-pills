@@ -1,5 +1,6 @@
 """Synthetic checks for the baseline pipeline."""
 
+import json
 import unittest
 from copy import deepcopy
 from importlib.util import find_spec
@@ -72,6 +73,17 @@ class ConversionTest(unittest.TestCase):
 
 
 class EvaluationTest(unittest.TestCase):
+    def test_coco_report_is_json_serializable(self):
+        raw, classes = fixture()
+        coco, _ = convert_split(raw, classes)
+        predictions = prediction_rows(coco["images"][0], [[20, 40, 80, 160, 0.9, 1]], classes)
+        metrics, curves, _ = report(coco_eval(coco, predictions))
+        serialized = json.loads(json.dumps({"metrics": metrics, "curves": curves}, allow_nan=False))
+        categories = serialized["metrics"]["per_class"]
+        self.assertEqual([item["category_id"] for item in categories], [3, 9])
+        self.assertTrue(all(type(item["category_id"]) is int for item in categories))
+        self.assertEqual(list(serialized["curves"]["classes"]), ["3", "9"])
+
     def test_float32_box_preserves_clipped_image_edges(self):
         import numpy as np
 
