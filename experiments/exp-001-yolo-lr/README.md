@@ -13,7 +13,7 @@ El AP nulo y el pico de pérdida al inicio del baseline de YOLO motivan una prue
 | Brazo | LR inicial | Configuración |
 | --- | ---: | --- |
 | Control | 0,001 | [Configuración del baseline](../../configs/baseline/yolo.json) |
-| Variante | 0,0005 | [Configuración EXP-001](yolo-lr-0005.json) |
+| Variante | 0,0005 | [Configuración EXP-001](../../configs/experiments/yolo-lr-0005.json) |
 
 Ambos brazos comparten los pesos COCO `yolov10s.pt`, los datos preparados, la revisión del código, el entorno, el tipo de GPU y la semilla de cada pareja. Conservan la receta de referencia, incluido el presupuesto de 30 épocas, los aumentos desactivados y la selección de `best` por mAP COCO en `valid`. Se mantienen la política coseno, el factor final y el warm-up, incluido el LR inicial de sesgos de 0,001. Las tasas del scheduler que dependen de `lr` cambian con la variante. [Receta de referencia](../baseline/README.md#f-recetas-e-hiperparámetros)
 
@@ -44,7 +44,7 @@ sbatch --parsable "${SLURM_LOGS[@]}" slurm/yolo.sh \
   --output "$EXP_ROOT/control-s$EXP_SEED"
 sbatch --parsable "${SLURM_LOGS[@]}" slurm/yolo.sh \
   --data "$BASELINE_DATA" --weights "$YOLO_WEIGHTS" \
-  --config experiments/exp-001-yolo-lr/yolo-lr-0005.json --seed "$EXP_SEED" \
+  --config configs/experiments/yolo-lr-0005.json --seed "$EXP_SEED" \
   --output "$EXP_ROOT/variante-s$EXP_SEED"
 ```
 
