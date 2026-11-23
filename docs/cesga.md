@@ -247,14 +247,24 @@ El lanzador evalúa secuencialmente los checkpoints `best` en `valid` sobre la G
 
 ## Recuperar resultados
 
-Conserve los checkpoints entrenados en `$BASELINE_RESULTS`. Desde el equipo local, use `rsync` para recuperar en `results/cesga/` los informes, historiales, configuraciones, figuras, ejemplos y logs. Ajuste la ruta remota si almacenó los resultados en otro directorio.
+Desde la raíz del proyecto en CESGA, indique las dos ejecuciones completas y su evaluación conjunta, todas bajo `$BASELINE_RESULTS`. El exportador comprueba el ZIP antes de publicarlo. Incluye los informes, historiales, gráficas, predicciones y hasta cinco ejemplos correctos y cinco fallidos por detector. Los checkpoints y logs se conservan en CESGA.
 
 ```bash
-remote_results=$(ssh "$CESGA_SSH" 'printf "%s\n" "$STORE/pills-baseline/results"') &&
-  mkdir -p results/cesga &&
-  rsync -av -e ssh --prune-empty-dirs \
-    --include='*/' --include='*.json' --include='*.csv' --include='*.yaml' --include='*.yml' \
-    --include='*.png' --include='*.jpg' --include='*.jpeg' --include='*.out' --include='*.err' \
-    --exclude='*' \
-    "$CESGA_SSH:$remote_results/" results/cesga/
+ZIP_NAME=baseline-results.zip
+"${CASCADE_ENV:?Defina CASCADE_ENV}/bin/python" experiments/baseline/export_results.py \
+  --results-root "$BASELINE_RESULTS" --cascade-run "$CASCADE_RUN" \
+  --yolo-run "$YOLO_RUN" --evaluation "$EVAL_ROOT" \
+  --output "${BASELINE_RESULTS:?Defina BASELINE_RESULTS}/$ZIP_NAME"
+```
+
+Desde el portátil, con `CESGA_SSH` definido, descargue únicamente el ZIP y compruebe su integridad.
+
+```bash
+ZIP_NAME=baseline-results.zip
+remote_results=$(ssh "${CESGA_SSH:?Defina CESGA_SSH}" 'printf "%s\n" "${STORE:?}/pills-baseline/results"') &&
+  local_results=$(mktemp -d ../baseline-results.XXXXXX) &&
+  scp "$CESGA_SSH:$remote_results/$ZIP_NAME" "$local_results/$ZIP_NAME" &&
+  python3 -c 'from sys import argv; from zipfile import ZipFile; raise SystemExit(ZipFile(argv[1]).testzip())' \
+    "$local_results/$ZIP_NAME" &&
+  printf '%s\n' "$local_results/$ZIP_NAME"
 ```

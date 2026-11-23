@@ -123,10 +123,10 @@ La inicialización se completó en `11930809` (Cascade) y `11930232` (YOLO). El 
 | mAP@0.5:0.95 | 0.80206393 | 0.70209365 |
 | AP50 | 0.88029961 | 0.83319268 |
 | AP75 | 0.88029961 | 0.82607634 |
-| Latencia media | 29.17 ms | 10.87 ms |
-| FPS | 34.28 | 91.99 |
+| Latencia media | 29.39 ms | 10.83 ms |
+| FPS | 34.02 | 92.32 |
 
-El lanzador versionado `slurm/evaluate.sh` terminó con estado `COMPLETED` y código `0:0` en `11945016`. Las tres métricas de AP coincidieron con `11944826` a ocho decimales. Entre ambas evaluaciones coincidieron los SHA-256 del checkpoint de cada detector, del manifiesto del dataset y del COCO de validación. Las latencias y FPS de la tabla corresponden a `11944826`.
+La tabla corresponde a la evaluación del lanzador versionado `slurm/evaluate.sh` en `11945016` (`COMPLETED`, código `0:0`). Las tres métricas de AP coincidieron con la evaluación `11944826` a ocho decimales. También coincidieron los SHA-256 del checkpoint de cada detector, del manifiesto del dataset y del COCO de validación.
 
 Quedan pendientes el smoke test de pausa y reanudación de YOLO y la evaluación final en `test`.
 
@@ -226,4 +226,4 @@ Una vez cerrados los experimentos, la evaluación sobre `test` usa los checkpoin
 - **Entrenamiento.** `run.json` registra la procedencia y la configuración. `status.json` indica el mejor paso, la duración, la memoria y las rutas de los checkpoints. Cascade guarda `metrics.json` en JSON Lines y YOLO, `results.csv`. Ambos generan `history.csv` y `training.png`.
 - **Evaluación.** Cada detector genera `metrics.json`, `predictions.json`, `pr_curves.json`, `pr_curves.png` y hasta cinco ejemplos por tipo. El AP de YOLO calculado al recargar los pesos EMA puede diferir del registrado al seleccionar el checkpoint.
 
-[Recuperación de artefactos](../../docs/cesga.md#recuperar-resultados)
+[Recuperación de artefactos](../../docs/cesga.md#recuperar-resultados) · [Figura de pérdidas de YOLOv10-S](results/README.md#historial-de-yolov10-s)
