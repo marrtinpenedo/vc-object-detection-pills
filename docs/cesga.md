@@ -236,15 +236,44 @@ srun --partition=short --gres=gpu:a100:1 \
 
 ## Evaluación conjunta
 
-Defina `CASCADE_RUN` y `YOLO_RUN` con dos ejecuciones completas que usaron el mismo `$BASELINE_DATA`. Indique en `EVAL_ROOT` un directorio nuevo fuera de los datos y de ambas ejecuciones, con el directorio padre ya creado. El [protocolo experimental](../experiments/baseline/README.md#protocolo-de-verificación) proporciona las rutas de cada fase.
+Desde la raíz del código usado para evaluar, ejecute el lanzador con `--data`, `--output` y un `--run NOMBRE RUTA` por ejecución. Cada nombre debe ser único, empezar por letra o dígito y usar únicamente letras ASCII, dígitos, guiones o guiones bajos. Prepare el directorio padre de la salida y deje libre la ruta de salida. El lanzador detecta el backend en `run.json` y usa su entorno Conda. Todos los checkpoints se evalúan secuencialmente en la GPU asignada.
+
+Los ejemplos de Bash usan las rutas y los logs definidos en esta guía. Asigne a cada variable de ejecución la ruta de un entrenamiento completo. En la comparación entre variantes, ambas deben usar los mismos datos.
 
 ```bash
-eval_job=$(sbatch --parsable "${SLURM_LOGS[@]}" slurm/evaluate.sh \
-  "$BASELINE_DATA" "$CASCADE_RUN" "$YOLO_RUN" "$EVAL_ROOT") &&
-  printf '%s\n' "${eval_job%%;*}"
+sbatch --job-name=eval-yolo-valid "${SLURM_LOGS[@]}" slurm/evaluate.sh \
+  --data "$BASELINE_DATA" --output "$BASELINE_RESULTS/eval-yolo-valid" --run yolo "$YOLO_RUN"
+
+sbatch --job-name=eval-cascade-valid "${SLURM_LOGS[@]}" slurm/evaluate.sh \
+  --data "$BASELINE_DATA" --output "$BASELINE_RESULTS/eval-cascade-valid" --run cascade "$CASCADE_RUN"
+
+sbatch --job-name=eval-yolo-variantes-valid "${SLURM_LOGS[@]}" slurm/evaluate.sh \
+  --data "$BASELINE_DATA" --output "$BASELINE_RESULTS/eval-yolo-variantes-valid" \
+  --run control "$CONTROL_RUN" --run variante "$VARIANT_RUN"
+
+sbatch --job-name=eval-baselines-valid "${SLURM_LOGS[@]}" slurm/evaluate.sh \
+  --data "$BASELINE_DATA" --output "$BASELINE_RESULTS/eval-baselines-valid" \
+  --run cascade "$CASCADE_RUN" --run yolo "$YOLO_RUN"
 ```
 
-El lanzador evalúa secuencialmente los checkpoints `best` en `valid` sobre la GPU asignada y ejecuta `scripts.verify_baseline`. Las salidas quedan en `$EVAL_ROOT/cascade` y `$EVAL_ROOT/yolo`. Confirme el estado `COMPLETED`, el código `0:0` y el mensaje final del verificador en el log. Para repetir una evaluación, utilice otra salida. [Protocolo de medición](../experiments/baseline/README.md#g-métricas-y-protocolo-de-inferencia)
+Use nombres descriptivos con `--job-name` para distinguir experimento, detector, brazo, fase o semilla según corresponda.
+
+```bash
+squeue --me --name=exp006-eval-a-s2026
+sacct --name=exp006-eval-a-s2026 --starttime today --format=JobID,JobName%32,State,ExitCode
+sacct -j ID_DEL_TRABAJO --format=JobID,JobName%32,State,ExitCode
+```
+
+- `--split valid|test` y `--checkpoint best|last` usan `valid` y `best` por defecto. Reserve `test` para la evaluación final.
+- El benchmark usa 20 calentamientos y 100 iteraciones por defecto. Ajuste `--warmup` y `--iterations` en común para todos los modelos. Use la misma resolución para comparar latencias o indique `--no-benchmark`.
+- `--examples N` elige hasta cinco ejemplos por tipo por defecto y admite cero. Para guardar las mismas imágenes por brazo, use uno o varios `--example-image-id ID` en su lugar.
+- `--check-slurm` exige `COMPLETED` y código `0:0` para el último trabajo de entrenamiento de cada brazo y guarda su estado en `NOMBRE.train.sacct`. Consulte la ayuda con `bash slurm/evaluate.sh --help`.
+
+La salida contiene `NOMBRE/` por ejecución, `eval.job` y `launch.json` con la procedencia y la selección de checkpoints. Antes de evaluar, se comprueban el estado del entrenamiento, los datos y el checkpoint. Después, se recalculan las métricas a partir de las predicciones y se cotejan las curvas PR, el hash del checkpoint y el protocolo de latencia. `verified.ok` se publica al terminar todas las comprobaciones. Confirme también `COMPLETED` y `0:0` en SLURM. Si hay un fallo, conserve la salida parcial y use otra ruta al repetir. La configuración de Ultralytics se guarda por trabajo. [Protocolo de medición](../experiments/baseline/README.md#g-métricas-y-protocolo-de-inferencia)
+
+La interfaz posicional `sbatch slurm/evaluate.sh DATOS RUN_CASCADE RUN_YOLO SALIDA_NUEVA` mantiene `cascade/`, `yolo/`, los checkpoints `best`, el split `valid` y las comprobaciones adicionales de los entrenamientos del baseline.
+
+Para evaluar desde una revisión histórica, puede desplegar juntos `evaluate.sh` y `evaluate.py` en una carpeta nueva. Envíe el trabajo desde la raíz del código histórico, con `PILLS_EVAL_LAUNCHER_DIR` exportada y con la ruta absoluta del lanzador en `sbatch`. El evaluador, el verificador y los hashes de `scripts/*.py` proceden de esa raíz. Conserve la carpeta del lanzador durante el trabajo. [Ejemplo con EXP-006](../experiments/exp-006-yolo-warmup/README.md#evaluar-sobre-la-misma-gpu)
 
 ## Recuperar resultados
 

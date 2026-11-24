@@ -1,0 +1,600 @@
+{
+  "source_commit": "7f459491ea21cf61733989c18a6ad362c390c534",
+  "variant": "warmup-5",
+  "coco_verified": true,
+  "pairs": {
+    "2026": {
+      "round": "a",
+      "classes": {
+        "1": [
+          "Cipro 500",
+          26
+        ],
+        "2": [
+          "Ibuphil 600 mg",
+          1
+        ],
+        "3": [
+          "Ibuphil Cold 400-60",
+          10
+        ],
+        "4": [
+          "Xyzall 5mg",
+          10
+        ],
+        "5": [
+          "blue",
+          11
+        ],
+        "6": [
+          "pink",
+          15
+        ],
+        "7": [
+          "red",
+          15
+        ],
+        "8": [
+          "white",
+          10
+        ]
+      },
+      "control": {
+        "map": 0.7020936505659803,
+        "ap50": 0.8331926765072571,
+        "ap75": 0.8260763398735937,
+        "ap_class_1": 0.5896812231830472,
+        "ap_class_2": 0.7999999999999999,
+        "ap_class_3": 0.7330363036303632,
+        "ap_class_4": 0.3966053748231966,
+        "ap_class_5": 0.8066203763233466,
+        "ap_class_6": 0.9333415841584158,
+        "ap_class_7": 0.6183944354187741,
+        "ap_class_8": 0.7390699069906991,
+        "map_without_ibuphil": 0.6881070292182633,
+        "precision": 0.8192771084337349,
+        "recall": 0.6938775510204082,
+        "tp": 68,
+        "fp": 15,
+        "fn": 30,
+        "mean_ms_per_image": 10.731557216495275,
+        "median_ms_per_image": 10.73062652722001,
+        "p95_ms_per_image": 10.767752164974809,
+        "fps_from_mean": 93.1831215010361,
+        "peak_val_cls_loss_1_5": 50317300.0,
+        "peak_val_cls_loss_epoch": 2,
+        "zero_map_epochs_1_5": 2,
+        "zero_map_epochs_1_30": 2,
+        "mean_map_1_5": 0.09576098,
+        "best_epoch": 23,
+        "best_map_history": 0.703009,
+        "last_map_history": 0.653203,
+        "best_minus_last_map": 0.04980600000000002
+      },
+      "warmup-5": {
+        "map": 0.69335260265386,
+        "ap50": 0.8053306761222968,
+        "ap75": 0.7976060860710373,
+        "ap_class_1": 0.6189143285696814,
+        "ap_class_2": 0.7999999999999999,
+        "ap_class_3": 0.6725797579757977,
+        "ap_class_4": 0.4549722777155764,
+        "ap_class_5": 0.8172524752475249,
+        "ap_class_6": 0.8398232606066036,
+        "ap_class_7": 0.6809993777967495,
+        "ap_class_8": 0.6622793433189473,
+        "map_without_ibuphil": 0.6781172601758401,
+        "precision": 0.8,
+        "recall": 0.6530612244897959,
+        "tp": 64,
+        "fp": 16,
+        "fn": 34,
+        "mean_ms_per_image": 10.8458012342453,
+        "median_ms_per_image": 10.849526152014732,
+        "p95_ms_per_image": 10.876846592873335,
+        "fps_from_mean": 92.20157906292154,
+        "peak_val_cls_loss_1_5": 15135.7,
+        "peak_val_cls_loss_epoch": 3,
+        "zero_map_epochs_1_5": 0,
+        "zero_map_epochs_1_30": 0,
+        "mean_map_1_5": 0.087875858,
+        "best_epoch": 24,
+        "best_map_history": 0.69452,
+        "last_map_history": 0.633456,
+        "best_minus_last_map": 0.06106400000000001
+      },
+      "delta": {
+        "map": -0.00874104791212027,
+        "ap50": -0.02786200038496034,
+        "ap75": -0.02847025380255641,
+        "ap_class_1": 0.02923310538663426,
+        "ap_class_2": 0.0,
+        "ap_class_3": -0.060456545654565486,
+        "ap_class_4": 0.058366902892379835,
+        "ap_class_5": 0.010632098924178268,
+        "ap_class_6": -0.09351832355181222,
+        "ap_class_7": 0.06260494237797531,
+        "ap_class_8": -0.07679056367175174,
+        "map_without_ibuphil": -0.009989769042423213,
+        "precision": -0.01927710843373487,
+        "recall": -0.04081632653061229,
+        "tp": -4,
+        "fp": 1,
+        "fn": 4,
+        "mean_ms_per_image": 0.1142440177500248,
+        "median_ms_per_image": 0.1188996247947216,
+        "p95_ms_per_image": 0.10909442789852619,
+        "fps_from_mean": -0.981542438114559,
+        "peak_val_cls_loss_1_5": -50302164.3,
+        "peak_val_cls_loss_epoch": 1,
+        "zero_map_epochs_1_5": -2,
+        "zero_map_epochs_1_30": -2,
+        "mean_map_1_5": -0.007885121999999994,
+        "best_epoch": 1,
+        "best_map_history": -0.008488999999999969,
+        "last_map_history": -0.01974699999999996,
+        "best_minus_last_map": 0.01125799999999999
+      }
+    }
+  },
+  "all_pairs": {
+    "control": {
+      "map": {
+        "n": 1,
+        "mean": 0.7020936505659803,
+        "sample_sd": null
+      },
+      "ap50": {
+        "n": 1,
+        "mean": 0.8331926765072571,
+        "sample_sd": null
+      },
+      "ap75": {
+        "n": 1,
+        "mean": 0.8260763398735937,
+        "sample_sd": null
+      },
+      "ap_class_1": {
+        "n": 1,
+        "mean": 0.5896812231830472,
+        "sample_sd": null
+      },
+      "ap_class_2": {
+        "n": 1,
+        "mean": 0.7999999999999999,
+        "sample_sd": null
+      },
+      "ap_class_3": {
+        "n": 1,
+        "mean": 0.7330363036303632,
+        "sample_sd": null
+      },
+      "ap_class_4": {
+        "n": 1,
+        "mean": 0.3966053748231966,
+        "sample_sd": null
+      },
+      "ap_class_5": {
+        "n": 1,
+        "mean": 0.8066203763233466,
+        "sample_sd": null
+      },
+      "ap_class_6": {
+        "n": 1,
+        "mean": 0.9333415841584158,
+        "sample_sd": null
+      },
+      "ap_class_7": {
+        "n": 1,
+        "mean": 0.6183944354187741,
+        "sample_sd": null
+      },
+      "ap_class_8": {
+        "n": 1,
+        "mean": 0.7390699069906991,
+        "sample_sd": null
+      },
+      "map_without_ibuphil": {
+        "n": 1,
+        "mean": 0.6881070292182633,
+        "sample_sd": null
+      },
+      "precision": {
+        "n": 1,
+        "mean": 0.8192771084337349,
+        "sample_sd": null
+      },
+      "recall": {
+        "n": 1,
+        "mean": 0.6938775510204082,
+        "sample_sd": null
+      },
+      "tp": {
+        "n": 1,
+        "mean": 68,
+        "sample_sd": null
+      },
+      "fp": {
+        "n": 1,
+        "mean": 15,
+        "sample_sd": null
+      },
+      "fn": {
+        "n": 1,
+        "mean": 30,
+        "sample_sd": null
+      },
+      "mean_ms_per_image": {
+        "n": 1,
+        "mean": 10.731557216495275,
+        "sample_sd": null
+      },
+      "median_ms_per_image": {
+        "n": 1,
+        "mean": 10.73062652722001,
+        "sample_sd": null
+      },
+      "p95_ms_per_image": {
+        "n": 1,
+        "mean": 10.767752164974809,
+        "sample_sd": null
+      },
+      "fps_from_mean": {
+        "n": 1,
+        "mean": 93.1831215010361,
+        "sample_sd": null
+      },
+      "peak_val_cls_loss_1_5": {
+        "n": 1,
+        "mean": 50317300.0,
+        "sample_sd": null
+      },
+      "peak_val_cls_loss_epoch": {
+        "n": 1,
+        "mean": 2,
+        "sample_sd": null
+      },
+      "zero_map_epochs_1_5": {
+        "n": 1,
+        "mean": 2,
+        "sample_sd": null
+      },
+      "zero_map_epochs_1_30": {
+        "n": 1,
+        "mean": 2,
+        "sample_sd": null
+      },
+      "mean_map_1_5": {
+        "n": 1,
+        "mean": 0.09576098,
+        "sample_sd": null
+      },
+      "best_epoch": {
+        "n": 1,
+        "mean": 23,
+        "sample_sd": null
+      },
+      "best_map_history": {
+        "n": 1,
+        "mean": 0.703009,
+        "sample_sd": null
+      },
+      "last_map_history": {
+        "n": 1,
+        "mean": 0.653203,
+        "sample_sd": null
+      },
+      "best_minus_last_map": {
+        "n": 1,
+        "mean": 0.04980600000000002,
+        "sample_sd": null
+      }
+    },
+    "warmup-5": {
+      "map": {
+        "n": 1,
+        "mean": 0.69335260265386,
+        "sample_sd": null
+      },
+      "ap50": {
+        "n": 1,
+        "mean": 0.8053306761222968,
+        "sample_sd": null
+      },
+      "ap75": {
+        "n": 1,
+        "mean": 0.7976060860710373,
+        "sample_sd": null
+      },
+      "ap_class_1": {
+        "n": 1,
+        "mean": 0.6189143285696814,
+        "sample_sd": null
+      },
+      "ap_class_2": {
+        "n": 1,
+        "mean": 0.7999999999999999,
+        "sample_sd": null
+      },
+      "ap_class_3": {
+        "n": 1,
+        "mean": 0.6725797579757977,
+        "sample_sd": null
+      },
+      "ap_class_4": {
+        "n": 1,
+        "mean": 0.4549722777155764,
+        "sample_sd": null
+      },
+      "ap_class_5": {
+        "n": 1,
+        "mean": 0.8172524752475249,
+        "sample_sd": null
+      },
+      "ap_class_6": {
+        "n": 1,
+        "mean": 0.8398232606066036,
+        "sample_sd": null
+      },
+      "ap_class_7": {
+        "n": 1,
+        "mean": 0.6809993777967495,
+        "sample_sd": null
+      },
+      "ap_class_8": {
+        "n": 1,
+        "mean": 0.6622793433189473,
+        "sample_sd": null
+      },
+      "map_without_ibuphil": {
+        "n": 1,
+        "mean": 0.6781172601758401,
+        "sample_sd": null
+      },
+      "precision": {
+        "n": 1,
+        "mean": 0.8,
+        "sample_sd": null
+      },
+      "recall": {
+        "n": 1,
+        "mean": 0.6530612244897959,
+        "sample_sd": null
+      },
+      "tp": {
+        "n": 1,
+        "mean": 64,
+        "sample_sd": null
+      },
+      "fp": {
+        "n": 1,
+        "mean": 16,
+        "sample_sd": null
+      },
+      "fn": {
+        "n": 1,
+        "mean": 34,
+        "sample_sd": null
+      },
+      "mean_ms_per_image": {
+        "n": 1,
+        "mean": 10.8458012342453,
+        "sample_sd": null
+      },
+      "median_ms_per_image": {
+        "n": 1,
+        "mean": 10.849526152014732,
+        "sample_sd": null
+      },
+      "p95_ms_per_image": {
+        "n": 1,
+        "mean": 10.876846592873335,
+        "sample_sd": null
+      },
+      "fps_from_mean": {
+        "n": 1,
+        "mean": 92.20157906292154,
+        "sample_sd": null
+      },
+      "peak_val_cls_loss_1_5": {
+        "n": 1,
+        "mean": 15135.7,
+        "sample_sd": null
+      },
+      "peak_val_cls_loss_epoch": {
+        "n": 1,
+        "mean": 3,
+        "sample_sd": null
+      },
+      "zero_map_epochs_1_5": {
+        "n": 1,
+        "mean": 0,
+        "sample_sd": null
+      },
+      "zero_map_epochs_1_30": {
+        "n": 1,
+        "mean": 0,
+        "sample_sd": null
+      },
+      "mean_map_1_5": {
+        "n": 1,
+        "mean": 0.087875858,
+        "sample_sd": null
+      },
+      "best_epoch": {
+        "n": 1,
+        "mean": 24,
+        "sample_sd": null
+      },
+      "best_map_history": {
+        "n": 1,
+        "mean": 0.69452,
+        "sample_sd": null
+      },
+      "last_map_history": {
+        "n": 1,
+        "mean": 0.633456,
+        "sample_sd": null
+      },
+      "best_minus_last_map": {
+        "n": 1,
+        "mean": 0.06106400000000001,
+        "sample_sd": null
+      }
+    },
+    "delta": {
+      "map": {
+        "n": 1,
+        "mean": -0.00874104791212027,
+        "sample_sd": null
+      },
+      "ap50": {
+        "n": 1,
+        "mean": -0.02786200038496034,
+        "sample_sd": null
+      },
+      "ap75": {
+        "n": 1,
+        "mean": -0.02847025380255641,
+        "sample_sd": null
+      },
+      "ap_class_1": {
+        "n": 1,
+        "mean": 0.02923310538663426,
+        "sample_sd": null
+      },
+      "ap_class_2": {
+        "n": 1,
+        "mean": 0.0,
+        "sample_sd": null
+      },
+      "ap_class_3": {
+        "n": 1,
+        "mean": -0.060456545654565486,
+        "sample_sd": null
+      },
+      "ap_class_4": {
+        "n": 1,
+        "mean": 0.058366902892379835,
+        "sample_sd": null
+      },
+      "ap_class_5": {
+        "n": 1,
+        "mean": 0.010632098924178268,
+        "sample_sd": null
+      },
+      "ap_class_6": {
+        "n": 1,
+        "mean": -0.09351832355181222,
+        "sample_sd": null
+      },
+      "ap_class_7": {
+        "n": 1,
+        "mean": 0.06260494237797531,
+        "sample_sd": null
+      },
+      "ap_class_8": {
+        "n": 1,
+        "mean": -0.07679056367175174,
+        "sample_sd": null
+      },
+      "map_without_ibuphil": {
+        "n": 1,
+        "mean": -0.009989769042423213,
+        "sample_sd": null
+      },
+      "precision": {
+        "n": 1,
+        "mean": -0.01927710843373487,
+        "sample_sd": null
+      },
+      "recall": {
+        "n": 1,
+        "mean": -0.04081632653061229,
+        "sample_sd": null
+      },
+      "tp": {
+        "n": 1,
+        "mean": -4,
+        "sample_sd": null
+      },
+      "fp": {
+        "n": 1,
+        "mean": 1,
+        "sample_sd": null
+      },
+      "fn": {
+        "n": 1,
+        "mean": 4,
+        "sample_sd": null
+      },
+      "mean_ms_per_image": {
+        "n": 1,
+        "mean": 0.1142440177500248,
+        "sample_sd": null
+      },
+      "median_ms_per_image": {
+        "n": 1,
+        "mean": 0.1188996247947216,
+        "sample_sd": null
+      },
+      "p95_ms_per_image": {
+        "n": 1,
+        "mean": 0.10909442789852619,
+        "sample_sd": null
+      },
+      "fps_from_mean": {
+        "n": 1,
+        "mean": -0.981542438114559,
+        "sample_sd": null
+      },
+      "peak_val_cls_loss_1_5": {
+        "n": 1,
+        "mean": -50302164.3,
+        "sample_sd": null
+      },
+      "peak_val_cls_loss_epoch": {
+        "n": 1,
+        "mean": 1,
+        "sample_sd": null
+      },
+      "zero_map_epochs_1_5": {
+        "n": 1,
+        "mean": -2,
+        "sample_sd": null
+      },
+      "zero_map_epochs_1_30": {
+        "n": 1,
+        "mean": -2,
+        "sample_sd": null
+      },
+      "mean_map_1_5": {
+        "n": 1,
+        "mean": -0.007885121999999994,
+        "sample_sd": null
+      },
+      "best_epoch": {
+        "n": 1,
+        "mean": 1,
+        "sample_sd": null
+      },
+      "best_map_history": {
+        "n": 1,
+        "mean": -0.008488999999999969,
+        "sample_sd": null
+      },
+      "last_map_history": {
+        "n": 1,
+        "mean": -0.01974699999999996,
+        "sample_sd": null
+      },
+      "best_minus_last_map": {
+        "n": 1,
+        "mean": 0.01125799999999999,
+        "sample_sd": null
+      }
+    },
+    "map_wins": 0
+  },
+  "confirmation_only": null
+}

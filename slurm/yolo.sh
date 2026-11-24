@@ -23,6 +23,6 @@ test -f scripts/train_baseline.py || { printf '%s\n' 'Envía el trabajo desde la
 baseline_work="${STORE:?Falta STORE en el entorno de CESGA}/pills-baseline"
 unset PYTHONHOME PYTHONPATH
 export OMP_NUM_THREADS=1 MPLBACKEND=Agg PYTHONUNBUFFERED=1 PYTHONNOUSERSITE=1
-export YOLO_CONFIG_DIR="$baseline_work/cache/ultralytics"
+export YOLO_CONFIG_DIR="${PILLS_YOLO_CONFIG_DIR:-$baseline_work/cache/ultralytics}"
 mkdir -p "$YOLO_CONFIG_DIR"
 exec "$baseline_work/envs/yolo/bin/python" -m scripts.train_baseline yolo "$@"
