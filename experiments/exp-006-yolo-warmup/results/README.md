@@ -1,65 +1,15 @@
 # Artefactos de EXP-006
 
-La evaluación de la fase A está pendiente. Cada tanda conserva el commit y las huellas de código, datos y pesos iniciales. El nombre `sSEMILLA/BRAZO` identifica un entrenamiento. `eval-RONDA-sSEMILLA/BRAZO` identifica la reevaluación, que puede reutilizarse para varias comparaciones en la misma asignación. Los JPEG muestran las mismas imágenes de validación en todos los brazos.
-
 ## Recuperación selectiva
 
-Desde la raíz del clon en el portátil, iniciar `bash` si el shell habitual es Zsh. Definir `CESGA_SSH` conforme a la guía y asignar a `REMOTE_EXP` la ruta absoluta mostrada al preparar la tanda. El ejemplo recupera A. Para incluir B, agregar `b:2026:control,warmup-5,warmup-3`. Para incluir C, agregar `c:2027:control,BRAZO` y `c:2028:control,BRAZO` con el brazo elegido. Cada descarga usa una carpeta nueva bajo el directorio local ignorado `results/`. [Acceso a CESGA](../../../docs/cesga.md#acceso-y-almacenamiento)
+La carpeta estable [`phase-a/`](phase-a/) archiva 37 de los 39 archivos de la descarga verificada. [`evidence.sha256`](phase-a/evidence.sha256) conserva sus SHA-256 originales. Se seleccionaron los tres pares de JPEG revisados en los hallazgos y se omitieron los PNG originales de entrenamiento. La descarga, los checkpoints, las cachés, los logs y los datos brutos permanecen fuera de Git.
 
-```bash
-rounds=(a:2026:control,warmup-5)
-mkdir -p results
-export LOCAL_EXP
-LOCAL_EXP=$(mktemp -d "$PWD/results/exp-006-XXXXXX")
-(
-  set -euo pipefail
-  : "${CESGA_SSH:?}" "${LOCAL_EXP:?}"
-  [[ "${REMOTE_EXP:?}" == /*/exp-006-yolo-warmup-* ]]
-  {
-    printf '%s\n' source-commit code-config.sha256 inputs.sha256 data/manifest.json
-    for round in "${rounds[@]}"; do
-      IFS=: read -r phase seed arms <<< "$round"
-      IFS=, read -r -a selected <<< "$arms"
-      eval_dir="eval-$phase-s$seed"
-      printf '%s\n' "$eval_dir"/{eval.job,launch.json,verified.ok}
-      for arm in "${selected[@]}"; do
-        slot="s$seed/$arm"
-        printf '%s\n' "$slot"/{config.json,train.job,train.path}
-        printf '%s\n' "$slot/train"/{run.json,status.json,history.csv,ultralytics_runtime.json,training.png}
-        printf '%s\n' "$eval_dir/$arm.train.sacct"
-        printf '%s\n' "$eval_dir/$arm"/{metrics.json,predictions.json,pr_curves.json,pr_curves.png}
-        printf '%s\n' "$eval_dir/$arm/examples"/image-{57,61,80}.jpg
-      done
-    done
-  } | LC_ALL=C sort -u > "$LOCAL_EXP/download.files"
-  rsync -a --files-from="$LOCAL_EXP/download.files" -- "${CESGA_SSH}:${REMOTE_EXP}/" "$LOCAL_EXP/"
-  cd "$LOCAL_EXP"
-  while IFS= read -r file; do sha256sum "$file"; done < download.files > downloaded.sha256
-) && printf '%s\n' "$LOCAL_EXP"
-```
+- **Procedencia.** [Commit de entrenamiento](phase-a/source-commit), [huellas de código y configuración](phase-a/code-config.sha256), [huellas de entrada](phase-a/inputs.sha256) y [manifiesto de datos](phase-a/data/manifest.json). Las huellas del lanzador extraídas de [`launch.json`](phase-a/eval-a-s2026/launch.json) coinciden con `slurm/evaluate.sh` y `slurm/evaluate.py` de `11b223b9a494e97886e715c0b043702ebdd24ba5`.
+- **Entrenamiento.** [Control](phase-a/s2026/control/) y [warm-up 5](phase-a/s2026/warmup-5/) conservan el ID del trabajo, la ruta de origen, la configuración solicitada y efectiva, `run.json`, `status.json` e `history.csv`.
+- **Evaluación.** [`eval-a-s2026/`](phase-a/eval-a-s2026/) contiene el ID de evaluación, los estados SLURM de entrenamiento, `verified.ok` y la procedencia del lanzamiento. Cada brazo conserva métricas, predicciones, curvas PR en JSON y PNG y los ejemplos emparejados 57, 61 y 80. Los SHA-256 declarados de `best` coinciden entre el lanzamiento y las métricas de cada brazo.
 
-La lista incluye configuración y registro efectivo, IDs, estados, métricas, predicciones, curvas, ejemplos emparejados y las huellas del lanzador en `launch.json`. Los checkpoints, logs y datos de entrenamiento permanecen en CESGA. Antes del análisis, verificar la descarga con `(cd "$LOCAL_EXP" && sha256sum --check --quiet downloaded.sha256)`. [Reproducción del análisis](../README.md#recuperación-y-reproducción-del-análisis)
+## Análisis derivado
 
-## Evidencia para versionar
-
-Al cerrar el experimento, guardar cada tanda utilizada en una carpeta nueva de este directorio y mantener las rutas del inventario. Conservar los archivos de procedencia (`source-commit`, `code-config.sha256`, `inputs.sha256` y `data/manifest.json`), las configuraciones y estados de SLURM, los historiales y metadatos de entrenamiento, y `metrics.json`, `predictions.json`, `pr_curves.json` y `pr_curves.png` de cada evaluación utilizada. El PNG de PR forma parte de la comprobación del verificador común. El manifiesto registra huellas y recuentos del dataset.
-
-El siguiente bloque Bash archiva la evidencia mínima de una descarga comprobada. Elegir en `evidence` una ruta nueva. Para conservar un JPEG citado o una figura original de entrenamiento, incluir su entrada en `evidence.sha256` desde el inventario de la descarga antes de la copia.
-
-```bash
-(
-  set -euo pipefail
-  source=$(realpath "${LOCAL_EXP:?}")
-  evidence="$PWD/experiments/exp-006-yolo-warmup/results/tanda-$(basename "$source")"
-  (cd "$source" && sha256sum --check --quiet downloaded.sha256)
-  mkdir "$evidence"
-  awk '$2 !~ /\/train\/training\.png$|\/examples\//' "$source/downloaded.sha256" > "$evidence/evidence.sha256"
-  awk '{print $2}' "$evidence/evidence.sha256" |
-    rsync -a --files-from=- -- "$source/" "$evidence/"
-  (cd "$evidence" && sha256sum --check --quiet evidence.sha256)
-)
-```
-
-Guardar en `results/analysis/` los `summary.json` verificados y las figuras citadas en los hallazgos, separados por comparación. Tras versionar las conclusiones, definir `LOCAL_EXP` con la ruta de la carpeta de evidencia y repetir el análisis con las mismas parejas. El procedimiento consulta `source-commit` y escribe las salidas regeneradas bajo el `results/` ignorado de la raíz. Las descargas completas, los pesos, los logs masivos y las anotaciones originales permanecen fuera de Git. [Reproducción del análisis](../README.md#recuperación-y-reproducción-del-análisis)
+El [resumen JSON](analysis/summary.json) y la [figura comparativa](analysis/history-s2026.png) proceden del analizador del commit de entrenamiento. El [procedimiento de reproducción](../README.md#recuperación-y-reproducción-del-análisis) usa `phase-a/` por defecto, valida sus huellas, reconstruye el COCO desde las anotaciones locales y genera nuevas salidas bajo el `results/` ignorado de la raíz.
 
 Los JPEG proceden de *pills-sxdht*, de Mohamed Attia, distribuido en Roboflow 100 bajo licencia CC BY 4.0. Las imágenes de ejemplo incorporan cajas y etiquetas TP, FP y FN. [Dataset original](https://universe.roboflow.com/roboflow-100/pills-sxdht) · [Licencia](https://creativecommons.org/licenses/by/4.0/)

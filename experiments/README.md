@@ -8,7 +8,7 @@
 | [EXP-002](exp-002-photometric/README.md) | YOLOv10-S y Cascade R-CNN, augmentación fotométrica controlada | `cerrado` tras evaluación en `valid` · [hallazgos](exp-002-photometric/findings.md) |
 | EXP-003 | Augmentación geométrica moderada | Planificado, sujeto a viabilidad |
 | EXP-004 | Ensemble de YOLOv10-S y Cascade R-CNN | Propuesto con predicciones guardadas |
-| [EXP-006](exp-006-yolo-warmup/README.md) | YOLOv10-S, duración del warm-up con LR inicial fijo | `propuesto` |
+| [EXP-006](exp-006-yolo-warmup/README.md) | YOLOv10-S, duración del warm-up con LR inicial fijo | `cerrado` en fase A. Se conserva el warm-up de referencia · [hallazgos](exp-006-yolo-warmup/findings.md) |
 
 [Metodología de los baselines](baseline/README.md) · [Resultados, diagnósticos y decisiones](baseline/findings.md)
 
@@ -16,8 +16,7 @@
 
 1. **EXP-004.** Probar una regla de fusión por clase y unos parámetros fijados de antemano sobre las predicciones `valid` de los dos controles de EXP-002. Comparar con el mAP de Cascade control, incluidas las siete clases con más soporte y el punto operativo. La prueba reutiliza las cajas exportadas y evita entrenar. El margen de aciertos exclusivos de YOLO es estrecho al corte operativo, así que conviene limitar la búsqueda de parámetros. [Diagnóstico de EXP-002](exp-002-photometric/findings.md#conclusiones)
 2. **EXP-003.** Si la fusión queda empatada o pierde y hay GPU antes de la entrega, priorizar Cascade. Probar un cambio geométrico moderado (p. ej., traslación y escala acotadas con actualización de cajas) solo en `train`. Mantener pesos, semilla, presupuesto y reglas de selección. Verificar las cajas transformadas y el cargador de `valid`, y usar un control emparejado dentro de la misma revisión. [Anotaciones señaladas](baseline/findings.md#limitaciones-del-dataset)
-3. **EXP-006.** Investigar el warm-up extendido de YOLOv10-S en `valid` antes de la evaluación final. [Protocolo](exp-006-yolo-warmup/README.md)
-4. Reservar tiempo para fijar recetas, checkpoints y punto operativo y evaluar en `test`. Si la fusión se selecciona en `valid`, generar las predicciones `test` de sus dos componentes y aplicar la regla congelada. Dejar Copy-Paste y más pruebas para después de esta evaluación.
+3. Reservar tiempo para fijar recetas, checkpoints y punto operativo y evaluar en `test`. Si la fusión se selecciona en `valid`, generar las predicciones `test` de sus dos componentes y aplicar la regla congelada. Dejar Copy-Paste y más pruebas para después de esta evaluación.
 
 La evaluación final en `test` se reserva hasta fijar las recetas, los checkpoints y el punto operativo.
 

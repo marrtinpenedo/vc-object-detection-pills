@@ -1,6 +1,6 @@
 # EXP-006 · Duración del warm-up de YOLOv10-S
 
-**Estado** `propuesto`
+**Estado** `cerrado` en fase A. Se conserva el warm-up de la baseline. Las fases B y C quedaron sin ejecutar.
 
 [Hallazgos y decisión](findings.md) · [Artefactos](results/README.md)
 
@@ -41,123 +41,22 @@ Informar deltas variante menos control por semilla, media y desviación estánda
 
 ## Ejecución en CESGA
 
-Ejecutar los bloques de esta sección en Bash. Si la sesión se abre en Zsh, iniciar `bash` antes de definir las variables o funciones.
-
-### Preparar una tanda
-
-Tras revisar y versionar EXP-006, desplegar una copia nueva del commit exacto siguiendo la [guía de transferencia](../../docs/cesga.md#transferencia-y-actualización-del-código). Conservarla durante toda la tanda. En CESGA, usar Bash desde esa raíz y definir las [rutas de la guía](../../docs/cesga.md#acceso-y-almacenamiento). Asignar a `EXP_COMMIT` el SHA completo devuelto por `git rev-parse HEAD` en el clon desde el que se transfirió la copia. Si no contiene `.git`, conservar `source-commit` con las huellas del código.
-
-El bloque prepara una copia privada de los archivos declarados en el manifiesto para aislar la caché de etiquetas de Ultralytics. Los pesos y el entorno siguen siendo los instalados. Conservar el valor de `EXP_ROOT` para las fases posteriores.
-
-```bash
-export EXP_ROOT
-EXP_ROOT=$(mktemp -d "${BASELINE_RESULTS:?}/exp-006-yolo-warmup-XXXXXX")
-(
-  set -euo pipefail
-  : "${EXP_ROOT:?}"
-  [[ "${EXP_COMMIT:?}" =~ ^[0-9a-f]{40}$ ]]
-  printf '%s\n' "$EXP_COMMIT" > "$EXP_ROOT/source-commit"
-  mkdir "$EXP_ROOT/data" "$EXP_ROOT/slurm"
-  "$YOLO_ENV/bin/python" -c 'import json, sys; print("manifest.json", *sorted(json.load(open(sys.argv[1]))["files"]), sep="\n")' \
-    "$BASELINE_DATA/manifest.json" > "$EXP_ROOT/data.files"
-  rsync -a --files-from="$EXP_ROOT/data.files" "$BASELINE_DATA/" "$EXP_ROOT/data/"
-  sha256sum scripts/*.py slurm/yolo.sh configs/baseline/yolo.json \
-    configs/experiments/yolo-warmup-{3,5}.json > "$EXP_ROOT/code-config.sha256"
-  sha256sum "$EXP_ROOT/data/manifest.json" "$EXP_ROOT/data/coco/valid.json" "$YOLO_WEIGHTS" \
-    > "$EXP_ROOT/inputs.sha256"
-) && printf '%s\n' "$EXP_ROOT"
-```
-
-### Enviar entrenamientos
-
-Para tandas nuevas, definir esta función en la sesión Bash de envío. Cada brazo tiene una salida, configuración de Ultralytics, configuración efectiva e ID propios. Dentro de una pareja, el segundo entrenamiento espera a que termine el primero para evitar escrituras simultáneas en la caché de etiquetas de la tanda.
-
-```bash
-train_exp() (
-  set -euo pipefail
-  : "${EXP_ROOT:?}"
-  seed=$1
-  shift
-  sha256sum --check --quiet "$EXP_ROOT/code-config.sha256" "$EXP_ROOT/inputs.sha256"
-  dep=()
-  for arm; do
-    case "$arm" in
-      control) config=configs/baseline/yolo.json ;;
-      warmup-3|warmup-5) config="configs/experiments/yolo-$arm.json" ;;
-      *) exit 2 ;;
-    esac
-    mkdir -p "$EXP_ROOT/s$seed"
-    slot="$EXP_ROOT/s$seed/$arm"
-    mkdir "$slot"
-    "$YOLO_ENV/bin/python" -m scripts.train_baseline yolo --check-config \
-      --config "$config" --seed "$seed" > "$slot/config.json"
-    printf '%s\n' "$slot/train" > "$slot/train.path"
-    job=$(PILLS_YOLO_CONFIG_DIR="$slot/ultralytics" sbatch --parsable --export=ALL "${dep[@]}" \
-      --job-name="exp006-yolo-$arm-s$seed" \
-      --output="$EXP_ROOT/slurm/%x-%j.out" --error="$EXP_ROOT/slurm/%x-%j.err" slurm/yolo.sh \
-      --data "$EXP_ROOT/data" --weights "$YOLO_WEIGHTS" --config "$config" \
-      --seed "$seed" --output "$slot/train")
-    printf '%s\n' "${job%%;*}" | tee "$slot/train.job"
-    dep=(--dependency="afterok:${job%%;*}")
-  done
-)
-
-train_exp 2026 control warmup-5
-```
-
-La última línea inicia A. Si se aprueba B, usar `train_exp 2026 warmup-3` tras terminar A. Para C, asignar a `SELECTED` el brazo elegido, ejecutar `train_exp 2027 control "$SELECTED"` y, cuando ambos trabajos terminen, `train_exp 2028 control "$SELECTED"`. Consultar el estado con `sacct -j ID --allocations --format=JobID,State,ExitCode` y los archivos de `$EXP_ROOT/slurm/`. Conservar las salidas fallidas antes de repetir en una tanda nueva. [Seguimiento SLURM](../../docs/cesga.md#ejecución-de-trabajos-slurm)
+La tanda `exp-006-yolo-warmup-wqn08F` comparó el control (`11994691`) y `warmup-5` (`11994693`) con semilla 2026. El entrenamiento usó `slurm/yolo.sh` de la [revisión registrada](results/phase-a/source-commit). Se conservan la configuración efectiva, las huellas de datos y pesos y el estado de cada ejecución. [Inventario de fase A](results/README.md)
 
 ### Evaluar sobre la misma GPU
 
-Los entrenamientos de la fase A ya están completos. Los trabajos `11994691` (control) y `11994693` (`warmup-5`) usaron la revisión `7f459491ea21cf61733989c18a6ad362c390c534`. Reutilizar esa copia y la tanda `exp-006-yolo-warmup-wqn08F`.
-
-Desde el clon local con la mejora revisada, desplegar solo el lanzador y su auxiliar en un directorio nuevo. Ejecutar en Bash con `CESGA_SSH` definida. El directorio del entrenamiento permanece intacto.
-
-```bash
-(
-  set -euo pipefail
-  launcher=$(ssh "${CESGA_SSH:?}" 'mktemp -d "$HOME/pills-evaluate-XXXXXX"')
-  rsync -a -e ssh -- slurm/evaluate.{sh,py} "$CESGA_SSH:$launcher/"
-  printf 'export PILLS_EVAL_LAUNCHER_DIR=%q\n' "$launcher"
-)
-```
-
-En CESGA, ejecutar el `export` impreso y situarse en la raíz del código de entrenamiento. La ruta del bloque corresponde a la convención de transferencia de la guía. Si la copia histórica tiene otro nombre, definir `EXP_CODE` con su ruta. El lanzador registra sus propias huellas en `launch.json`. Los hashes del evaluador y el verificador proceden de la copia de entrenamiento.
-
-```bash
-(
-  set -euo pipefail
-  cd "${EXP_CODE:-$HOME/vc-object-detection-pills-7f459491ea21}"
-  EXP_ROOT="${STORE:?}/pills-baseline/results/exp-006-yolo-warmup-wqn08F"
-  test "$(cat "$EXP_ROOT/source-commit")" = 7f459491ea21cf61733989c18a6ad362c390c534
-  sha256sum --check --quiet "$EXP_ROOT/code-config.sha256" "$EXP_ROOT/inputs.sha256"
-  test "$(cat "$EXP_ROOT/s2026/control/train.job")" = 11994691
-  test "$(cat "$EXP_ROOT/s2026/warmup-5/train.job")" = 11994693
-  job=$(sbatch --parsable --export=ALL --job-name=exp006-eval-a-s2026 \
-    --output="$EXP_ROOT/slurm/%x-%j.out" --error="$EXP_ROOT/slurm/%x-%j.err" \
-    "${PILLS_EVAL_LAUNCHER_DIR:?}/evaluate.sh" --data "$EXP_ROOT/data" \
-    --split valid --checkpoint best --output "$EXP_ROOT/eval-a-s2026" --check-slurm \
-    --example-image-id 57 --example-image-id 61 --example-image-id 80 \
-    --run control "$EXP_ROOT/s2026/control/train" \
-    --run warmup-5 "$EXP_ROOT/s2026/warmup-5/train")
-  printf '%s\n' "${job%%;*}"
-)
-```
-
-El trabajo comprueba los dos entrenamientos antes de evaluar y mide ambos en la misma GPU con el benchmark de referencia. Cada brazo exporta los JPEG de los mismos IDs 57, 61 y 80. Antes de recuperar resultados, comprobar `COMPLETED`, `0:0` y `verified.ok`. Conservar `eval.job`, los estados `*.train.sacct` y el [inventario de artefactos](results/README.md#recuperación-selectiva).
-
-Para B, usar un nombre `exp006-eval-b-s2026`, salida `eval-b-s2026` y añadir `--run warmup-3 "$EXP_ROOT/s2026/warmup-3/train"`. Para C, enviar una comparación por semilla con los nombres y salidas de ronda `c` y las rutas del control y del brazo seleccionado. En ambos casos, comprobar la revisión y las huellas de la tanda correspondiente. Si una evaluación falla, conservar su directorio de salida bajo otro nombre antes de reintentar. [Interfaz y seguimiento](../../docs/cesga.md#evaluación-conjunta)
+El trabajo `12001925` evaluó ambos checkpoints `best` en `valid` con el lanzador de la revisión `11b223b9a494e97886e715c0b043702ebdd24ba5` desplegado aparte. El evaluador y el verificador se ejecutaron desde la copia del código de entrenamiento. `launch.json` registra las huellas de ambos archivos del lanzador, los checkpoints y los parámetros del benchmark. El envío histórico se puede consultar con `git show 11b223b:experiments/exp-006-yolo-warmup/README.md`. [Lanzamiento registrado](results/phase-a/eval-a-s2026/launch.json)
 
 ## Recuperación y reproducción del análisis
 
-Recuperar la selección del [inventario de resultados](results/README.md#recuperación-selectiva) o usar una tanda del [archivo de evidencia](results/README.md#evidencia-para-versionar). Desde la raíz del clon local, iniciar `bash` si el shell habitual es Zsh. Definir `LOCAL_EXP` con la ruta de la tanda y, si procede, `EXP_DATASET` con la ruta del dataset COCO original. Para verificar las métricas basta con su anotación `valid/_annotations.coco.json`.
+Desde la raíz del clon local, ejecutar el bloque en Bash. Por defecto usa la evidencia archivada de la fase A. Se puede indicar otra copia con `LOCAL_EXP` y ubicar el dataset COCO original mediante `EXP_DATASET`. Para el recálculo basta con su anotación `valid/_annotations.coco.json`. [Inventario de resultados](results/README.md#recuperación-selectiva)
 
 El bloque comprueba las huellas de los artefactos y extrae en un directorio temporal el commit de `source-commit`, que debe estar disponible en el clon. Los comandos funcionan desde un HEAD posterior al commit de entrenamiento. El análisis reconstruye el COCO con el mapeo del manifiesto, coteja las huellas del original y del COCO preparado, y llama a `verify_evaluation()` para recalcular mAP, AP por clase y curvas PR sobre las predicciones exportadas. El informe indica `coco_verified: true` si todas las evaluaciones de la comparación superan la comprobación. [Verificador común](../../scripts/verify_baseline.py)
 
 ```bash
 (
   set -euo pipefail
-  source=$(realpath "${LOCAL_EXP:?}")
+  source=$(realpath "${LOCAL_EXP:-experiments/exp-006-yolo-warmup/results/phase-a}")
   dataset=$(realpath "${EXP_DATASET:-data/pills-sxdht}")
   sums=downloaded.sha256
   if [[ -f "$source/evidence.sha256" ]]; then sums=evidence.sha256; fi
@@ -179,4 +78,4 @@ El bloque comprueba las huellas de los artefactos y extrae en un directorio temp
 )
 ```
 
-Si faltan dependencias en la caché de `uv`, quitar `--offline` para preparar el entorno fijado. Para B, comparar cada variante con `--pair 2026 b` y una salida distinta. Para C, usar la variante elegida, añadir `--pair 2027 c --pair 2028 c` a su pareja exploratoria y usar otra salida. El informe distingue todas las parejas de las dos confirmaciones y mantiene por separado las métricas de reevaluación y el historial. El resumen sin `--data` sirve para consulta y deja `coco_verified: false`. Registrar la decisión a partir del informe verificado. [Hallazgos](findings.md)
+Si faltan dependencias en la caché de `uv`, quitar `--offline` para preparar el entorno fijado. Comparar el `summary.json` regenerado con el [resumen archivado](results/analysis/summary.json). El informe sin `--data` queda marcado con `coco_verified: false`.
