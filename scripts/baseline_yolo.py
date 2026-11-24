@@ -22,6 +22,7 @@ from scripts.baseline_run import (
     PauseTraining, UpdateCheck, check_gradients, parameters, publish_copy, save_history,
 )
 from scripts.photometric import PhotometricSampler, adjust_luminance
+from scripts.yolo_staged import StagedBackbone, layout
 
 VERSION = "8.3.161"
 DISABLED_AUGMENTATIONS = {
@@ -186,6 +187,22 @@ class YoloTrainer(DetectionTrainer):
         """Retain the native resumable format; the common CLI evaluates the chosen checkpoint."""
 
 
+class StagedYoloTrainer(YoloTrainer):
+    def get_model(self, cfg=None, weights=None, verbose=True):
+        model = super().get_model(cfg, weights, verbose)
+        layout(weights)
+        layout(model)
+        return model
+
+    def _model_train(self):
+        super()._model_train()
+        self.staged.begin_epoch(self, self.epoch + 1)
+
+    def optimizer_step(self):
+        self.staged.before_optimizer_step()
+        super().optimizer_step()
+
+
 def make_predictor(model, imgsz):
     letterbox = LetterBox(new_shape=(imgsz, imgsz), auto=False, scaleup=True, stride=32)
 
@@ -240,7 +257,11 @@ def ultralytics_args(args, spec, resume_path):
 
 def record_runtime(trainer, args):
     inventory = parameters(trainer.model)
-    if any(".dfl" not in row["name"] for row in inventory["frozen"]):
+    staged = getattr(trainer, "staged", None)
+    frozen = {row["name"] for row in inventory["frozen"]}
+    if staged is not None and frozen != set(staged.frozen_parameters()):
+        raise RuntimeError("El inventario inicial no coincide con la fase congelada")
+    if staged is None and any(".dfl" not in name for name in frozen):
         raise RuntimeError("YOLO presenta parámetros congelados fuera de DFL")
     write_json(args.output / "parameters.json", inventory)
     batches = len(trainer.train_loader)
@@ -262,6 +283,7 @@ def record_runtime(trainer, args):
             {k: g[k] for k in ("initial_lr", "weight_decay", "betas") if k in g}
             for g in trainer.optimizer.param_groups
         ],
+        **({"freeze_backbone_epochs": staged.duration} if staged is not None else {}),
         **photometric,
     })
 
@@ -277,6 +299,9 @@ def probe(trainer, args, spec):
     if result.ndim != 2 or result.shape[1] != 6 or not np.isfinite(result).all():
         raise RuntimeError("Salida YOLO no finita o de forma inválida")
     trainer.model.train()
+    staged = getattr(trainer, "staged", None)
+    if staged is not None:
+        staged.begin_epoch(trainer, 1, probe=True)
     loss, items = trainer.model(trainer.preprocess_batch(batch))
     if not torch.isfinite(loss.sum()).item():
         raise RuntimeError("Pérdida YOLO no finita")
@@ -288,6 +313,10 @@ def probe(trainer, args, spec):
         "one-to-many": lambda name: name.startswith(head + "cv3."),
         "one-to-one": lambda name: name.startswith(head + "one2one_cv3."),
     }
+    if staged is not None:
+        del checks["backbone"]
+        checks["neck"] = lambda name: name.startswith("model.13.")
+        staged.finish_probe(trainer)
     for name, matches in checks.items():
         if not any(matches(key) and value == "nonzero" for key, value in gradients.items()):
             raise RuntimeError(f"YOLO no recibió gradientes útiles en {name}")
@@ -322,12 +351,19 @@ def train(args, spec, manifest):
             publish_copy(last, last.with_name("best.pt"))
         del state
         trim_csv(args.output / "results.csv", completed_epochs)
-    trainer = YoloTrainer(overrides, truth, manifest["classes"], manifest["splits"], spec.get("photometric"))
+    freeze = spec.get("freeze_backbone_epochs", 0)
+    trainer_type = StagedYoloTrainer if freeze else YoloTrainer
+    trainer = trainer_type(overrides, truth, manifest["classes"], manifest["splits"], spec.get("photometric"))
     if trainer.save_dir.resolve() != args.output:
         raise ValueError(f"Ultralytics usaría una salida diferente: {trainer.save_dir}")
     if trainer.data["names"] != {item["internal_id"]: item["name"] for item in manifest["classes"]}:
         raise ValueError("El YAML YOLO y el manifiesto discrepan en las clases")
-    trainer.add_callback("on_pretrain_routine_end", lambda t: record_runtime(t, args))
+    def initialize_runtime(t):
+        if freeze:
+            t.staged = StagedBackbone(t, args.output, freeze)
+        record_runtime(t, args)
+
+    trainer.add_callback("on_pretrain_routine_end", initialize_runtime)
 
     if args.initialize:
         probe(trainer, args, spec)
@@ -340,13 +376,17 @@ def train(args, spec, manifest):
     def check_losses(t):
         if not torch.isfinite(t.tloss).all().item():
             raise RuntimeError("Pérdidas YOLO de entrenamiento no finitas")
-        t.update_check.after_epoch(t.epoch + 1)
+        if freeze:
+            t.staged.end_epoch(t, t.epoch + 1)
+        else:
+            t.update_check.after_epoch(t.epoch + 1)
 
     def pause(t):
         if t.epoch + 1 == args.pause_after:
             raise PauseTraining
 
-    trainer.add_callback("on_pretrain_routine_end", start_update_check)
+    if not freeze:
+        trainer.add_callback("on_pretrain_routine_end", start_update_check)
     trainer.add_callback("on_train_epoch_end", check_losses)
     trainer.add_callback("on_model_save", pause)
     try:

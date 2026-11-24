@@ -66,7 +66,8 @@ def publish_copy(source, destination):
 def load_config(backend, path, overrides):
     shape = read_json(REPO / "configs" / "baseline" / f"{backend}.json")
     spec = read_json(path) if path else shape.copy()
-    if spec.keys() - {"photometric"} != shape.keys():
+    optional = {"photometric", "freeze_backbone_epochs"} if backend == "yolo" else {"photometric"}
+    if spec.keys() - optional != shape.keys():
         raise ValueError(f"Claves de configuración diferentes de {sorted(shape)}")
     if "photometric" in spec:
         from scripts.photometric import validate_photometric
@@ -89,6 +90,10 @@ def load_config(backend, path, overrides):
         or spec["eval_every_epochs"] != 1 or spec["checkpoint_every_epochs"] != 1
     ):
         raise ValueError("Revisa lote, épocas, LR, tamaño múltiplo de 32, semilla y frecuencia por época")
+    if backend == "yolo":
+        freeze = spec.get("freeze_backbone_epochs", 0)
+        if type(freeze) is not int or not 0 <= freeze < spec["epochs"]:
+            raise ValueError("freeze_backbone_epochs debe ser un entero entre 0 y epochs - 1")
     for key in ("momentum", "warmup_momentum", "warmup_factor", "final_lr_factor", "nms_iou"):
         if key in spec and not 0 < spec[key] <= 1:
             raise ValueError(f"{key} debe estar en (0, 1]")
