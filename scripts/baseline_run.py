@@ -66,8 +66,12 @@ def publish_copy(source, destination):
 def load_config(backend, path, overrides):
     shape = read_json(REPO / "configs" / "baseline" / f"{backend}.json")
     spec = read_json(path) if path else shape.copy()
-    if spec.keys() != shape.keys():
+    if spec.keys() - {"photometric"} != shape.keys():
         raise ValueError(f"Claves de configuración diferentes de {sorted(shape)}")
+    if "photometric" in spec:
+        from scripts.photometric import validate_photometric
+
+        validate_photometric(spec["photometric"])
     for key, value in overrides.items():
         if value is not None:
             spec[key] = value

@@ -72,7 +72,7 @@ La divergencia tardía entre entrenamiento y validación de YOLO es compatible c
 
 ### Factores para futuras comparaciones
 
-Esta priorización orienta comparaciones controladas en `valid`. La ficha de EXP-001 concreta la primera prueba. Las prioridades de los demás factores dependen de las señales indicadas.
+Esta priorización recoge las hipótesis surgidas del baseline. El [índice](../README.md#próximos-pasos) recoge el orden de trabajo vigente.
 
 | Factor y prioridad inicial | Qué controla | Relevancia para pastillas y diferencia entre detectores | Señal que justificaría estudiarlo |
 | --- | --- | --- | --- |
@@ -89,4 +89,4 @@ Esta priorización orienta comparaciones controladas en `valid`. La ficha de EXP
 
 - Mantener ambos baselines como referencia en `valid`, con las ocho clases activas y el evaluador COCO común. Acompañar el mAP oficial con la sensibilidad a la clase de soporte unitario, y el punto operativo ilustrativo de 0,25 con las curvas PR.
 - Conservar las anotaciones originales en el baseline. Revisar las incidencias señaladas antes de interpretar los resultados de las cajas pequeñas.
-- Priorizar EXP-001 y reservar `test` hasta fijar las recetas. [Orden de trabajo](../README.md#próximos-pasos)
+- La primera comparación fue EXP-001. El trabajo posterior sigue el [orden de trabajo vigente](../README.md#próximos-pasos). Reservar `test` hasta fijar las recetas.
