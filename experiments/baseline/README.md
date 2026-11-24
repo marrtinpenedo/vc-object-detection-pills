@@ -151,12 +151,14 @@ sbatch "${SLURM_LOGS[@]}" --time=02:00:00 slurm/yolo.sh --data "$BASELINE_DATA" 
 
 Compruebe `complete`, dos validaciones con pasos crecientes, pérdidas finitas y cambios de los parámetros de control en `parameter_updates.json`. El warm-up de YOLO abarca las dos épocas del smoke test. La reanudación parte del último checkpoint completo y no garantiza equivalencia bit a bit. [Consulta de trabajos y recuperación de checkpoints](../../docs/cesga.md#ejecución-de-trabajos-slurm)
 
-**Fase D. Métricas y artefactos.** Para ejecuciones de dos épocas, el verificador exige el registro de pausa y reanudación de la fase C. Con ambos entrenamientos en estado `complete`, defina las rutas y use el [envío de evaluación conjunta](../../docs/cesga.md#evaluación-conjunta).
+**Fase D. Métricas y artefactos.** Para ejecuciones de dos épocas, use la interfaz posicional, que verifica el registro de pausa y reanudación de la fase C. Espere a que ambos entrenamientos estén en estado `complete`. [Guía del lanzador](../../docs/cesga.md#evaluación-conjunta)
 
 ```bash
 CASCADE_RUN="$VERIFY_ROOT/smoke-cascade"
 YOLO_RUN="$VERIFY_ROOT/smoke-yolo"
 EVAL_ROOT="$VERIFY_ROOT/eval-valid"
+sbatch --job-name=eval-baseline-smoke "${SLURM_LOGS[@]}" slurm/evaluate.sh \
+  "$BASELINE_DATA" "$CASCADE_RUN" "$YOLO_RUN" "$EVAL_ROOT"
 ```
 
 El verificador comprueba el dataset, los checkpoints, el recálculo del AP y las curvas PR, y la equivalencia de las condiciones del benchmark. Inspeccione `training.png`, `pr_curves.png` y los ejemplos para comprobar la escala de las cajas y la visualización de TP, FP y FN.
@@ -176,28 +178,22 @@ sbatch "${SLURM_LOGS[@]}" slurm/yolo.sh --data "$BASELINE_DATA" --weights "$YOLO
 
 Para reanudar, Cascade usa `last_checkpoint` y recupera el optimizador, el scheduler, la iteración y el estado del mejor AP. YOLO usa `weights/last.pt` con EMA, época y estado del optimizador. Los estados RNG y del muestreador pueden diferir tras reanudar. `status.json` acumula la duración de las sesiones registradas. Para una terminación abrupta, consulte el tiempo en `sacct`.
 
-Con ambos entrenamientos completos, defina las rutas y use el mismo [envío de evaluación conjunta](../../docs/cesga.md#evaluación-conjunta).
+Con ambos entrenamientos completos, use el [lanzador común](../../docs/cesga.md#evaluación-conjunta) para evaluar en validación.
 
 ```bash
 CASCADE_RUN="$RUN_ROOT/cascade"
 YOLO_RUN="$RUN_ROOT/yolo"
 EVAL_ROOT="$RUN_ROOT/eval-valid"
+sbatch --job-name=eval-baselines-valid "${SLURM_LOGS[@]}" slurm/evaluate.sh \
+  --data "$BASELINE_DATA" --output "$EVAL_ROOT" --run cascade "$CASCADE_RUN" --run yolo "$YOLO_RUN"
 ```
 
-Una vez cerrados los experimentos, la evaluación sobre `test` usa los checkpoints ya seleccionados en validación. Ejecute estos comandos en la misma [sesión GPU interactiva](../../docs/cesga.md#sesión-gpu-interactiva), con los módulos cargados y desde la raíz del proyecto.
+Una vez cerrados los experimentos, evalúe sobre `test` los checkpoints seleccionados en validación. Envíe ambos en la misma asignación GPU conforme a la [guía de evaluación](../../docs/cesga.md#evaluación-conjunta).
 
 ```bash
-(
-  set -e
-  unset PYTHONHOME PYTHONPATH
-  export OMP_NUM_THREADS=1 MPLBACKEND=Agg PYTHONNOUSERSITE=1
-  "$CASCADE_ENV/bin/python" -m scripts.evaluate_baseline --data "$BASELINE_DATA" \
-    --run "$RUN_ROOT/cascade" --split test --checkpoint best \
-    --output "$RUN_ROOT/eval-cascade-test" --benchmark --warmup 20 --iterations 100
-  "$YOLO_ENV/bin/python" -m scripts.evaluate_baseline --data "$BASELINE_DATA" \
-    --run "$RUN_ROOT/yolo" --split test --checkpoint best \
-    --output "$RUN_ROOT/eval-yolo-test" --benchmark --warmup 20 --iterations 100
-)
+sbatch --job-name=eval-baselines-test "${SLURM_LOGS[@]}" slurm/evaluate.sh \
+  --data "$BASELINE_DATA" --split test --checkpoint best --output "$RUN_ROOT/eval-test" \
+  --run cascade "$RUN_ROOT/cascade" --run yolo "$RUN_ROOT/yolo"
 ```
 
 ### Artefactos

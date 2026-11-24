@@ -1,6 +1,6 @@
 # Artefactos de EXP-006
 
-Pendientes de ejecución. Cada tanda conserva el commit y las huellas de código, datos y pesos iniciales. El nombre `sSEMILLA/BRAZO` identifica un entrenamiento. `eval-RONDA-sSEMILLA/BRAZO` identifica la reevaluación, que puede reutilizarse para varias comparaciones en la misma asignación. Los JPEG muestran las mismas imágenes de validación en todos los brazos.
+La evaluación de la fase A está pendiente. Cada tanda conserva el commit y las huellas de código, datos y pesos iniciales. El nombre `sSEMILLA/BRAZO` identifica un entrenamiento. `eval-RONDA-sSEMILLA/BRAZO` identifica la reevaluación, que puede reutilizarse para varias comparaciones en la misma asignación. Los JPEG muestran las mismas imágenes de validación en todos los brazos.
 
 ## Recuperación selectiva
 
@@ -21,7 +21,7 @@ LOCAL_EXP=$(mktemp -d "$PWD/results/exp-006-XXXXXX")
       IFS=: read -r phase seed arms <<< "$round"
       IFS=, read -r -a selected <<< "$arms"
       eval_dir="eval-$phase-s$seed"
-      printf '%s\n' "$eval_dir"/{eval.job,verified.ok}
+      printf '%s\n' "$eval_dir"/{eval.job,launch.json,verified.ok}
       for arm in "${selected[@]}"; do
         slot="s$seed/$arm"
         printf '%s\n' "$slot"/{config.json,train.job,train.path}
@@ -38,7 +38,7 @@ LOCAL_EXP=$(mktemp -d "$PWD/results/exp-006-XXXXXX")
 ) && printf '%s\n' "$LOCAL_EXP"
 ```
 
-La lista incluye configuración y registro efectivo, IDs, estados, métricas, predicciones, curvas y ejemplos emparejados. Los checkpoints, logs y datos de entrenamiento permanecen en CESGA. Antes del análisis, verificar la descarga con `(cd "$LOCAL_EXP" && sha256sum --check --quiet downloaded.sha256)`. [Reproducción del análisis](../README.md#recuperación-y-reproducción-del-análisis)
+La lista incluye configuración y registro efectivo, IDs, estados, métricas, predicciones, curvas, ejemplos emparejados y las huellas del lanzador en `launch.json`. Los checkpoints, logs y datos de entrenamiento permanecen en CESGA. Antes del análisis, verificar la descarga con `(cd "$LOCAL_EXP" && sha256sum --check --quiet downloaded.sha256)`. [Reproducción del análisis](../README.md#recuperación-y-reproducción-del-análisis)
 
 ## Evidencia para versionar
 

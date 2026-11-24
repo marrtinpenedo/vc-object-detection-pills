@@ -70,7 +70,7 @@ EXP_ROOT=$(mktemp -d "${BASELINE_RESULTS:?}/exp-006-yolo-warmup-XXXXXX")
 
 ### Enviar entrenamientos
 
-Definir esta función en la sesión Bash de envío. Cada brazo tiene una salida, configuración de Ultralytics, configuración efectiva e ID propios. Dentro de una pareja, el segundo entrenamiento espera a que termine el primero para evitar escrituras simultáneas en la caché de etiquetas de la tanda.
+Para tandas nuevas, definir esta función en la sesión Bash de envío. Cada brazo tiene una salida, configuración de Ultralytics, configuración efectiva e ID propios. Dentro de una pareja, el segundo entrenamiento espera a que termine el primero para evitar escrituras simultáneas en la caché de etiquetas de la tanda.
 
 ```bash
 train_exp() (
@@ -93,6 +93,7 @@ train_exp() (
       --config "$config" --seed "$seed" > "$slot/config.json"
     printf '%s\n' "$slot/train" > "$slot/train.path"
     job=$(PILLS_YOLO_CONFIG_DIR="$slot/ultralytics" sbatch --parsable --export=ALL "${dep[@]}" \
+      --job-name="exp006-yolo-$arm-s$seed" \
       --output="$EXP_ROOT/slurm/%x-%j.out" --error="$EXP_ROOT/slurm/%x-%j.err" slurm/yolo.sh \
       --data "$EXP_ROOT/data" --weights "$YOLO_WEIGHTS" --config "$config" \
       --seed "$seed" --output "$slot/train")
@@ -108,68 +109,44 @@ La última línea inicia A. Si se aprueba B, usar `train_exp 2026 warmup-3` tras
 
 ### Evaluar sobre la misma GPU
 
-Solicitar una [sesión interactiva en una A100](../../docs/cesga.md#sesión-gpu-interactiva) con 32 CPU. Cargar los [módulos de la guía](../../docs/cesga.md#entornos-y-dependencias) dentro de la asignación. Restablecer `EXP_ROOT` con la ruta de la tanda y situarse en la misma copia del código. Comprobar todos los brazos antes de iniciar la evaluación.
+Los entrenamientos de la fase A ya están completos. Los trabajos `11994691` (control) y `11994693` (`warmup-5`) usaron la revisión `7f459491ea21cf61733989c18a6ad362c390c534`. Reutilizar esa copia y la tanda `exp-006-yolo-warmup-wqn08F`.
+
+Desde el clon local con la mejora revisada, desplegar solo el lanzador y su auxiliar en un directorio nuevo. Ejecutar en Bash con `CESGA_SSH` definida. El directorio del entrenamiento permanece intacto.
 
 ```bash
-eval_exp() (
+(
   set -euo pipefail
-  : "${EXP_ROOT:?}" "${SLURM_JOB_ID:?Requiere una asignación GPU}"
-  phase=$1 seed=$2
-  shift 2
-  sha256sum --check --quiet "$EXP_ROOT/code-config.sha256" "$EXP_ROOT/inputs.sha256"
-  unset PYTHONHOME PYTHONPATH
-  export OMP_NUM_THREADS=1 MPLBACKEND=Agg PYTHONNOUSERSITE=1
-  out="$EXP_ROOT/eval-$phase-s$seed"
-  mkdir "$out"
-  export YOLO_CONFIG_DIR="$out/ultralytics"
-  py="$YOLO_ENV/bin/python"
-  data="$EXP_ROOT/data"
-  for arm; do
-    slot="$EXP_ROOT/s$seed/$arm"
-    state=$(sacct -j "$(cat "$slot/train.job")" --allocations --noheader --parsable2 --format=State,ExitCode)
-    [[ "$state" == 'COMPLETED|0:0' ]]
-    printf '%s\n' "$state" > "$out/$arm.train.sacct"
-    "$py" -c 'import json, sys; assert json.load(open(sys.argv[1]))["status"] == "complete"' "$slot/train/status.json"
-  done
-  printf '%s\n' "$SLURM_JOB_ID" > "$out/eval.job"
-  for arm; do
-    run="$EXP_ROOT/s$seed/$arm/train"
-    "$py" -m scripts.evaluate_baseline --data "$data" --run "$run" \
-      --split valid --checkpoint best --benchmark --warmup 20 --iterations 100 \
-      --examples 0 --output "$out/$arm"
-    "$py" - "$data" "$run" "$out/$arm" <<'PY'
-from pathlib import Path
-import sys
-from scripts.baseline_data import read_json, sha256
-from scripts.baseline_metrics import coco_eval, operating_point, save_examples
-from scripts.verify_baseline import verify_evaluation, verify_run
-
-data, run, output = map(Path, sys.argv[1:])
-coco = data / "coco/valid.json"
-truth = read_json(coco)
-digest = sha256(data / "manifest.json")
-_, best = verify_run(run, digest)
-metrics = verify_evaluation(output, truth, sha256(coco), digest, "valid")
-if best != metrics["checkpoint_sha256"]:
-    raise ValueError("La evaluación no corresponde a best")
-ev = coco_eval(truth, read_json(output / "predictions.json"))
-_, examples = operating_point(ev)
-ids = (57, 61, 80)
-folder = output / "examples"
-save_examples(ev, {i: examples[i] for i in ids}, data / "images/valid", folder, len(ids))
-for image in folder.glob("*.jpg"):
-    image.rename(folder / f"image-{image.name.split('-', 1)[1]}")
-if {image.name for image in folder.glob("*.jpg")} != {f"image-{i}.jpg" for i in ids}:
-    raise ValueError("Faltan ejemplos emparejados")
-PY
-  done
-  touch "$out/verified.ok"
+  launcher=$(ssh "${CESGA_SSH:?}" 'mktemp -d "$HOME/pills-evaluate-XXXXXX"')
+  rsync -a -e ssh -- slurm/evaluate.{sh,py} "$CESGA_SSH:$launcher/"
+  printf 'export PILLS_EVAL_LAUNCHER_DIR=%q\n' "$launcher"
 )
-
-eval_exp a 2026 control warmup-5
 ```
 
-En B, usar `eval_exp b 2026 control warmup-5 warmup-3` para medir todos los brazos comparables en la misma asignación. En C, usar `eval_exp c 2027 control "$SELECTED"` y `eval_exp c 2028 control "$SELECTED"` tras comprobar cada pareja. Los ejemplos fijan los IDs 57, 61 y 80 de `valid` antes de ver resultados. Si una evaluación falla, conservar su directorio bajo otro nombre antes de reintentar. Los checkpoints permanecen en CESGA.
+En CESGA, ejecutar el `export` impreso y situarse en la raíz del código de entrenamiento. La ruta del bloque corresponde a la convención de transferencia de la guía. Si la copia histórica tiene otro nombre, definir `EXP_CODE` con su ruta. El lanzador registra sus propias huellas en `launch.json`. Los hashes del evaluador y el verificador proceden de la copia de entrenamiento.
+
+```bash
+(
+  set -euo pipefail
+  cd "${EXP_CODE:-$HOME/vc-object-detection-pills-7f459491ea21}"
+  EXP_ROOT="${STORE:?}/pills-baseline/results/exp-006-yolo-warmup-wqn08F"
+  test "$(cat "$EXP_ROOT/source-commit")" = 7f459491ea21cf61733989c18a6ad362c390c534
+  sha256sum --check --quiet "$EXP_ROOT/code-config.sha256" "$EXP_ROOT/inputs.sha256"
+  test "$(cat "$EXP_ROOT/s2026/control/train.job")" = 11994691
+  test "$(cat "$EXP_ROOT/s2026/warmup-5/train.job")" = 11994693
+  job=$(sbatch --parsable --export=ALL --job-name=exp006-eval-a-s2026 \
+    --output="$EXP_ROOT/slurm/%x-%j.out" --error="$EXP_ROOT/slurm/%x-%j.err" \
+    "${PILLS_EVAL_LAUNCHER_DIR:?}/evaluate.sh" --data "$EXP_ROOT/data" \
+    --split valid --checkpoint best --output "$EXP_ROOT/eval-a-s2026" --check-slurm \
+    --example-image-id 57 --example-image-id 61 --example-image-id 80 \
+    --run control "$EXP_ROOT/s2026/control/train" \
+    --run warmup-5 "$EXP_ROOT/s2026/warmup-5/train")
+  printf '%s\n' "${job%%;*}"
+)
+```
+
+El trabajo comprueba los dos entrenamientos antes de evaluar y mide ambos en la misma GPU con el benchmark de referencia. Cada brazo exporta los JPEG de los mismos IDs 57, 61 y 80. Antes de recuperar resultados, comprobar `COMPLETED`, `0:0` y `verified.ok`. Conservar `eval.job`, los estados `*.train.sacct` y el [inventario de artefactos](results/README.md#recuperación-selectiva).
+
+Para B, usar un nombre `exp006-eval-b-s2026`, salida `eval-b-s2026` y añadir `--run warmup-3 "$EXP_ROOT/s2026/warmup-3/train"`. Para C, enviar una comparación por semilla con los nombres y salidas de ronda `c` y las rutas del control y del brazo seleccionado. En ambos casos, comprobar la revisión y las huellas de la tanda correspondiente. Si una evaluación falla, conservar su directorio de salida bajo otro nombre antes de reintentar. [Interfaz y seguimiento](../../docs/cesga.md#evaluación-conjunta)
 
 ## Recuperación y reproducción del análisis
 
