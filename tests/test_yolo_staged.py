@@ -1,5 +1,6 @@
 """CPU tests of the staged transfer policy and its audit."""
 
+import csv
 import json
 import os
 from copy import deepcopy
@@ -20,7 +21,7 @@ class StagedConfigTest(unittest.TestCase):
     def test_variants_change_only_freeze_duration(self):
         baseline = load_config("yolo", None, {})
         self.assertNotIn("freeze_backbone_epochs", baseline)
-        for freeze in (5, 10, 15):
+        for freeze in (5, 10, 15, 20, 25, 30):
             config = REPO / f"configs/experiments/yolo-freeze-{freeze}.json"
             self.assertEqual(load_config("yolo", config, {}), {**baseline, "freeze_backbone_epochs": freeze})
         for name in ("yolo-lr-0005", "yolo-photometric", "yolo-warmup-3", "yolo-warmup-5"):
@@ -31,7 +32,7 @@ class StagedConfigTest(unittest.TestCase):
         with TemporaryDirectory() as temporary:
             config = Path(temporary) / "cfg.json"
             yolo = load_config("yolo", None, {})
-            for invalid in (True, 2.0, "2", None, -1, 30):
+            for invalid in (True, 2.0, "2", None, -1, 31):
                 with self.subTest(invalid=invalid):
                     config.write_text(json.dumps({**yolo, "freeze_backbone_epochs": invalid}))
                     with self.assertRaises(ValueError):
@@ -39,8 +40,9 @@ class StagedConfigTest(unittest.TestCase):
             config.write_text(json.dumps({**yolo, "freeze_backbone_epochs": 0}))
             self.assertEqual(load_config("yolo", config, {}).get("freeze_backbone_epochs"), 0)
             config.write_text(json.dumps({**yolo, "freeze_backbone_epochs": 5}))
+            self.assertEqual(load_config("yolo", config, {"epochs": 5})["freeze_backbone_epochs"], 5)
             with self.assertRaises(ValueError):
-                load_config("yolo", config, {"epochs": 5})
+                load_config("yolo", config, {"epochs": 4})
             config.write_text(json.dumps({**load_config("cascade", None, {}), "freeze_backbone_epochs": 0}))
             with self.assertRaises(ValueError):
                 load_config("cascade", config, {})
@@ -176,17 +178,25 @@ class StagedCpuTest(unittest.TestCase):
                 }
             write_json(data / "dataset.yaml", {"path": str(data), "train": "images/train", "val": "images/valid",
                                               "names": [row["name"] for row in classes]})
-            args = SimpleNamespace(weights=weights, data=data, output=root / "smoke",
-                                   resume=False, initialize=False, pause_after=None)
-            spec = {**load_config("yolo", None, {"epochs": 3, "batch": 2, "imgsz": 64, "workers": 0}),
-                    "freeze_backbone_epochs": 1}
-            status = train(args, spec, manifest)
-            audit = read_json(args.output / "staged_transfer.json")
-            self.assertEqual(status["status"], "complete")
-            self.assertTrue((args.output / status["best_checkpoint"]).is_file())
-            self.assertEqual(audit["thaw_epoch"], 2)
-            self.assertEqual([item["backbone_frozen"] for item in audit["epochs"]], [True, False, False])
-            self.assertEqual([item["ema_updates"] for item in audit["epochs"]], [2, 4, 6])
+            analysis = import_module("experiments.exp-007-yolo-staged-transfer.analyze")
+            for duration, thaw, frozen in ((1, 2, [True, False, False]), (3, None, [True, True, True])):
+                with self.subTest(duration=duration):
+                    args = SimpleNamespace(weights=weights, data=data, output=root / f"smoke-{duration}",
+                                           resume=False, initialize=False, pause_after=None)
+                    spec = {**load_config("yolo", None, {"epochs": 3, "batch": 2, "imgsz": 64, "workers": 0}),
+                            "freeze_backbone_epochs": duration}
+                    status = train(args, spec, manifest)
+                    audit = read_json(args.output / "staged_transfer.json")
+                    self.assertEqual(status["status"], "complete")
+                    self.assertTrue((args.output / status["best_checkpoint"]).is_file())
+                    self.assertEqual(audit["thaw_epoch"], thaw)
+                    self.assertEqual([item["backbone_frozen"] for item in audit["epochs"]], frozen)
+                    self.assertEqual([item["ema_updates"] for item in audit["epochs"]], [2, 4, 6])
+                    with (args.output / "history.csv").open(newline="") as stream:
+                        history = [{key: float(row[key]) for key in ("step", *analysis.common.LR)}
+                                   for row in csv.DictReader(stream)]
+                    analysis.verify_stages(audit, read_json(args.output / "parameters.json"),
+                                           read_json(args.output / "ultralytics_runtime.json"), history, duration)
 
     def test_native_optimizer_ema_and_training_modes_across_thaw(self):
         from ultralytics.cfg import get_cfg

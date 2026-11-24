@@ -92,8 +92,8 @@ def load_config(backend, path, overrides):
         raise ValueError("Revisa lote, épocas, LR, tamaño múltiplo de 32, semilla y frecuencia por época")
     if backend == "yolo":
         freeze = spec.get("freeze_backbone_epochs", 0)
-        if type(freeze) is not int or not 0 <= freeze < spec["epochs"]:
-            raise ValueError("freeze_backbone_epochs debe ser un entero entre 0 y epochs - 1")
+        if type(freeze) is not int or not 0 <= freeze <= spec["epochs"]:
+            raise ValueError("freeze_backbone_epochs debe ser un entero entre 0 y epochs")
     for key in ("momentum", "warmup_momentum", "warmup_factor", "final_lr_factor", "nms_iou"):
         if key in spec and not 0 < spec[key] <= 1:
             raise ValueError(f"{key} debe estar en (0, 1]")

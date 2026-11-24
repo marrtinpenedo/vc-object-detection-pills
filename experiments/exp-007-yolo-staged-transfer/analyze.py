@@ -1,6 +1,7 @@
 """Verifica evidencias de EXP-007 y aplica sus criterios preestablecidos."""
 
 import argparse
+import csv
 from importlib import import_module
 import math
 from pathlib import Path
@@ -9,10 +10,12 @@ import re
 from scripts.baseline_data import DESTINATION, read_json, sha256, write_json
 from scripts.baseline_run import REPO, load_config
 from scripts.verify_baseline import require, verify_evaluation
+from .provenance import historical_receipt, receipt, verify_evidence
 
 # Reuse the history, benchmark and COCO reconstruction of the preceding YOLO comparison.
 common = import_module("experiments.exp-006-yolo-warmup.analyze")
 ARMS = {"control": 0, "freeze-5": 5, "freeze-10": 10, "freeze-15": 15}
+ALL_ARMS = {**ARMS, "freeze-20": 20, "freeze-25": 25, "freeze-30": 30}
 REGIONS = {"backbone", "neck", "one2many", "one2one"}
 DFL = "model.23.dfl.conv.weight"
 ENVIRONMENT_HARDWARE = ("gpu", "cuda_runtime", "nvidia_driver")
@@ -28,9 +31,11 @@ def verify_stages(audit, inventory, runtime, history, duration):
     if duration == 0:
         require(set(frozen) == {DFL}, "El control debe conservar solo DFL congelada")
         return
+    require(0 < duration <= len(history), "Duración de congelación fuera del historial")
+    thaw = duration + 1 if duration < len(history) else None
     require(audit["freeze_backbone_epochs"] == runtime["freeze_backbone_epochs"] == duration
-            and audit["thaw_epoch"] == duration + 1
-            and audit["optimizer_groups_verified_at_thaw"] is True,
+            and audit["thaw_epoch"] == thaw
+            and audit["optimizer_groups_verified_at_thaw"] is (thaw is not None),
             "Duración, transición de descongelación o grupos AdamW incorrectos")
     require([item["index"] for item in audit["modules"]] == list(range(24))
             and [item["part"] for item in audit["modules"]] == ["backbone"] * 11 + ["neck"] * 12 + ["detector"]
@@ -88,27 +93,49 @@ def verify_stages(audit, inventory, runtime, history, duration):
         before = digest
 
 
-def read_cohort(source, phase, seed, arms, identity, truth):
+def verify_permanent_smoke(slot):
+    run = slot / "train"
+    status = read_json(run / "status.json")
+    config = read_json(run / "run.json")["run"]["config"]
+    runtime = read_json(run / "ultralytics_runtime.json")
+    require(status["status"] == "complete" and config["epochs"] == config["freeze_backbone_epochs"] == 3
+            and runtime["iterations_per_epoch"] == 40, "Smoke de congelación permanente incompleto")
+    with (run / "history.csv").open(newline="") as stream:
+        history = [{key: float(row[key]) for key in ("step", *common.LR)} for row in csv.DictReader(stream)]
+    require([row["step"] for row in history] == [1, 2, 3], "El smoke debe cubrir exactamente tres épocas")
+    verify_stages(read_json(run / "staged_transfer.json"), read_json(run / "parameters.json"), runtime, history, 3)
+
+
+def read_cohort(source, phase, seed, arms, identity, truth, *, training_sources=None, evaluation_checkout=None):
     commit, inputs = identity
+    archived = (source / "evidence.sha256").is_file()
     evaluation = source / f"eval-{phase}-s{seed}"
-    require((evaluation / "verified.ok").is_file(), "Falta el sello de verificación del lanzador")
-    job = (evaluation / "eval.job").read_text().strip()
     launch = read_json(evaluation / "launch.json")
-    require(launch["job_id"] == job and set(launch["runs"]) == set(arms)
+    job = launch["job_id"]
+    require(isinstance(job, str) and re.fullmatch(r"[0-9]+", job), "ID de evaluación inválido")
+    if not archived:
+        require((evaluation / "verified.ok").is_file() and (evaluation / "eval.job").read_text().strip() == job,
+                "Falta el sello de verificación del lanzador o el ID de evaluación es distinto")
+    evaluation_checkout = evaluation_checkout or REPO
+    require(set(launch["runs"]) == set(arms)
             and launch["dataset_manifest_sha256"] == inputs["manifest.json"]
             and launch["coco_sha256"] == inputs["valid.json"] and launch["split"] == "valid"
             and launch["checkpoint_kind"] == "best" and launch["example_image_ids"] == [57, 61, 80]
             and (launch["benchmark"], launch["warmup"], launch["iterations"]) == (True, 20, 100)
-            and launch["launcher_sha256"] == {name: sha256(REPO / "slurm" / name) for name in ("evaluate.sh", "evaluate.py")},
+            and launch["launcher_sha256"]
+            == {name: sha256(evaluation_checkout / "slurm" / name) for name in ("evaluate.sh", "evaluate.py")},
             "Procedencia o inventario del lanzamiento incompatible")
-    code = {path.relative_to(REPO).as_posix(): sha256(path) for path in sorted((REPO / "scripts").glob("*.py"))}
+    code = {path.relative_to(evaluation_checkout).as_posix(): sha256(path)
+            for path in sorted((evaluation_checkout / "scripts").glob("*.py"))}
     results, histories, comparability = {}, {}, []
     environment = None
     for arm in arms:
-        slot = source / f"s{seed}" / arm
+        training_source, training_commit, training_code = (
+            training_sources[arm] if training_sources is not None else (source, commit, code)
+        )
+        slot = training_source / f"s{seed}" / arm
         training = slot / "train"
         output = evaluation / arm
-        original = Path((slot / "train.path").read_text().strip())
         run = read_json(training / "run.json")
         runtime = read_json(training / "ultralytics_runtime.json")
         status = read_json(training / "status.json")
@@ -118,18 +145,33 @@ def read_cohort(source, phase, seed, arms, identity, truth):
         expected = load_config("yolo", config, {"seed": seed})
         require(run["run"]["config"] == metrics["model_config"] == read_json(slot / "config.json") == expected,
                 f"{arm}: recetas distintas")
-        train_job = (slot / "train.job").read_text().strip()
-        require(status["status"] == "complete" and run["mode"] == "train"
-                and status["sessions"][-1]["job_id"] == run["hardware"]["job_id"] == recorded["training_job_id"] == train_job
-                and (evaluation / f"{arm}.train.sacct").read_text().strip() == recorded["training_slurm"] == "COMPLETED|0:0",
+        train_job = run["hardware"]["job_id"]
+        require(isinstance(train_job, str) and re.fullmatch(r"[0-9]+", train_job)
+                and status["status"] == "complete" and run["mode"] == "train"
+                and status["sessions"][-1]["job_id"] == recorded["training_job_id"] == train_job
+                and recorded["training_slurm"] == "COMPLETED|0:0",
                 f"{arm}: estado de entrenamiento incompatible")
+        training_archived = (training_source / "evidence.sha256").is_file()
+        if training_archived:
+            original = Path(runtime["args"]["save_dir"])
+        else:
+            original = Path((slot / "train.path").read_text().strip())
+            require((slot / "train.job").read_text().strip() == train_job
+                    and Path(runtime["args"].get("save_dir", original)) == original,
+                    f"{arm}: ID o ruta del entrenamiento incompatible")
+        if not archived:
+            require((evaluation / f"{arm}.train.sacct").read_text().strip() == recorded["training_slurm"],
+                    f"{arm}: estado SLURM incompatible")
+        best = Path(status["best_checkpoint"])
         require(run["run"]["backend"] == recorded["backend"] == metrics["backend"] == "yolo"
-                and run["code_sha256"] == metrics["code_sha256"] == code
-                and all(item["git_head"] in (None, commit) for item in (run, metrics))
+                and run["code_sha256"] == training_code and metrics["code_sha256"] == code
+                and run["git_head"] in (None, training_commit) and metrics["git_head"] in (None, commit)
+                and recorded.get("training_git_head", run["git_head"]) == run["git_head"]
                 and run["run"]["dataset_manifest_sha256"] == inputs["manifest.json"]
                 and run["run"]["initial_weights_sha256"] == inputs["yolov10s.pt"]
-                and Path(recorded["run"]) == original and metrics["hardware"]["job_id"] == job
-                and original / status["best_checkpoint"] == Path(metrics["checkpoint"]) == Path(recorded["checkpoint"])
+                and original.is_absolute() and Path(recorded["run"]) == original and metrics["hardware"]["job_id"] == job
+                and not best.is_absolute() and ".." not in best.parts
+                and original / best == Path(metrics["checkpoint"]) == Path(recorded["checkpoint"])
                 and valid_digest(metrics["checkpoint_sha256"])
                 and metrics["checkpoint_sha256"] == recorded["checkpoint_sha256"] and metrics["checkpoint_kind"] == "best",
                 f"{arm}: procedencia de datos, checkpoint o código incompatible")
@@ -149,15 +191,16 @@ def read_cohort(source, phase, seed, arms, identity, truth):
                 f"{arm}: configuración efectiva incompatible")
         history = common.read_history(training / "history.csv")
         audit_file = training / "staged_transfer.json"
-        if ARMS[arm] == 0:
+        if ALL_ARMS[arm] == 0:
             require(not audit_file.exists() and "freeze_backbone_epochs" not in runtime, "El control ejecutó ajuste por etapas")
             updates = read_json(training / "parameter_updates.json")
             require(len(updates) == 1 and updates[0]["step"] == 1 and len(updates[0]["changed"]) == 2
                     and all(updates[0]["changed"].values()), "Faltan las actualizaciones iniciales del control")
-        verify_stages(read_json(audit_file) if ARMS[arm] else None,
-                      read_json(training / "parameters.json"), runtime, history, ARMS[arm])
-        require(all((output / "examples" / f"image-{ident}.jpg").is_file() for ident in (57, 61, 80)),
-                "Faltan los ejemplos emparejados")
+        verify_stages(read_json(audit_file) if ALL_ARMS[arm] else None,
+                      read_json(training / "parameters.json"), runtime, history, ALL_ARMS[arm])
+        if not archived:
+            require(all((output / "examples" / f"image-{ident}.jpg").is_file() for ident in (57, 61, 80)),
+                    "Faltan los ejemplos emparejados")
         vals = common.values(metrics, history, status)
         results[arm] = {
             **vals, **{key: metrics[key] for key in ("ap_small", "ap_medium", "ap_large")},
@@ -218,7 +261,7 @@ def transition_windows(histories):
     return {
         arm: {name: [{key: row[key] for key in keys} for row in histories[name][duration - 1:duration + 1]]
               for name in ("control", arm)}
-        for arm, duration in ARMS.items() if duration and arm in histories
+        for arm, duration in ALL_ARMS.items() if arm in histories and 0 < duration < len(histories[arm])
     }
 
 
@@ -227,6 +270,8 @@ def plot(histories, output):
     from matplotlib.lines import Line2D
 
     fig, axes = plt.subplots(4, 1, sharex=True, figsize=(10, 10), layout="constrained")
+    if len(histories) == 1:
+        fig.suptitle("YOLOv10-S · " + next(iter(histories)))
     groups = (("val/map",), common.LOSSES[:3], common.LOSSES[3:], common.LR)
     labels = ("mAP COCO", "Pérdida train", "Pérdida valid", "LR al fin de época")
     styles = ("-", "--", ":")
@@ -235,8 +280,8 @@ def plot(histories, output):
             for index, key in enumerate(keys):
                 ax.plot([r["step"] for r in rows], [r[key] for r in rows], styles[index],
                         color=f"C{color}", label=arm if panel == 0 else None)
-            if ARMS[arm]:
-                ax.axvline(ARMS[arm] + 1, lw=1, alpha=0.45, color=f"C{color}")
+            if 0 < ALL_ARMS[arm] < len(rows):
+                ax.axvline(ALL_ARMS[arm] + 1, lw=1, alpha=0.45, color=f"C{color}")
         if panel:
             ax.legend(handles=[Line2D([], [], color="0.3", ls=style, label=key)
                                for key, style in zip(keys, styles)], fontsize=8)
@@ -256,17 +301,30 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, required=True, help="Evidencias de la fase A")
     parser.add_argument("--confirmation", type=Path, help="Evidencias de la fase B")
+    parser.add_argument("--original-checkout", type=Path, help="Código de entrenamiento y evaluación de A y B")
     parser.add_argument("--data", type=Path, default=DESTINATION, help="Datos COCO originales")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
+        sources = [args.source] + ([args.confirmation] if args.confirmation else [])
+        for source in sources:
+            if any((source / name).is_file() for name in ("evidence.sha256", "downloaded.sha256")):
+                verify_evidence(source)
+        evaluation = {"evaluation_checkout": args.original_checkout}
+        if args.original_checkout or any((source / "evidence.sha256").is_file() for source in sources):
+            original = historical_receipt(args.original_checkout or REPO, args.source)
+            if args.confirmation:
+                require(receipt(args.confirmation / "code-config.sha256") == original,
+                        "La fase B requiere el código de la fase A")
         identity = common.campaign_identity(args.source)
         baseline = read_json(REPO / "experiments/baseline/results/yolo/training/run.json")["run"]
         require(identity[1]["yolov10s.pt"] == baseline["initial_weights_sha256"]
                 and identity[1]["manifest.json"] == baseline["dataset_manifest_sha256"],
                 "Los pesos COCO o el dataset preparado difieren de la baseline")
         truth = common.validation_truth(args.data, args.source, identity[1])
-        exploration, history, exploration_environment = read_cohort(args.source, "a", 2026, tuple(ARMS), identity, truth)
+        exploration, history, exploration_environment = read_cohort(
+            args.source, "a", 2026, tuple(ARMS), identity, truth, **evaluation,
+        )
         selected = select(exploration)
         result = {
             "source_commit": identity[0], "coco_verified": True,
@@ -285,7 +343,7 @@ def main():
             pairs = {}
             for seed in (2027, 2028):
                 values, plots[seed], environment = read_cohort(
-                    args.confirmation, "b", seed, ("control", selected), identity, truth,
+                    args.confirmation, "b", seed, ("control", selected), identity, truth, **evaluation,
                 )
                 require(environment == exploration_environment,
                         f"Semilla {seed}: entorno de confirmación distinto al de exploración")

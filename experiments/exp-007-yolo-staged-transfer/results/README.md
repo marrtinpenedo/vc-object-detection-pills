@@ -1,48 +1,47 @@
 # Evidencias de EXP-007
 
-Pendientes de ejecución. Archivar la selección de resultados en `phase-a/`, `phase-b/` y `analysis/`. Conservar la descarga en el `results/` ignorado de la raíz. Los pesos, datos brutos, cachés y logs masivos permanecen fuera de Git.
+[`phase-a/`](phase-a/evidence.sha256) contiene las recetas y auditorías de entrenamiento y las métricas, predicciones y curvas PR (JSON y PNG) de la evaluación `12005631`. Las cuatro gráficas individuales se regeneraron a partir de los CSV originales porque la descarga de A solo incluía los historiales. `analysis/` contiene el [resumen](analysis/phase-a.json) y la [comparación](analysis/phase-a-history-s2026.png) reproducidos con el protocolo original. B y C tendrán archivos separados. Los entrenamientos reutilizados permanecen en su fase de origen.
 
-## Recuperación selectiva
+## Ejemplos emparejados
 
-Desde el clon local en Bash, definir `CESGA_SSH` y `REMOTE_EXP` con la ruta absoluta de la tanda. El bloque descarga A. Para B, sustituir `rounds` por `b:2027:control,BRAZO` y `b:2028:control,BRAZO`, usando el brazo seleccionado. Verificar `COMPLETED|0:0` y `verified.ok` antes de recuperar una ronda.
-
-```bash
-rounds=(a:2026:control,freeze-5,freeze-10,freeze-15)
-mkdir -p results
-export LOCAL_EXP
-LOCAL_EXP=$(mktemp -d "$PWD/results/exp-007-XXXXXX")
-(
-  set -euo pipefail
-  : "${CESGA_SSH:?}" "${LOCAL_EXP:?}"
-  [[ "${REMOTE_EXP:?}" == /*/exp-007-yolo-staged-* ]]
-  {
-    printf '%s\n' source-commit code-config.sha256 inputs.sha256 data/manifest.json
-    for round in "${rounds[@]}"; do
-      IFS=: read -r phase seed arms <<< "$round"
-      IFS=, read -r -a selected <<< "$arms"
-      ev="eval-$phase-s$seed"
-      printf '%s\n' "$ev"/{eval.job,launch.json,verified.ok}
-      for arm in "${selected[@]}"; do
-        slot="s$seed/$arm"
-        printf '%s\n' "$slot"/{config.json,train.job,train.path}
-        printf '%s\n' "$slot/train"/{run.json,status.json,history.csv,ultralytics_runtime.json,parameters.json,weight_transfer.json}
-        if [[ $arm == control ]]; then
-          printf '%s\n' "$slot/train/parameter_updates.json"
-        else
-          printf '%s\n' "$slot/train/staged_transfer.json"
-        fi
-        printf '%s\n' "$ev/$arm.train.sacct"
-        printf '%s\n' "$ev/$arm"/{metrics.json,predictions.json,pr_curves.json,pr_curves.png}
-        printf '%s\n' "$ev/$arm/examples"/image-{57,61,80}.jpg
-      done
-    done
-  } | LC_ALL=C sort -u > "$LOCAL_EXP/download.files"
-  rsync -a --files-from="$LOCAL_EXP/download.files" -- "$CESGA_SSH:$REMOTE_EXP/" "$LOCAL_EXP/"
-  cd "$LOCAL_EXP"
-  while IFS= read -r file; do sha256sum "$file"; done < download.files > downloaded.sha256
-) && printf '%s\n' "$LOCAL_EXP"
-```
-
-Para publicar una fase, copiar los archivos listados sin alterar su estructura y conservar sus huellas bajo `evidence.sha256`. Guardar en `analysis/` el resumen y las figuras citadas. Al reproducir, verificar primero las huellas y ejecutar el analizador desde el commit indicado por `source-commit`. Los binarios de `best` se verifican en CESGA al evaluar. La evidencia local conserva sus huellas y permite recalcular COCO a partir de las predicciones. [Reproducción](../README.md#recuperación-y-reproducción-local)
+Se conservan las escenas 57, 61 y 80 para el control y `freeze-15`. Sus JPEG se copiaron con el nombre derivado del punto operativo. Se añadió la escena 10, dibujada a partir de las predicciones existentes y de la imagen verificada contra el manifiesto. Se aplica el protocolo común de score ≥ 0,25 e IoU ≥ 0,50. Los contornos verdes indican TP, los rojos FP y los amarillos FN. Un `correct-ID.jpg` contiene al menos un TP y cero FP y FN. Un `failure-ID.jpg` contiene algún FP o FN. `empty-ID.jpg` indica que no hay TP, FP ni FN.
 
 Los ejemplos del dataset *pills-sxdht* (Mohamed Attia, Roboflow 100) llevan sobreimpresos los resultados al punto operativo. [Dataset](https://universe.roboflow.com/roboflow-100/pills-sxdht) · [Licencia CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+
+## Recuperación selectiva de B y C
+
+Ejecutar en Bash desde el clon local. Definir `CESGA_SSH` con la cuenta de CESGA y `REMOTE_HISTORICAL` con la ruta absoluta de la campaña original, terminada en `exp-007-yolo-staged-HhuHld`. El sufijo `-extension` identifica C. La descarga de C contiene solo los 13 entrenamientos nuevos y las tres reevaluaciones de siete brazos. Los otros ocho entrenamientos se leen directamente de A y B. Conservar la descarga en el `results/` ignorado de la raíz.
+
+```bash
+(
+  set -euo pipefail
+  : "${CESGA_SSH:?}" "${REMOTE_HISTORICAL:?}"
+  mkdir -p results
+  for phase in b c; do
+    remote=$REMOTE_HISTORICAL
+    if [[ $phase == c ]]; then remote="${REMOTE_HISTORICAL}-extension"; fi
+    local_dir=$(mktemp -d "$PWD/results/exp-007-$phase-XXXXXX")
+    uv run --offline --no-project --python 3.11 --with pillow==10.4.0 --with numpy==1.26.4 \
+      python -m experiments.exp-007-yolo-staged-transfer.evidence inventory "$phase" > "$local_dir/download.files"
+    rsync -a --files-from="$local_dir/download.files" -- "$CESGA_SSH:$remote/" "$local_dir/"
+    (cd "$local_dir"; while IFS= read -r file; do sha256sum "$file"; done < download.files > downloaded.sha256)
+    printf '%s %s\n' "$phase" "$local_dir"
+  done
+)
+```
+
+Quitar `--offline` si las dependencias faltan en caché. Conservar la descarga bruta con `downloaded.sha256` para repetir el análisis histórico y comprobar los archivos de trabajo. Al publicar, el archivo selectivo recibe su propio `evidence.sha256`. Conserva los datos numéricos, las figuras, el coste de entrenamiento y la procedencia. El analizador cruza `launch.json`, `run.json`, `status.json` y el entorno efectivo, y recalcula COCO y las curvas PR. Los estados auxiliares de SLURM y sus marcadores quedan en la descarga bruta y en CESGA. [Reproducción](../README.md#recuperación-y-reproducción-local)
+
+## Publicación
+
+Ejecutar en Bash desde el clon local. Ejemplo con B sin añadir JPEG. Para aportar una comparación visual, pasar un `--examples EVAL/BRAZO` por cada brazo elegido de una misma evaluación, con al menos dos brazos. Las tres escenas se mantienen emparejadas.
+
+```bash
+: "${PHASE_B:?}"
+uv run --offline --no-project --python 3.11 --with pillow==10.4.0 --with numpy==1.26.4 \
+  --with pycocotools==2.0.8 --with matplotlib==3.9.4 \
+  python -m experiments.exp-007-yolo-staged-transfer.evidence archive b "$PHASE_B" \
+  experiments/exp-007-yolo-staged-transfer/results/phase-b
+```
+
+Para C, utilizar `archive c`, su descarga de origen y `phase-c/`. Guardar los informes y comparaciones en `analysis/`. La fase A se exportó con `--examples eval-a-s2026/control --examples eval-a-s2026/freeze-15 --extra-image-id 10`.
