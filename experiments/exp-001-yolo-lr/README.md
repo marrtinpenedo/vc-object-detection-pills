@@ -1,6 +1,8 @@
 # EXP-001 · Tasa de aprendizaje inicial de YOLOv10-S
 
-**Estado** `propuesto`
+**Estado** `cerrado` tras evaluación en `valid`
+
+[Hallazgos y decisión en validación](findings.md) · [Inventario y procedencia](results/README.md)
 
 ## Motivación e hipótesis
 
@@ -17,21 +19,17 @@ El AP nulo y el pico de pérdida al inicio del baseline de YOLO motivan una prue
 
 Ambos brazos comparten los pesos COCO `yolov10s.pt`, los datos preparados, la revisión del código, el entorno, el tipo de GPU y la semilla de cada pareja. Conservan la receta de referencia, incluido el presupuesto de 30 épocas, los aumentos desactivados y la selección de `best` por mAP COCO en `valid`. Se mantienen la política coseno, el factor final y el warm-up, incluido el LR inicial de sesgos de 0,001. Las tasas del scheduler que dependen de `lr` cambian con la variante. [Receta de referencia](../baseline/README.md#f-recetas-e-hiperparámetros)
 
-La primera pareja usará la semilla 2026 y las repeticiones usarán 2027 y 2028. Cada control se ejecutará en la misma tanda que su variante y tendrá el mismo presupuesto. La decisión se basa en esos controles pareados. El baseline publicado da contexto.
+La primera pareja usa la semilla 2026 y las repeticiones usan 2027 y 2028. Cada control comparte tanda y presupuesto con su variante. La decisión se basa en esas tres parejas.
 
 ### Métricas y criterios de comparación
 
 - **Estabilidad temprana.** Comparar el pico de `val/cls_loss`, el número de épocas con AP cero y el mAP de las cinco primeras épocas. Un pico menor acompañado de un AP inicial peor puede indicar adaptación más lenta. Examinar también la diferencia entre el mejor mAP y el de la época 30.
-- **Rendimiento en validación.** La métrica primaria es la diferencia pareada de mAP@0,50:0,95 entre los checkpoints `best` reevaluados. Registrar las métricas, curvas PR y latencias del protocolo común, con ejemplos de las mismas imágenes. Revisar especialmente `Cipro 500` y `Xyzall 5mg`. Con las predicciones guardadas, barrer los umbrales de score y comparar el recall micro máximo alcanzable con precisión micro ≥ 0,82 a IoU 0,50. [Protocolo COCO](../baseline/README.md#g-métricas-y-protocolo-de-inferencia)
+- **Rendimiento en validación.** La métrica primaria es la diferencia pareada de mAP@0,50:0,95 COCO sobre ocho clases entre los checkpoints `best` reevaluados. Registrar las métricas, curvas PR y latencias del protocolo común, con ejemplos de las mismas imágenes. Revisar especialmente `Cipro 500` y `Xyzall 5mg`. Con las predicciones guardadas, barrer los umbrales de score y comparar el recall micro máximo alcanzable con precisión micro ≥ 0,82 a IoU 0,50. [Protocolo COCO](../baseline/README.md#g-métricas-y-protocolo-de-inferencia)
 - **Decisión.** Favorecer la variante si el mAP mejora en al menos dos de las tres parejas y en la media, con las diferencias por semilla y por clase a la vista. Una mejora restringida al arranque indica estabilidad. Un efecto pequeño, variable o acompañado por caídas repetidas en las clases de interés queda como evidencia inconclusa para adoptar la variante.
 
-### Limitaciones previstas
+## Ejecución de referencia
 
-Un LR más bajo puede necesitar más épocas y quedar por detrás con el mismo presupuesto. Los cambios en el arranque corresponden al cambio de LR bajo la política de warm-up fijada. El soporte de `valid` limita las conclusiones por clase, en particular para `Ibuphil 600 mg`. Las repeticiones estiman sensibilidad a la semilla en la misma partición. Las decisiones se toman en `valid` y la evaluación final se reserva para `test`.
-
-## Ejecución y artefactos
-
-Usar el [entorno YOLO](../../docs/cesga.md#entornos-y-dependencias), los [datos y pesos preparados](../../docs/cesga.md#datos-y-pesos) y los [logs persistentes de SLURM](../../docs/cesga.md#ejecución-de-trabajos-slurm). Desde la raíz de la revisión que se vaya a ejecutar, crear una salida nueva para la tanda. Conservar `EXP_ROOT` y los ID devueltos por `sbatch`. Para cada repetición, cambiar `EXP_SEED` y repetir ambos envíos dentro de la misma tanda.
+La revisión ejecutada fue `e7ad7adb512b5f5274428087c5bb328200f8b7f0`. El procedimiento de referencia usa el [entorno YOLO](../../docs/cesga.md#entornos-y-dependencias), los [datos y pesos preparados](../../docs/cesga.md#datos-y-pesos) y los [logs persistentes de SLURM](../../docs/cesga.md#ejecución-de-trabajos-slurm). Desde la raíz de esa revisión, crear una salida nueva por tanda y guardar `EXP_ROOT` y los ID de trabajo. Para cada repetición, cambiar `EXP_SEED` y enviar los dos brazos dentro de la misma tanda.
 
 ```bash
 export EXP_ROOT="$(mktemp -d "$BASELINE_RESULTS/exp-001-yolo-lr-XXXXXX")"
@@ -64,12 +62,15 @@ Cuando ambos trabajos terminen con `COMPLETED`, código `0:0` y estado `complete
 )
 ```
 
-Registrar revisión, trabajos, rutas, huellas de datos y pesos, versiones, GPU y parámetros efectivos. Conservar `run.json`, `status.json`, `ultralytics_runtime.json` e `history.csv` del entrenamiento y `metrics.json`, `predictions.json`, curvas PR y ejemplos de la evaluación. Añadir los enlaces a los artefactos al evaluar la ficha. Repetir una evaluación en una ruta nueva.
+## Reproducción local del análisis
 
-## Resultados
+Ejecutar esta orden desde la raíz del repositorio con el dataset COCO original en `data/pills-sxdht` y las dependencias ya disponibles en la caché de `uv`.
 
-**PENDIENTES.** La ficha se encuentra en fase de propuesta.
+```bash
+MPLBACKEND=Agg uv run --offline --no-project \
+  --with pycocotools==2.0.8 --with numpy==1.26.4 \
+  --with pillow==10.4.0 --with matplotlib==3.9.4 \
+  python -m experiments.exp-001-yolo-lr.analyze
+```
 
-## Conclusiones y decisión
-
-**PENDIENTES.** Tras comparar las parejas, registrar si se conserva el control, se adopta la variante o se requiere más evidencia. Actualizar el [índice](../README.md).
+El análisis verifica los artefactos descargados, contrasta la revisión local y recalcula COCO a partir de las predicciones exportadas y las anotaciones de `valid`. La opción `--data` permite indicar otra copia local del dataset. Las salidas se regeneran en [`results/analysis/`](results/README.md#análisis-derivado). [Código del análisis](analyze.py)
