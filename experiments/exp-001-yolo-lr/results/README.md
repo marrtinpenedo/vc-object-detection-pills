@@ -2,6 +2,8 @@
 
 Cada brazo tiene `training/` y `evaluation/`. [El inventario](provenance/downloaded.tsv) conserva la ruta de descarga, la ruta local actual y el SHA-256 de los 69 archivos recuperados, que se movieron byte a byte.
 
+Los PNG por brazo que acompañan a los datos PR y a los historiales son copias de consulta opcionales. El análisis y las figuras publicadas en `analysis/` se reproducen a partir de la evidencia tabular versionada.
+
 | Semilla | Control, ID de entrenamiento | Variante, ID de entrenamiento | ID de evaluación | Carpeta de evaluación en la descarga |
 | --- | --- | --- | --- | --- |
 | 2026 | [`11953121`](s2026/control/training/slurm.job) | [`11953122`](s2026/variante/training/slurm.job) | [`11974093`](s2026/control/evaluation/metrics.json) | `s2026/eval-valid-jrDSk6/{control,variante}` |

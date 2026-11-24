@@ -1,6 +1,6 @@
 # EXP-002 · Augmentación fotométrica controlada
 
-**Estado** `propuesto`, implementación preparada.
+**Estado** `cerrado` tras la evaluación de los cuatro brazos en `valid`.
 
 [Verificaciones y hallazgos](findings.md) · [Artefactos](results/README.md)
 
@@ -214,3 +214,20 @@ Confirmar `COMPLETED` y `0:0` en SLURM y `complete` en los cuatro `status.json`.
 ```
 
 Conservar los registros de la tanda y los [artefactos de entrenamiento y validación](results/README.md).
+
+## Análisis local
+
+La tanda archivada `eval-valid-UgqskU` (trabajo `11987778`) se analiza a partir de la evidencia de `results/s2026/`. El análisis coteja las recetas y las huellas contra el commit histórico `66ac347`, que debe estar disponible en el clon. Comprueba los trabajos SLURM, identifica los checkpoints `best` y reconstruye el COCO de `valid` desde las anotaciones originales. Recalcula COCOeval con las predicciones guardadas, coteja las curvas PR y calcula las latencias a partir de sus muestras. [Archivos e instrucciones para volver a importar](results/README.md)
+
+El contraste principal es variante menos control dentro de cada detector. Los contrastes Cascade menos YOLO por brazo y la diferencia entre ambos efectos son descriptivos, con semilla única. Los deltas de latencia requieren que las dos mediciones compartan protocolo, host, GPU y asignación. En el diagnóstico se usan los emparejamientos de COCO a score 0,25 e IoU 0,50. Una caja de otra clase que solapa una anotación sin TP se registra como candidata a confusión, ya que también puede corresponder a otro objeto anotado.
+
+Ejecutar el recálculo desde la raíz del repositorio con Python 3.11 y las dependencias de análisis disponibles en la caché de `uv`. En un entorno sin caché, quitar `--offline` para instalarlas.
+
+```bash
+MPLBACKEND=Agg uv run --offline --no-project --python 3.11 \
+  --with pycocotools==2.0.8 --with numpy==1.26.4 \
+  --with pillow==10.4.0 --with matplotlib==3.9.4 --with pyyaml==6.0.4 \
+  python -m experiments.exp-002-photometric.analyze
+```
+
+El analizador usa PyYAML para leer la receta efectiva de Cascade. Con `--data` se puede indicar otra copia del COCO original y con `--results` otra carpeta de resultados importados. Las tablas y figuras se regeneran en `results/analysis/`. [Salidas del análisis](results/README.md#salidas-del-análisis) · [Código](analyze.py)

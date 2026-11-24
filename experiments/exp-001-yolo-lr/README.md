@@ -64,10 +64,10 @@ Cuando ambos trabajos terminen con `COMPLETED`, código `0:0` y estado `complete
 
 ## Reproducción local del análisis
 
-Ejecutar esta orden desde la raíz del repositorio con el dataset COCO original en `data/pills-sxdht` y las dependencias ya disponibles en la caché de `uv`.
+Ejecutar esta orden desde la raíz del repositorio con el dataset COCO original en `data/pills-sxdht`, el commit histórico `e7ad7ad` disponible en el clon y las dependencias ya disponibles en la caché de `uv`.
 
 ```bash
-MPLBACKEND=Agg uv run --offline --no-project \
+MPLBACKEND=Agg uv run --offline --no-project --python 3.11 \
   --with pycocotools==2.0.8 --with numpy==1.26.4 \
   --with pillow==10.4.0 --with matplotlib==3.9.4 \
   python -m experiments.exp-001-yolo-lr.analyze

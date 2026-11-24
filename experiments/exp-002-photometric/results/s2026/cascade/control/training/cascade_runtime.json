@@ -1,0 +1,7 @@
+{
+  "official_checkpoint": "https://dl.fbaipublicfiles.com/detectron2/Misc/cascade_mask_rcnn_R_50_FPN_3x/144998488/model_final_480dd8.pkl",
+  "iterations_per_epoch": 79,
+  "max_iter": 2370,
+  "effective_batch": 4,
+  "warmup_iters": 79
+}

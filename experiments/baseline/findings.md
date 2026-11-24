@@ -17,6 +17,8 @@ En las 90 imágenes y 98 instancias de `valid`, Cascade R-CNN obtiene mayor AP y
 
 La evaluación independiente del checkpoint `best` corresponde al trabajo `11945016` con [`slurm/evaluate.sh`](../../slurm/evaluate.sh), estado `COMPLETED` y código `0:0`. Las tres métricas de AP coincidieron con el trabajo `11944826` a ocho decimales, y también coincidieron los SHA-256 de cada checkpoint, del manifiesto de datos y del COCO de validación. Precisión, recall y recuentos corresponden a score ≥ 0,25 e IoU ≥ 0,50. La latencia se midió en la misma A100 siguiendo el protocolo común. [Métricas YOLO](results/yolo/evaluation/metrics.json) · [Métricas Cascade](results/cascade/evaluation/metrics.json) · [Protocolo](README.md#g-métricas-y-protocolo-de-inferencia)
 
+El 0,8021 de Cascade corresponde a esta ejecución histórica. EXP-002 entrenó su propio control, que obtuvo 0,7887 y sirve de referencia para medir el efecto de la fotometría. [Comparación de procedencia y AP por clase](../exp-002-photometric/findings.md#comparabilidad-con-el-baseline-histórico-de-cascade)
+
 ### Comparación por clase
 
 | Clase | Instancias en `valid` | AP YOLO / Cascade | TP YOLO / Cascade |
