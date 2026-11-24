@@ -183,6 +183,8 @@ class CascadeInitializationTest(unittest.TestCase):
             image = output / "probe.png"
             Image.new("RGB", (2, 2)).save(image)
             trainer = Mock(model=ProbeModel(), data_loader=[[{"file_name": str(image)}]])
+            transfer = {"reinitialized": [], "discarded": []}
+            weights = Mock(transfer=transfer)
             args = SimpleNamespace(
                 output=output, data=output, weights=output / "model_final_480dd8.pkl",
                 initialize=True, resume=False, pause_after=None,
@@ -195,13 +197,15 @@ class CascadeInitializationTest(unittest.TestCase):
                     seed_all_rng=DEFAULT,
                     register_training_data=DEFAULT,
                     CascadeTrainer=Mock(return_value=trainer),
-                    CheckedWeights=DEFAULT,
+                    CheckedWeights=Mock(return_value=weights),
                     make_predictor=Mock(return_value=lambda image: np.empty((0, 6))),
                 ),
             ):
                 baseline_cascade.train(args, load_config("cascade", None, {}), manifest)
             set_determinism.assert_called_once_with(False)
             trainer.train.assert_not_called()
+            weights.load.assert_called_once_with(str(args.weights))
+            self.assertEqual(baseline_cascade.read_json(output / "weight_transfer.json"), transfer)
             report = baseline_cascade.read_json(output / "initialization.json")
             self.assertEqual(report["gradients"], {
                 "backbone.weight": "nonzero",

@@ -9,8 +9,8 @@ import numpy as np
 import torch
 from detectron2 import model_zoo
 from detectron2.checkpoint import DetectionCheckpointer
-from detectron2.config import get_cfg
-from detectron2.data import DatasetCatalog, MetadataCatalog
+from detectron2.config import CfgNode, get_cfg
+from detectron2.data import DatasetCatalog, DatasetMapper, MetadataCatalog, build_detection_train_loader
 from detectron2.data import transforms as T
 from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultTrainer, HookBase, hooks
@@ -19,12 +19,14 @@ from detectron2.modeling import build_model
 from detectron2.utils.env import seed_all_rng
 from detectron2.utils.events import EventStorage
 from detectron2.utils.logger import setup_logger
+from torch.utils.data import get_worker_info
 
 from scripts.baseline_data import read_json, write_json
 from scripts.baseline_metrics import MAX_DETECTIONS, MIN_SCORE, coco_eval, prediction_rows
 from scripts.baseline_run import (
     PauseTraining, UpdateCheck, check_gradients, parameters, publish_copy, save_history,
 )
+from scripts.photometric import PhotometricSampler, adjust_luminance
 
 PREFIX = "roi_heads.box_predictor."
 EXPECTED_CLASSIFIERS = {
@@ -228,6 +230,30 @@ class EpochPublication(HookBase):
             raise PauseTraining
 
 
+class LuminanceTransform(T.Transform):
+    def __init__(self, brightness, contrast):
+        self.brightness = brightness
+        self.contrast = contrast
+
+    def apply_image(self, image):
+        return adjust_luminance(image, self.brightness, self.contrast)
+
+    def apply_coords(self, coords):
+        return coords
+
+    def apply_segmentation(self, segmentation):
+        return segmentation
+
+
+class CascadePhotometric(T.Augmentation):
+    def __init__(self, spec, seed):
+        self.sampler = PhotometricSampler(spec, seed)
+
+    def get_transform(self, image):
+        gains = self.sampler.sample(get_worker_info())
+        return LuminanceTransform(*gains) if gains is not None else T.NoOpTransform()
+
+
 class CascadeTrainer(DefaultTrainer):
     def __init__(self, cfg, stop_step):
         self.stop_step = stop_step
@@ -241,6 +267,17 @@ class CascadeTrainer(DefaultTrainer):
             hooks.PeriodicCheckpointer(self.checkpointer, self.cfg.SOLVER.CHECKPOINT_PERIOD, max_to_keep=2),
             EpochPublication(validation, self.stop_step),
         ]
+
+    @classmethod
+    def build_train_loader(cls, cfg):
+        if "PHOTOMETRIC" not in cfg.INPUT:
+            return super().build_train_loader(cfg)
+        mapper = DatasetMapper(cfg, is_train=True)
+        transforms = mapper.augmentations.augs
+        if [type(transform).__name__ for transform in transforms] != ["ResizeShortestEdge"]:
+            raise RuntimeError("EXP-002 requiere ResizeShortestEdge como única transformación base")
+        mapper.augmentations = T.AugmentationList([CascadePhotometric(cfg.INPUT.PHOTOMETRIC, cfg.SEED), *transforms])
+        return build_detection_train_loader(cfg, mapper=mapper)
 
     @classmethod
     def build_evaluator(cls, cfg, dataset_name):
@@ -277,6 +314,8 @@ def train(args, spec, manifest):
     cfg, iterations, official_url = configure(
         spec, len(manifest["classes"]), manifest["splits"]["train"]["images"], args.weights, args.output,
     )
+    if "photometric" in spec:
+        cfg.INPUT.PHOTOMETRIC = CfgNode(spec["photometric"])
     register_training_data(cfg, args.data, manifest)
     (args.output / "best").mkdir(exist_ok=True)
     effective = args.output / "detectron2.yaml"

@@ -1,5 +1,7 @@
 # Baselines de detección de pastillas
 
+[Hallazgos y decisiones en validación](findings.md) · [Artefactos publicados](results/README.md)
+
 ## A. Objetivo y uso de los datos
 
 La comparación utiliza el mismo dataset, resolución nominal y evaluador para ambos detectores. Cada implementación conserva su optimización y posprocesado, por lo que los resultados caracterizan las recetas completas.
@@ -13,23 +15,22 @@ La comparación utiliza el mismo dataset, resolución nominal y evaluador para a
 | Cascade R-CNN, ResNet-50 + FPN | Detectron2 usa `Misc/cascade_mask_rcnn_R_50_FPN_3x.yaml` y reemplaza sus pesos de ImageNet por la copia local del checkpoint COCO `model_final_480dd8.pkl`, identificado por `model_zoo.get_checkpoint_url`. Con `MASK_ON=False` se conservan el RPN, la regresión agnóstica a clase y las tres etapas de cajas. Se descartan las claves de máscaras y se reinicializan los pesos y sesgos de los tres clasificadores `cls_score`, que pasan de 81 a 9 salidas (ocho clases y fondo). |
 | YOLOv10-S | Ultralytics parte de `yolov10s.pt`, con cabeza `v10Detect` end-to-end de 80 clases. El YAML del checkpoint reconstruye ambas ramas para ocho clases. Se comprueba la transferencia de tensores compatibles y se registran las reinicializaciones en `cv3` y `one2one_cv3`. |
 
-La carga rechaza incompatibilidades ajenas a las indicadas y registra el SHA-256 de los pesos utilizados. [Configuración de Cascade](https://github.com/facebookresearch/detectron2/blob/main/configs/Misc/cascade_mask_rcnn_R_50_FPN_3x.yaml) · [Cabezas de Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/nn/modules/head.py)
+La carga rechaza incompatibilidades ajenas a las indicadas y registra el SHA-256 de los pesos utilizados. [Configuración de Cascade](https://github.com/facebookresearch/detectron2/blob/fd27788985af0f4ca800bca563acdb700bb890e2/configs/Misc/cascade_mask_rcnn_R_50_FPN_3x.yaml)
 
 ## C. Fine-tuning completo
 
 Se ajustan todos los parámetros entrenables para adaptar las representaciones de COCO a la escala, textura y color de las pastillas. Se inspecciona la evolución del AP en validación por el riesgo de sobreajuste con 316 imágenes de entrenamiento.
 
-En Cascade se fija `BACKBONE.FREEZE_AT=0`. Los buffers de `FrozenBatchNorm2d` permanecen fijos por la arquitectura heredada. En YOLO se fija `freeze=0`. Ultralytics conserva fijas las proyecciones DFL y la cabeza one-to-one recibe características desacopladas del gradiente. La rama one-to-many retropropaga al backbone. `parameters.json` informa de parámetros entrenables y congelados y de buffers FrozenBN. [Entrenador de Ultralytics](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/engine/trainer.py) · [Cabeza de YOLOv10](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/nn/modules/head.py)
+En Cascade se fija `BACKBONE.FREEZE_AT=0`. Los buffers de `FrozenBatchNorm2d` permanecen fijos por la arquitectura heredada. En YOLO se fija `freeze=0`. Ultralytics conserva fijas las proyecciones DFL y la cabeza one-to-one recibe características desacopladas del gradiente. La rama one-to-many retropropaga al backbone. `parameters.json` informa de parámetros entrenables y congelados y de buffers FrozenBN. [Cabeza de YOLOv10 en Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/nn/modules/head.py)
 
 ## D–E. Preprocesamiento, resolución y aumentos
 
-La resolución nominal de 640 × 640 conserva la escala original de los JPEG y las cajas. La mediana del área relativa por partición se sitúa entre 3 % y 3,5 %. Hay 41 cajas con área relativa inferior al 1 %, dos de ellas en `test`.
+La resolución nominal de 640 × 640 conserva la escala original de los JPEG y las cajas. Se desactivan los aumentos en ambos baselines para medir su contribución en futuras comparaciones controladas.
 
 - **Cascade.** BGR, `ResizeShortestEdge` con un único tamaño inferior de 640 y lado máximo de 640 para train y validación. A tamaño nativo es identidad. Se conservan la media BGR y la desviación del YAML resuelto, la transformación de cajas correspondiente y el padding interno de la FPN al múltiplo requerido. El tensor se rellena dentro del modelo después de normalizar. `RANDOM_FLIP=none`, crop desactivado, muestreo de resize con un valor fijo y TTA desactivada. El muestreo de imágenes y propuestas sigue siendo parte del entrenamiento.
 - **YOLO.** Carga OpenCV con resize proporcional determinista, `LetterBox` cuadrado y centrado con relleno 114 en caso necesario, `Format` con cajas normalizadas, RGB CHW y división de píxeles por 255 en entrenamiento y validación. En evaluación el adaptador reproduce el preprocesamiento y revierte escala y padding. Con los JPEG de este dataset la escala es uno y el padding geométrico es cero. El dataset se construye con `augment=False` para excluir `v8_transforms` y Albumentations. Mosaic, mixup, cutmix, copy-paste, HSV, rotación, traslación, escala, cizalla, perspectiva, flips y permuta BGR quedan en cero. También quedan desactivados multi-scale, close-mosaic y TTA. Auto-augment y random erasing pertenecen al pipeline de clasificación.
-- Los aumentos aleatorios ampliarían la variabilidad de entrenamiento y podrían mejorar generalización. Desactivarlos en la primera referencia permite medir por separado su contribución en una futura comparación. Los cambios cromáticos merecen especial cuidado porque hay clases definidas por color.
 
-[Mapeador de Detectron2](https://github.com/facebookresearch/detectron2/blob/main/detectron2/data/dataset_mapper.py) · [Transformaciones de Detectron2](https://github.com/facebookresearch/detectron2/blob/main/detectron2/data/detection_utils.py) · [Datasets de Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/data/dataset.py)
+[Mapeador de Detectron2](https://github.com/facebookresearch/detectron2/blob/fd27788985af0f4ca800bca563acdb700bb890e2/detectron2/data/dataset_mapper.py) · [Transformaciones de Detectron2](https://github.com/facebookresearch/detectron2/blob/fd27788985af0f4ca800bca563acdb700bb890e2/detectron2/data/detection_utils.py) · [Datasets de Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/data/dataset.py)
 
 ## F. Recetas e hiperparámetros
 
@@ -49,24 +50,9 @@ Cascade desactiva el modo determinista de PyTorch para usar ROIAlign nativo de t
 
 Cascade usa SGD con una tasa conservadora para un lote pequeño y un backbone preentrenado. YOLO usa AdamW con una tasa explícita. El recorte de la norma del gradiente se aplica por parámetro en Cascade y globalmente en YOLO. Las 30 épocas fijan una exposición nominal comparable pese a las diferencias de lote y número de pasos.
 
-`configs/baseline/*.json` contiene la receta declarada. `--epochs`, `--batch`, `--imgsz`, `--workers`, `--seed` y `--lr` permiten cambios explícitos. Se guardan `detectron2.yaml` y `cascade_runtime.json` o `args.yaml` y `ultralytics_runtime.json` con valores efectivos. Los CSV dejan trazas de LR y pérdidas. En Cascade la pérdida de validación requeriría activar rutas de RPN/ROI, muestreo y comportamiento de entrenamiento. Se usa la curva COCO de validación para leer generalización. En YOLO se conserva la pérdida de validación que calcula el validador nativo con EMA.
+Las configuraciones de [Cascade](../../configs/baseline/cascade.json) y [YOLO](../../configs/baseline/yolo.json) contienen las recetas declaradas. `--epochs`, `--batch`, `--imgsz`, `--workers`, `--seed` y `--lr` permiten cambios explícitos. Se guardan `detectron2.yaml` y `cascade_runtime.json` o `args.yaml` y `ultralytics_runtime.json` con valores efectivos. Los CSV dejan trazas de LR y pérdidas. En Cascade la pérdida de validación requeriría activar rutas de RPN/ROI, muestreo y comportamiento de entrenamiento. Se usa la curva COCO de validación para leer generalización. En YOLO se conserva la pérdida de validación que calcula el validador nativo con EMA.
 
-[Scheduler de Detectron2](https://github.com/facebookresearch/detectron2/blob/main/detectron2/solver/build.py) · [Entrenador de Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/engine/trainer.py)
-
-### Sensibilidad potencial y prioridad de estudio
-
-Los efectos propuestos son hipótesis para experimentos controlados en `valid`.
-
-| Factor y prioridad inicial | Qué controla | Relevancia para pastillas y diferencia entre detectores | Señal que justificaría estudiarlo |
-| --- | --- | --- | --- |
-| Alta · LR, warm-up y scheduler | Magnitud de las actualizaciones y su evolución | Con 316 imágenes, un LR alto puede degradar las características transferidas y uno bajo puede limitar la adaptación. Cascade ajusta conjuntamente RPN y ROI con SGD. En YOLO, AdamW y el mínimo de warm-up condicionan las primeras actualizaciones. | Pérdidas oscilantes, AP inicial inestable o curvas estancadas con LR bajo. |
-| Alta · Épocas | Cuántas veces se recorre el conjunto y presupuesto de actualizaciones | El dataset pequeño permite repetir pronto las mismas escenas. En Cascade, las iteraciones lógicas dependen del muestreador infinito. En YOLO, EMA puede suavizar las oscilaciones de validación. | Pérdidas de train que bajan con AP de validación estancado o descendente, o AP aún ascendente al final. |
-| Alta · Aumentos | Variabilidad geométrica y fotométrica vista durante el ajuste | Flips o brillo podrían mejorar cobertura y conservar el significado de clase. Los cambios de tono pueden confundir clases cromáticas. La cascada reajusta propuestas y regiones y YOLO asigna positivos a dos ramas, lo que puede generar respuestas diferentes a cambios de densidad y escala. | Errores concentrados por iluminación, pose, fondo o escenas con varias pastillas en validación. |
-| Media · Congelación y descongelación | Qué capas reciben actualizaciones y cuándo | Ajustar menos capas puede preservar rasgos preentrenados, a costa de limitar la adaptación del dominio. En Cascade conviene separar backbone y FPN de RPN/ROI. En YOLO conviene distinguir backbone, cuello y ramas, dejando DFL con su política interna. | Buena adaptación inicial de cabezas seguida de deterioro en validación, o evidencia de que el escenario falla solo en algunas clases de poco soporte. |
-| Media · Resolución | Píxeles que representan un objeto en cada nivel de características | Una entrada mayor puede beneficiar a cajas pequeñas, con más coste y un original ya de 640. En Cascade puede cambiar propuestas útiles y niveles FPN. En YOLO cambia el número de posiciones disponibles para cada stride. | AP/recall bajo para cajas pequeñas y localización sistemáticamente pobre tras revisar aciertos y fallos. |
-| Media · Lote | Ruido del gradiente, memoria y frecuencia de actualizaciones | Pocos ejemplos por paso amplifican variabilidad entre imágenes. FrozenBN reduce la dependencia directa de Cascade del lote en sus estadísticas. La BN de YOLO sigue aprendiendo estadísticas y el lote altera el último minibatch. | Picos de pérdida persistentes, AP poco estable entre ejecuciones, o saturación de memoria que limita la resolución. |
-| Condicional · Weight decay | Fuerza de la regularización de los pesos | Puede ayudar si las cabezas memorizan ejemplos raros. Con SGD opera en el paso del gradiente y con AdamW se desacopla de la actualización adaptativa. | Brecha persistente de generalización con ajuste estable y LR razonable. |
-| Condicional · Optimizador | Regla de actualización, momentum y preacondicionamiento | SGD y AdamW pueden recorrer trayectorias distintas con pocos pasos, especialmente en cabezas recién inicializadas. Comparar cambios exige controlar LR y presupuesto razonables para cada caso. | Convergencia insuficiente pese a un LR y scheduler defendibles o variabilidad repetida con la receta actual. |
+[Scheduler de Detectron2](https://github.com/facebookresearch/detectron2/blob/fd27788985af0f4ca800bca563acdb700bb890e2/detectron2/solver/build.py) · [Entrenador de Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/engine/trainer.py)
 
 ## G. Métricas y protocolo de inferencia
 
@@ -82,7 +68,7 @@ Los adaptadores convierten las cajas a COCO `[x, y, ancho, alto]` en píxeles de
 
 ## H. Dataset, mapeo e integridad
 
-El EDA y los JSON COCO de la revisión fijada confirman 451 imágenes y 496 instancias. Los JSON declaran 0 `pills` junto a los IDs activos 1–8. Dado que 0 carece de instancias, el baseline tiene ocho clases activas, frente a las siete del guion. La inversa de la tabla recupera el ID del evaluador.
+El archivo original contiene 451 JPEG y un JSON COCO por partición, con 496 instancias en total. De las nueve categorías declaradas, el ID 0 (`pills`) carece de anotaciones. El baseline usa los ocho IDs activos. La inversa del mapeo recupera el ID original para el evaluador.
 
 | ID original COCO | ID interno | Clase | train | valid | test |
 | --- | --- | --- | --- | --- | --- |
@@ -99,36 +85,24 @@ El EDA y los JSON COCO de la revisión fijada confirman 451 imágenes y 496 inst
 
 La preparación reutiliza la auditoría del descargador. Comprueba IDs, referencias, dimensiones, JPEG, cajas, duplicados a precisión YOLO y recuentos, y falla detalladamente ante una discrepancia. El derivado contiene copias íntegras de JPEG, un COCO con las ocho categorías y TXT YOLO normalizados. Las anotaciones del COCO derivado se numeran desde 1 porque COCOeval emplea el 0 como centinela de emparejamiento. Se conservan los IDs de imagen y categoría, el área y las coordenadas originales. `manifest.json` contiene recuentos y huellas SHA-256. Repetir la preparación comprueba la equivalencia del derivado existente.
 
-Ibuphil 600 mg tiene una anotación en `train` y una en `valid`. Su AP en `test` será indefinido. Solo 23 imágenes tienen varias cajas (19/3/1). Las medianas de luminancia media fueron 136,32, 128,27 y 128,80 en `train`, `valid` y `test`, respectivamente. dHash señaló seis pares candidatos a similitud perceptual, tres entre particiones, sin duplicados exactos por bytes o píxeles. La interpretación de los resultados debe considerar los recuentos por subconjunto y la revisión visual de los pares entre particiones. [EDA del repositorio](../../notebooks/01_eda.ipynb)
+### Descarga y exploración local
+
+Desde la raíz del repositorio, con `uv` instalado, prepare el entorno Python 3.11 con las versiones de `uv.lock` y descargue la revisión fijada por el script. El archivo original se extrae en `data/pills-sxdht/`. [Dataset en Hugging Face](https://huggingface.co/datasets/Francesco/pills-sxdht) · [Descargador](../../scripts/download_dataset.py)
+
+```bash
+uv sync --locked
+uv run --locked python scripts/download_dataset.py
+```
+
+Abra el [notebook del EDA](../../notebooks/01_eda.ipynb) con el siguiente comando. Ejecute todas las celdas para generar las tablas, los gráficos y el visor. El kernel puede iniciarse en la raíz del repositorio o en `notebooks/`. Limpie las salidas antes de guardar cambios para Git.
+
+```bash
+uv run --locked jupyter lab notebooks/01_eda.ipynb
+```
 
 ## I. Protocolo experimental en FinisTerrae III
 
 El protocolo utiliza los entornos, rutas y opciones `SLURM_LOGS` de la [guía de CESGA](../../docs/cesga.md).
-
-### Resultados observados en CESGA
-
-#### Entrenamiento
-
-| Detector | Trabajo (30 épocas) | Mejor mAP@0.5:0.95 en validación durante el entrenamiento | Época (iteración) | Tiempo SLURM | Checkpoints best y last |
-| --- | --- | ---: | --- | --- | --- |
-| Cascade R-CNN | `11931348` | 0.8020639283459134 | 25 (1975) | 12 min 7 s | `best/model_best.pth`, `model_final.pth` |
-| YOLOv10-S | `11930429` | 0.7030092778429936 | 23 | 5 min 30 s | `weights/best.pt`, `weights/last.pt` |
-
-La inicialización se completó en `11930809` (Cascade) y `11930232` (YOLO). El smoke test de Cascade verificó pausa y reanudación en `11931119` y `11931120`. El de YOLO completó dos épocas en una sesión (`11930428`).
-
-#### Evaluación independiente en validación
-
-| Métrica | Cascade R-CNN | YOLOv10-S |
-| --- | ---: | ---: |
-| mAP@0.5:0.95 | 0.80206393 | 0.70209365 |
-| AP50 | 0.88029961 | 0.83319268 |
-| AP75 | 0.88029961 | 0.82607634 |
-| Latencia media | 29.39 ms | 10.83 ms |
-| FPS | 34.02 | 92.32 |
-
-La tabla corresponde a la evaluación del lanzador versionado `slurm/evaluate.sh` en `11945016` (`COMPLETED`, código `0:0`). Las tres métricas de AP coincidieron con la evaluación `11944826` a ocho decimales. También coincidieron los SHA-256 del checkpoint de cada detector, del manifiesto del dataset y del COCO de validación.
-
-Quedan pendientes el smoke test de pausa y reanudación de YOLO y la evaluación final en `test`.
 
 ### Protocolo de verificación
 
@@ -213,12 +187,17 @@ EVAL_ROOT="$RUN_ROOT/eval-valid"
 Una vez cerrados los experimentos, la evaluación sobre `test` usa los checkpoints ya seleccionados en validación. Ejecute estos comandos en la misma [sesión GPU interactiva](../../docs/cesga.md#sesión-gpu-interactiva), con los módulos cargados y desde la raíz del proyecto.
 
 ```bash
-"$CASCADE_ENV/bin/python" -m scripts.evaluate_baseline --data "$BASELINE_DATA" \
-  --run "$RUN_ROOT/cascade" --split test --checkpoint best \
-  --output "$RUN_ROOT/eval-cascade-test" --benchmark --warmup 20 --iterations 100
-"$YOLO_ENV/bin/python" -m scripts.evaluate_baseline --data "$BASELINE_DATA" \
-  --run "$RUN_ROOT/yolo" --split test --checkpoint best \
-  --output "$RUN_ROOT/eval-yolo-test" --benchmark --warmup 20 --iterations 100
+(
+  set -e
+  unset PYTHONHOME PYTHONPATH
+  export OMP_NUM_THREADS=1 MPLBACKEND=Agg PYTHONNOUSERSITE=1
+  "$CASCADE_ENV/bin/python" -m scripts.evaluate_baseline --data "$BASELINE_DATA" \
+    --run "$RUN_ROOT/cascade" --split test --checkpoint best \
+    --output "$RUN_ROOT/eval-cascade-test" --benchmark --warmup 20 --iterations 100
+  "$YOLO_ENV/bin/python" -m scripts.evaluate_baseline --data "$BASELINE_DATA" \
+    --run "$RUN_ROOT/yolo" --split test --checkpoint best \
+    --output "$RUN_ROOT/eval-yolo-test" --benchmark --warmup 20 --iterations 100
+)
 ```
 
 ### Artefactos
@@ -226,4 +205,4 @@ Una vez cerrados los experimentos, la evaluación sobre `test` usa los checkpoin
 - **Entrenamiento.** `run.json` registra la procedencia y la configuración. `status.json` indica el mejor paso, la duración, la memoria y las rutas de los checkpoints. Cascade guarda `metrics.json` en JSON Lines y YOLO, `results.csv`. Ambos generan `history.csv` y `training.png`.
 - **Evaluación.** Cada detector genera `metrics.json`, `predictions.json`, `pr_curves.json`, `pr_curves.png` y hasta cinco ejemplos por tipo. El AP de YOLO calculado al recargar los pesos EMA puede diferir del registrado al seleccionar el checkpoint.
 
-[Recuperación de artefactos](../../docs/cesga.md#recuperar-resultados) · [Figura de pérdidas de YOLOv10-S](results/README.md#historial-de-yolov10-s)
+[Recuperación de artefactos](../../docs/cesga.md#recuperar-resultados)

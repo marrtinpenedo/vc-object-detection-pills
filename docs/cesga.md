@@ -1,4 +1,4 @@
-# Ejecución de los baselines en CESGA FinisTerrae III
+# Infraestructura y operación en CESGA FinisTerrae III
 
 ## Acceso y almacenamiento
 
@@ -43,12 +43,13 @@ mkdir -p "$BASELINE_WORK"/{envs,data,checkpoints,results} \
 
 ## Transferencia y actualización del código
 
-Las ejecuciones de referencia utilizaron una copia transferida con `rsync` sin directorio `.git`. Desde la raíz del repositorio local, empaquete la revisión versionada de `feat/baseline-training` y transfiérala a `$HOME` en CESGA.
+Desde la raíz del repositorio local, seleccione la revisión versionada que contiene el código y la configuración del experimento. El ejemplo archiva `HEAD`. Si desea ejecutar otra revisión, indique su commit o referencia en `revision`. El envío crea una carpeta por commit en `$HOME` de CESGA.
 
 ```bash
 (
   set -euo pipefail
-  commit=$(git rev-parse --verify feat/baseline-training)
+  revision=HEAD
+  commit=$(git rev-parse --verify "${revision}^{commit}")
   remote_project="vc-object-detection-pills-${commit:0:12}"
   stage=$(mktemp -d)
   trap 'rm -rf -- "$stage"' EXIT
@@ -59,7 +60,7 @@ Las ejecuciones de referencia utilizaron una copia transferida con `rsync` sin d
 )
 ```
 
-En CESGA, sitúese en la carpeta indicada al finalizar la transferencia. Para actualizar el código, transfiera la nueva revisión a otra carpeta y mantenga las copias de los trabajos activos. En estas copias `git_head` puede quedar nulo. El registro de procedencia incluye los SHA-256 de los scripts Python y el nombre de la carpeta identifica la revisión del proyecto.
+En CESGA, sitúese en la carpeta indicada al finalizar la transferencia. Para actualizar el código, transfiera la nueva revisión a otra carpeta y mantenga las copias de los trabajos activos. Las ejecuciones de referencia utilizaron una copia con `rsync` sin directorio `.git`. En estas copias `git_head` puede quedar nulo. Registre el commit completo junto con las rutas y los ID de SLURM. El registro de procedencia incluye los SHA-256 de los scripts Python.
 
 ## Entornos y dependencias
 
@@ -93,7 +94,7 @@ conda create --yes --prefix "$CASCADE_ENV" python=3.11 pip
 conda create --yes --prefix "$YOLO_ENV" python=3.11 pip
 
 conda install -y \
-  --prefix "$BASELINE_WORK/envs/cascade" \
+  --prefix "$CASCADE_ENV" \
   --override-channels -c conda-forge \
   "gcc_linux-64=11" \
   "gxx_linux-64=11" \
@@ -123,7 +124,7 @@ Compile Detectron2 0.6 en el entorno Cascade con GCC/G++ 11, sysroot 2.17, CUDA 
 (
   set -e
   eval "$(conda shell.bash hook)"
-  conda activate "$BASELINE_WORK/envs/cascade"
+  conda activate "$CASCADE_ENV"
   export CC="$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc"
   export CXX="$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++"
   export CUDAHOSTCXX="$CXX"
@@ -153,7 +154,7 @@ done
 
 ## Datos y pesos
 
-El descargador de la revisión fijada de [Francesco/pills-sxdht](https://huggingface.co/datasets/Francesco/pills-sxdht) escribe en `data/pills-sxdht/`. Siga las [instrucciones de descarga](../README.md#datos-y-modelos) y traslade los archivos originales al almacenamiento persistente.
+Siga las [instrucciones de descarga](../experiments/baseline/README.md#descarga-y-exploración-local) y traslade los archivos de `data/pills-sxdht/` al almacenamiento persistente.
 
 Si realizó la descarga en CESGA, ejecute desde la raíz del proyecto en CESGA el siguiente bloque.
 
@@ -208,7 +209,7 @@ fi
 
 Envíe los trabajos desde la raíz del proyecto. [slurm/cascade.sh](../slurm/cascade.sh), [slurm/yolo.sh](../slurm/yolo.sh) y [slurm/evaluate.sh](../slurm/evaluate.sh) cargan los módulos y usan los intérpretes de `$STORE/pills-baseline/envs` dentro de la asignación. Cada trabajo usa la partición `short`, una NVIDIA A100 PCIe de 40 GB, 32 CPU por GPU y 64 GB de RAM. El límite de los entrenamientos es de seis horas y el de la evaluación, una hora.
 
-Configure los logs persistentes antes de enviar las fases de [inicialización, prueba corta y entrenamiento](../experiments/baseline/README.md#protocolo-de-verificación). Conserve el ID que devuelve `sbatch` y la ruta de cada ejecución.
+Configure los logs persistentes antes de enviar los trabajos. Conserve el ID que devuelve `sbatch` y la ruta de cada ejecución.
 
 ```bash
 mkdir -p "$BASELINE_RESULTS/slurm"
@@ -243,7 +244,7 @@ eval_job=$(sbatch --parsable "${SLURM_LOGS[@]}" slurm/evaluate.sh \
   printf '%s\n' "${eval_job%%;*}"
 ```
 
-El lanzador evalúa secuencialmente los checkpoints `best` en `valid` sobre la GPU asignada y ejecuta `scripts.verify_baseline`. Las salidas quedan en `$EVAL_ROOT/cascade` y `$EVAL_ROOT/yolo`. Confirme el estado `COMPLETED`, el código `0:0` y el mensaje final del verificador en el log. Para repetir una evaluación, utilice otra salida. [Protocolo de medición](../experiments/baseline/README.md#g-métricas-y-protocolo-de-inferencia) · [Resultados observados](../experiments/baseline/README.md#resultados-observados-en-cesga)
+El lanzador evalúa secuencialmente los checkpoints `best` en `valid` sobre la GPU asignada y ejecuta `scripts.verify_baseline`. Las salidas quedan en `$EVAL_ROOT/cascade` y `$EVAL_ROOT/yolo`. Confirme el estado `COMPLETED`, el código `0:0` y el mensaje final del verificador en el log. Para repetir una evaluación, utilice otra salida. [Protocolo de medición](../experiments/baseline/README.md#g-métricas-y-protocolo-de-inferencia)
 
 ## Recuperar resultados
 

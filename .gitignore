@@ -23,6 +23,16 @@ runs/
 wandb/
 lightning_logs/
 
+# Descargas brutas y copias de consulta de los experimentos
+/experiments/exp-001-yolo-lr/results/s*/**/training/training.png
+/experiments/exp-001-yolo-lr/results/s*/**/evaluation/pr_curves.png
+/experiments/exp-002-photometric/results/descarga/
+/experiments/exp-002-photometric/results/s*/**/training/training.png
+/experiments/exp-002-photometric/results/s*/**/evaluation/pr_curves.png
+/experiments/exp-002-photometric/results/s*/**/evaluation/examples/*
+!/experiments/exp-002-photometric/results/s2026/cascade/*/evaluation/examples/failure-61.jpg
+!/experiments/exp-002-photometric/results/s2026/yolo/*/evaluation/examples/failure-19.jpg
+
 # Logs SLURM del baseline en la raíz
 /pills-cascade-[0-9]*.out
 /pills-cascade-[0-9]*.err

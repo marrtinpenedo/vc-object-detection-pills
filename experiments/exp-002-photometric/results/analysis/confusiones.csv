@@ -1,0 +1,57 @@
+gt_class,other_class,yolo_control,yolo_variante,cascade_control,cascade_variante,yolo_delta,cascade_delta,cascade_minus_yolo_control,cascade_minus_yolo_variante,delta_cascade_minus_delta_yolo
+Cipro 500,Ibuphil 600 mg,0,0,0,0,0,0,0,0,0
+Cipro 500,Ibuphil Cold 400-60,1,1,1,1,0,0,0,0,0
+Cipro 500,Xyzall 5mg,6,2,1,1,-4,0,-5,-1,4
+Cipro 500,blue,0,0,0,0,0,0,0,0,0
+Cipro 500,pink,0,0,0,0,0,0,0,0,0
+Cipro 500,red,0,0,0,0,0,0,0,0,0
+Cipro 500,white,0,0,0,0,0,0,0,0,0
+Ibuphil 600 mg,Cipro 500,0,0,0,0,0,0,0,0,0
+Ibuphil 600 mg,Ibuphil Cold 400-60,1,0,1,1,-1,0,0,1,1
+Ibuphil 600 mg,Xyzall 5mg,0,0,0,0,0,0,0,0,0
+Ibuphil 600 mg,blue,0,0,0,0,0,0,0,0,0
+Ibuphil 600 mg,pink,0,0,0,0,0,0,0,0,0
+Ibuphil 600 mg,red,0,0,0,0,0,0,0,0,0
+Ibuphil 600 mg,white,0,0,0,0,0,0,0,0,0
+Ibuphil Cold 400-60,Cipro 500,0,0,0,0,0,0,0,0,0
+Ibuphil Cold 400-60,Ibuphil 600 mg,0,0,0,0,0,0,0,0,0
+Ibuphil Cold 400-60,Xyzall 5mg,0,0,0,0,0,0,0,0,0
+Ibuphil Cold 400-60,blue,0,0,0,0,0,0,0,0,0
+Ibuphil Cold 400-60,pink,0,0,0,0,0,0,0,0,0
+Ibuphil Cold 400-60,red,0,0,0,0,0,0,0,0,0
+Ibuphil Cold 400-60,white,0,0,0,0,0,0,0,0,0
+Xyzall 5mg,Cipro 500,0,0,0,0,0,0,0,0,0
+Xyzall 5mg,Ibuphil 600 mg,0,0,0,0,0,0,0,0,0
+Xyzall 5mg,Ibuphil Cold 400-60,0,0,0,0,0,0,0,0,0
+Xyzall 5mg,blue,0,0,0,0,0,0,0,0,0
+Xyzall 5mg,pink,0,0,0,0,0,0,0,0,0
+Xyzall 5mg,red,0,0,0,0,0,0,0,0,0
+Xyzall 5mg,white,0,1,0,0,1,0,0,-1,-1
+blue,Cipro 500,0,0,0,0,0,0,0,0,0
+blue,Ibuphil 600 mg,0,0,0,0,0,0,0,0,0
+blue,Ibuphil Cold 400-60,0,0,0,0,0,0,0,0,0
+blue,Xyzall 5mg,0,0,0,0,0,0,0,0,0
+blue,pink,0,0,0,0,0,0,0,0,0
+blue,red,0,0,0,0,0,0,0,0,0
+blue,white,0,0,0,0,0,0,0,0,0
+pink,Cipro 500,0,0,0,0,0,0,0,0,0
+pink,Ibuphil 600 mg,0,0,0,0,0,0,0,0,0
+pink,Ibuphil Cold 400-60,0,0,0,0,0,0,0,0,0
+pink,Xyzall 5mg,0,0,0,0,0,0,0,0,0
+pink,blue,0,0,0,0,0,0,0,0,0
+pink,red,0,0,0,0,0,0,0,0,0
+pink,white,0,0,0,0,0,0,0,0,0
+red,Cipro 500,0,0,0,0,0,0,0,0,0
+red,Ibuphil 600 mg,0,0,0,0,0,0,0,0,0
+red,Ibuphil Cold 400-60,0,1,0,0,1,0,0,-1,-1
+red,Xyzall 5mg,0,0,0,0,0,0,0,0,0
+red,blue,0,0,0,0,0,0,0,0,0
+red,pink,0,0,0,0,0,0,0,0,0
+red,white,0,0,0,0,0,0,0,0,0
+white,Cipro 500,0,0,1,1,0,0,1,1,0
+white,Ibuphil 600 mg,0,0,0,0,0,0,0,0,0
+white,Ibuphil Cold 400-60,0,0,0,0,0,0,0,0,0
+white,Xyzall 5mg,0,0,0,0,0,0,0,0,0
+white,blue,0,0,0,0,0,0,0,0,0
+white,pink,0,0,0,0,0,0,0,0,0
+white,red,0,0,0,0,0,0,0,0,0

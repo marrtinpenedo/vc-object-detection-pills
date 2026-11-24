@@ -1,0 +1,19 @@
+{
+  "step_unit": "iteration",
+  "best_step": 1185,
+  "best_validation_map": 0.7886600005714354,
+  "last_checkpoint": "model_final.pth",
+  "best_checkpoint": "best/model_best.pth",
+  "status": "complete",
+  "sessions": [
+    {
+      "status": "complete",
+      "elapsed_seconds": 787.0203046370298,
+      "cuda_peak_allocated_bytes": 3167479808,
+      "cuda_peak_reserved_bytes": 3999268864,
+      "job_id": "11984228"
+    }
+  ],
+  "total_elapsed_seconds": 787.0203046370298,
+  "cuda_peak_allocated_bytes": 3167479808
+}

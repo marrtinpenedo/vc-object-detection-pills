@@ -9,6 +9,7 @@ from tempfile import TemporaryDirectory
 import numpy as np
 import torch
 import ultralytics
+from torch.utils.data import get_worker_info
 from ultralytics.data.augment import LetterBox
 from ultralytics.data.dataset import YOLODataset
 from ultralytics.models.yolo.detect import DetectionTrainer, DetectionValidator
@@ -20,6 +21,7 @@ from scripts.baseline_metrics import MAX_DETECTIONS, MIN_SCORE, coco_eval, predi
 from scripts.baseline_run import (
     PauseTraining, UpdateCheck, check_gradients, parameters, publish_copy, save_history,
 )
+from scripts.photometric import PhotometricSampler, adjust_luminance
 
 VERSION = "8.3.161"
 DISABLED_AUGMENTATIONS = {
@@ -73,11 +75,23 @@ class CocoValidator(DetectionValidator):
         return metrics
 
 
+class YoloPhotometric:
+    def __init__(self, spec, seed):
+        self.sampler = PhotometricSampler(spec, seed)
+
+    def __call__(self, labels):
+        gains = self.sampler.sample(get_worker_info())
+        if gains is not None:
+            labels["img"] = adjust_luminance(labels["img"], *gains)
+        return labels
+
+
 class YoloTrainer(DetectionTrainer):
-    def __init__(self, args, truth, classes, summary):
+    def __init__(self, args, truth, classes, summary, photometric=None):
         self.truth = truth
         self.classes = classes
         self.summary = summary
+        self.photometric = photometric
         super().__init__(overrides=args)
 
     def build_dataset(self, img_path, mode="train", batch=None):
@@ -105,6 +119,11 @@ class YoloTrainer(DetectionTrainer):
         )
         if counts.tolist() != [expected["ground_truth_by_category"][str(c["original_id"])] for c in self.classes]:
             raise RuntimeError(f"Ultralytics alteró el mapeo de clases de {split}")
+        if mode == "train" and self.photometric is not None:
+            transforms = dataset.transforms.transforms
+            if [type(transform).__name__ for transform in transforms] != ["LetterBox", "Format"]:
+                raise RuntimeError("EXP-002 requiere la cadena base LetterBox → Format")
+            transforms.insert(0, YoloPhotometric(self.photometric, self.args.seed))
         return dataset
 
     def get_model(self, cfg=None, weights=None, verbose=True):
@@ -226,6 +245,13 @@ def record_runtime(trainer, args):
     write_json(args.output / "parameters.json", inventory)
     batches = len(trainer.train_loader)
     warmup = trainer.args.warmup_epochs
+    photometric = {}
+    if trainer.photometric is not None:
+        transforms = trainer.train_loader.dataset.transforms.transforms
+        photometric = {
+            "photometric": trainer.photometric,
+            "train_transforms": [type(transform).__name__ for transform in transforms],
+        }
     write_json(args.output / "ultralytics_runtime.json", {
         "args": vars(trainer.args),
         "iterations_per_epoch": batches, "nominal_max_iterations": batches * trainer.epochs,
@@ -236,6 +262,7 @@ def record_runtime(trainer, args):
             {k: g[k] for k in ("initial_lr", "weight_decay", "betas") if k in g}
             for g in trainer.optimizer.param_groups
         ],
+        **photometric,
     })
 
 
@@ -295,7 +322,7 @@ def train(args, spec, manifest):
             publish_copy(last, last.with_name("best.pt"))
         del state
         trim_csv(args.output / "results.csv", completed_epochs)
-    trainer = YoloTrainer(overrides, truth, manifest["classes"], manifest["splits"])
+    trainer = YoloTrainer(overrides, truth, manifest["classes"], manifest["splits"], spec.get("photometric"))
     if trainer.save_dir.resolve() != args.output:
         raise ValueError(f"Ultralytics usaría una salida diferente: {trainer.save_dir}")
     if trainer.data["names"] != {item["internal_id"]: item["name"] for item in manifest["classes"]}:

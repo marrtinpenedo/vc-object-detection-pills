@@ -1,0 +1,6 @@
+# Conservar los bytes de los artefactos verificados por SHA-256.
+/experiments/exp-001-yolo-lr/results/provenance/** -text
+/experiments/exp-001-yolo-lr/results/s*/** -text
+/experiments/exp-002-photometric/results/s*/** -text
+/experiments/exp-001-yolo-lr/results/s*/**/training/history.csv whitespace=cr-at-eol
+/experiments/exp-002-photometric/results/s*/**/training/history.csv whitespace=cr-at-eol

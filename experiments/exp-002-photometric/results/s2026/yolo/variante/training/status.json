@@ -1,0 +1,19 @@
+{
+  "step_unit": "epoch",
+  "best_step": 20,
+  "best_validation_map": 0.5949713387275373,
+  "last_checkpoint": "weights/last.pt",
+  "best_checkpoint": "weights/best.pt",
+  "status": "complete",
+  "sessions": [
+    {
+      "status": "complete",
+      "elapsed_seconds": 309.82023875042796,
+      "cuda_peak_allocated_bytes": 5109560320,
+      "cuda_peak_reserved_bytes": 6390022144,
+      "job_id": "11984227"
+    }
+  ],
+  "total_elapsed_seconds": 309.82023875042796,
+  "cuda_peak_allocated_bytes": 5109560320
+}
