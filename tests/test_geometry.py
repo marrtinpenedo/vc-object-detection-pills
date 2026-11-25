@@ -109,15 +109,14 @@ class YoloGeometryLoaderTest(unittest.TestCase):
             np.testing.assert_array_equal(val["img"].numpy(), rgb(original[0]))
             torch.testing.assert_close(val["bboxes"], torch.tensor([[.25, .4375, .25, .5]]))
             self.assertEqual(val["cls"].flatten().tolist(), [0])
-            mosaic = combined.transforms.transforms[0].mosaic
-
-            def fixed_mosaic(center):
+            def fixed_mosaic(center, ds=combined):
+                mosaic = ds.transforms.transforms[0].mosaic
                 # BaseMixTransform draws the gate first, then Mosaic draws y and x.
                 # Format also draws a gate for BGR/RGB. All four draws have different roles.
                 with patch.object(mosaic, "get_indexes", return_value=[1, 2, 3]) as indexes, \
                      patch("ultralytics.data.augment.random") as rng:
                     rng.uniform.side_effect = [0.5, center, center, 0.5]
-                    result = combined[0]
+                    result = ds[0]
                 indexes.assert_called_once_with()
                 self.assertEqual(rng.uniform.call_args_list,
                                  [call(0, 1), call(32, 96), call(32, 96), call(0, 1)])
@@ -150,6 +149,23 @@ class YoloGeometryLoaderTest(unittest.TestCase):
             for original_label, label in zip(source_labels, combined.labels):
                 for key in ("cls", "bboxes"):
                     np.testing.assert_array_equal(label[key], original_label[key])
+
+            from scripts.photometric import adjust_luminance
+
+            trainer.photometric = {"probability": 0.5, "brightness": 0.1, "contrast": 0.1}
+            joint = dataset("train", "train")
+            self.assertEqual(names(joint), ["YoloMosaic", "YoloGeometry", "YoloPhotometric", "LetterBox", "Format"])
+            photo = joint.transforms.transforms[2]
+            with patch.object(photo.sampler, "sample", return_value=(1.1, 1.1)) as sample:
+                composed = fixed_mosaic(64, joint)
+            sample.assert_called_once()
+            expected = adjust_luminance(cv2.flip(canvas, 1), 1.1, 1.1)
+            np.testing.assert_array_equal(composed["img"].numpy(), rgb(cv2.resize(expected, (64, 64))))
+            torch.testing.assert_close(composed["bboxes"], augmented["bboxes"])
+            torch.testing.assert_close(composed["cls"], augmented["cls"])
+            val_joint = dataset("valid", "val")
+            self.assertEqual(names(val_joint), ["LetterBox", "Format"])
+            np.testing.assert_array_equal(val_joint[0]["img"].numpy(), val["img"].numpy())
 
 
 @unittest.skipUnless(find_spec("detectron2"), "Detectron2 ausente")

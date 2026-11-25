@@ -68,8 +68,12 @@ def verify_runtime(folder, backend, spec, n_train):
                   "lrf": spec["final_lr_factor"], "warmup_epochs": spec["warmup_epochs"], "cos_lr": True,
                   "val": True, "split": "val", "close_mosaic": 0, "mosaic": mosaic, "augment": False,
                   "hsv_h": 0.0, "hsv_s": 0.0, "hsv_v": 0.0, "amp": False}
-        chain = (["YoloMosaic"] if mosaic else []) + ["YoloGeometry", "LetterBox", "Format"] if geom else None
+        photo = spec.get("photometric")
+        prefix = (["YoloMosaic"] if mosaic else []) + (["YoloGeometry"] if geom else []) + (["YoloPhotometric"] if photo else [])
+        chain = prefix + ["LetterBox", "Format"] if prefix else None
         require(all(args[key] == value for key, value in fields.items())
+                and summary.get("freeze_backbone_epochs") == (spec.get("freeze_backbone_epochs") or None)
+                and summary.get("photometric") == photo
                 and summary.get("geometric") == geom and summary.get("train_transforms") == chain
                 and summary["nominal_max_iterations"] == iterations * spec["epochs"], f"Receta efectiva: {folder}")
         # Each attempt has its own output parent, including retries from another snapshot.
@@ -106,7 +110,8 @@ def verify_provenance(record, backend, job_id, snapshot, plan):
             and record["hardware"]["job_id"] == job_id, "Código, versión o trabajo distintos")
 
 
-def evaluate_condition(root, manifest, snapshots, ledger, states, condition, truth, splits):
+def evaluate_condition(root, manifest, snapshots, ledger, states, condition, truth, splits, *,
+                       recipe_resolver=condition_config, extra_smokes=()):
     name, backend = condition["name"], condition["backend"]
     plan = manifest["plan"]
     training_name, evaluation_name, probe_name = f"train-{name}", f"eval-{name}", f"preflight-{backend}"
@@ -127,8 +132,10 @@ def evaluate_condition(root, manifest, snapshots, ledger, states, condition, tru
     evaluated = job_record(root, digest, evaluation_name, ev_job)
     require(probe and training and evaluated, f"Faltan recibos de la cadena: {name}")
     for initialized in manifest["nodes"][probe_name]["probes"]:
-        if plan.get("experiment") == "EXP-008" and initialized == "smoke":
-            continue  # EXP-008 verifies the audit of the real optimizer steps separately.
+        if initialized in extra_smokes or (plan.get("experiment"), initialized) in {
+            ("EXP-008", "smoke"), ("EXP-009", "smoke-temporal"), ("EXP-009", "smoke-permanent")
+        }:
+            continue  # The experiment analyzer verifies optimizer-step smokes separately.
         folder = probe / initialized
         status = read_json(folder / "status.json")
         run = read_json(folder / "run.json")
@@ -145,7 +152,7 @@ def evaluate_condition(root, manifest, snapshots, ledger, states, condition, tru
     evaluation = evaluated / "evaluation"
     run, status = (read_json(train / file) for file in ("run.json", "status.json"))
     original = read_json(evaluation / "metrics.json")
-    spec = condition_config(plan, condition)
+    spec = recipe_resolver(plan, condition)
     require(spec == read_json(root / "configs" / f"{name}.json") == manifest["recipes"][name]
             == run["run"]["config"] == original["model_config"], f"Receta declarada: {name}")
     verify_provenance(run, backend, train_job["id"], snapshot, plan)
@@ -179,8 +186,8 @@ def evaluate_condition(root, manifest, snapshots, ledger, states, condition, tru
             and read_json(evaluation / "pr_curves.json") == curves, f"COCO exportado no reproducible: {name}")
     benchmark, protocol = archive.benchmark_metrics(original, [img["file_name"] for img in truth["images"]])
     require(protocol["protocol"], f"Protocolo del benchmark: {name}")
-    counts, confusions, focused, rare, _ = archive.diagnose(backend, name[-1].upper(), truth, predictions,
-                                                         evaluator, examples)
+    arm = name if plan.get("experiment") == "EXP-009" else name[-1].upper()
+    counts, confusions, focused, rare, _ = archive.diagnose(backend, arm, truth, predictions, evaluator, examples)
     classes = [{**row, "ap50": mean(curves["classes"][str(row["category_id"])]["0.50"]),
                 "ap75": mean(curves["classes"][str(row["category_id"])]["0.75"]),
                 **{event: values[row["category_id"]] for event, values in counts.items()}}
@@ -196,10 +203,11 @@ def evaluate_condition(root, manifest, snapshots, ledger, states, condition, tru
     return {"values": values, "classes": classes, "benchmark": benchmark, "protocol": protocol,
             "effective": effective, "history": history, "stride": stride,
             "confusions": confusions, "focused": focused, "rare": rare, "examples": examples, "evaluator": evaluator,
-            "pr_curves": curves,
+            "pr_curves": curves, "packages": {"training": run["packages"], "evaluation": original["packages"]},
             "audit": {"training_job": train_job["id"], "evaluation_job": ev_job["id"], "preflight_job": probe_job["id"],
                       "snapshot_sha256": digest,
-                      "checkpoint_sha256": original["checkpoint_sha256"], "training_hardware": run["hardware"],
+                      "checkpoint_path": original["checkpoint"], "checkpoint_sha256": original["checkpoint_sha256"],
+                      "training_hardware": run["hardware"],
                       "evaluation_hardware": original["hardware"]}}
 
 

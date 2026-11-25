@@ -1,0 +1,243 @@
+{
+  "schema": 1,
+  "seed": 2026,
+  "dataset": "Francesco/pills-sxdht",
+  "dataset_relpath": "data/pills-prepared",
+  "dataset_manifest_sha256": "79987cbeab9737d1377e3f056b745c8f0fb5845eb915ff12c32741b12e43bda9",
+  "valid_coco_sha256": "8da7dc75022c67fe9e4d806559e8110f89a2cbb8850948f1d89ce5208cdead7c",
+  "evaluation": {
+    "split": "valid",
+    "checkpoint": "best",
+    "warmup": 20,
+    "iterations": 100
+  },
+  "geometric": {
+    "probability": 0.5,
+    "degrees": 8,
+    "translate": 0.04,
+    "scale": 0.1,
+    "flip": 0.5
+  },
+  "mosaic_probability": 0.3,
+  "experiment": "EXP-009",
+  "phase": "B",
+  "weights": {
+    "yolo": {
+      "path": "checkpoints/yolov10s.pt",
+      "sha256": "65fa8332c38a7189597a268897bce6c1026f9499711b9761fb0c2c639b91d4d6"
+    }
+  },
+  "packages": {
+    "yolo": [
+      "ultralytics",
+      "8.3.161"
+    ]
+  },
+  "conditions": [
+    {
+      "name": "f000-control-photo",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": false,
+      "mosaic": false,
+      "reference": "f000-control",
+      "seed": 2026
+    },
+    {
+      "name": "f000-geom-photo",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": true,
+      "mosaic": true,
+      "reference": "f000-geom",
+      "seed": 2026
+    },
+    {
+      "name": "f080-control-photo",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": false,
+      "mosaic": false,
+      "freeze_backbone_epochs": 80,
+      "reference": "f080-control",
+      "seed": 2026
+    },
+    {
+      "name": "f080-geom-photo",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": true,
+      "mosaic": true,
+      "freeze_backbone_epochs": 80,
+      "reference": "f080-geom",
+      "seed": 2026
+    }
+  ],
+  "reference": {
+    "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+    "inventory_sha256": "e1ec28268f17ab6741f623bae9b6b0ba1cd349c009a2e0b4be97a5a3c1726c7b",
+    "arms": {
+      "f000-control": {
+        "condition": {
+          "name": "f000-control",
+          "backend": "yolo",
+          "epochs": 100,
+          "geometric": false,
+          "mosaic": false
+        },
+        "config": {
+          "architecture": "yolov10s.pt",
+          "epochs": 100,
+          "batch": 8,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "AdamW",
+          "lr": 0.001,
+          "momentum": 0.9,
+          "weight_decay": 0.0005,
+          "scheduler": "cosine",
+          "final_lr_factor": 0.05,
+          "warmup_epochs": 1.0,
+          "warmup_momentum": 0.8,
+          "warmup_bias_lr": 0.001,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1
+        },
+        "training_job": "12026505",
+        "evaluation_job": "12026506",
+        "preflight_job": "12026504",
+        "best_sha256": "40f29e88eedc89ea677e108b3b6be2594cba0fdeba127a4dca1369d50145e4fe",
+        "predictions_sha256": "d3616e677c34f43e505623078efdcc8b75952455737a5f04f61954154bf62a4e"
+      },
+      "f000-geom": {
+        "condition": {
+          "name": "f000-geom",
+          "backend": "yolo",
+          "epochs": 100,
+          "geometric": true,
+          "mosaic": true
+        },
+        "config": {
+          "architecture": "yolov10s.pt",
+          "epochs": 100,
+          "batch": 8,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "AdamW",
+          "lr": 0.001,
+          "momentum": 0.9,
+          "weight_decay": 0.0005,
+          "scheduler": "cosine",
+          "final_lr_factor": 0.05,
+          "warmup_epochs": 1.0,
+          "warmup_momentum": 0.8,
+          "warmup_bias_lr": 0.001,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1,
+          "geometric": {
+            "probability": 0.5,
+            "degrees": 8,
+            "translate": 0.04,
+            "scale": 0.1,
+            "flip": 0.5
+          },
+          "mosaic": 0.3
+        },
+        "training_job": "12026507",
+        "evaluation_job": "12026508",
+        "preflight_job": "12026504",
+        "best_sha256": "7b904e94efb3068c30cb660c2ef643ec3d25af9eb4234305b21f0bdc100c6d83",
+        "predictions_sha256": "c4f777fb28963f5c97789130f4b7a146766f6c9d4bea4aede6b24bda37b98218"
+      },
+      "f080-control": {
+        "condition": {
+          "name": "f080-control",
+          "backend": "yolo",
+          "epochs": 100,
+          "geometric": false,
+          "mosaic": false,
+          "freeze_backbone_epochs": 80
+        },
+        "config": {
+          "architecture": "yolov10s.pt",
+          "epochs": 100,
+          "batch": 8,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "AdamW",
+          "lr": 0.001,
+          "momentum": 0.9,
+          "weight_decay": 0.0005,
+          "scheduler": "cosine",
+          "final_lr_factor": 0.05,
+          "warmup_epochs": 1.0,
+          "warmup_momentum": 0.8,
+          "warmup_bias_lr": 0.001,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1,
+          "freeze_backbone_epochs": 80
+        },
+        "training_job": "12026525",
+        "evaluation_job": "12026526",
+        "preflight_job": "12026504",
+        "best_sha256": "9663d0f38ad90dccaf76d83a1a828f5e3e8589e99d8f0e1a46fb9a3fe0c57912",
+        "predictions_sha256": "eccc0dace428dd0f352d720b5a5ec06faefac3b2ff9c020211aa60e16037870b"
+      },
+      "f080-geom": {
+        "condition": {
+          "name": "f080-geom",
+          "backend": "yolo",
+          "epochs": 100,
+          "geometric": true,
+          "mosaic": true,
+          "freeze_backbone_epochs": 80
+        },
+        "config": {
+          "architecture": "yolov10s.pt",
+          "epochs": 100,
+          "batch": 8,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "AdamW",
+          "lr": 0.001,
+          "momentum": 0.9,
+          "weight_decay": 0.0005,
+          "scheduler": "cosine",
+          "final_lr_factor": 0.05,
+          "warmup_epochs": 1.0,
+          "warmup_momentum": 0.8,
+          "warmup_bias_lr": 0.001,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1,
+          "freeze_backbone_epochs": 80,
+          "geometric": {
+            "probability": 0.5,
+            "degrees": 8,
+            "translate": 0.04,
+            "scale": 0.1,
+            "flip": 0.5
+          },
+          "mosaic": 0.3
+        },
+        "training_job": "12026527",
+        "evaluation_job": "12026528",
+        "preflight_job": "12026504",
+        "best_sha256": "2a89fcb9917b459b8210f1cb028c946303820b306d269fb9eb4c4d8405a1ffe1",
+        "predictions_sha256": "5f7b4b4a16d3120b1706a93aff31c583103bfe4b72f80ee8572cc006d52e2e7d"
+      }
+    }
+  },
+  "photometric": {
+    "probability": 0.5,
+    "brightness": 0.1,
+    "contrast": 0.1
+  }
+}
