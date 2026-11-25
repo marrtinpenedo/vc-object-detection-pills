@@ -9,6 +9,13 @@
 set -eo pipefail
 
 # The submitter passes absolute paths as script arguments. The jobs can outlive the session.
+campaign=()
+login_backend=yolo
+if [[ ${1:-} == exp008 ]]; then
+    campaign=(--exp008)
+    login_backend=cascade
+    shift
+fi
 mode="${1:?Uso: bash slurm/campaign.sh launch|status|collect|reconcile ...}"
 shift
 module --force purge
@@ -22,8 +29,8 @@ export OMP_NUM_THREADS=1 MPLBACKEND=Agg PYTHONUNBUFFERED=1 PYTHONNOUSERSITE=1
 if [[ "$mode" == job ]]; then
     cd -- "${SLURM_SUBMIT_DIR:?Falta el directorio de envío}"
     test -n "${SLURM_JOB_ID:-}" || { printf '%s\n' 'Usa sbatch para tareas GPU.' >&2; exit 1; }
-    exec "$1/envs/$2/bin/python" -m scripts.campaign job "$@"
+    exec "$1/envs/$2/bin/python" -m scripts.campaign "${campaign[@]}" job "$@"
 fi
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 work="${PILLS_CAMPAIGN_WORK:-${STORE:?Define STORE o PILLS_CAMPAIGN_WORK}/pills-baseline}"
-exec "$work/envs/yolo/bin/python" -m scripts.campaign "$mode" --work "$work" "$@"
+exec "$work/envs/$login_backend/bin/python" -m scripts.campaign "${campaign[@]}" "$mode" --work "$work" "$@"

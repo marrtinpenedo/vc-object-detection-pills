@@ -10,4 +10,5 @@ Práctica de Visión por Computador del Grado en Inteligencia Artificial de la U
 - [Datos y análisis exploratorio](experiments/baseline/README.md#descarga-y-exploración-local) y [notebook del EDA](notebooks/01_eda.ipynb).
 - [Metodología de los baselines](experiments/baseline/README.md) y [hallazgos en validación](experiments/baseline/findings.md).
 - [Índice de experimentos](experiments/README.md) con estado y próximos pasos.
+- [Cierre de EXP-008](experiments/exp-008-cascade-freezing/findings.md). Ninguna variante de freezing mejoró a su control de Cascade en validación.
 - [Guía de CESGA](docs/cesga.md) para preparar el entorno, enviar trabajos y recuperar artefactos. El [lanzador de evaluación](docs/cesga.md#evaluación-conjunta) admite uno o varios checkpoints en una misma GPU.

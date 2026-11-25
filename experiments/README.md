@@ -11,6 +11,7 @@
 | [EXP-005](exp-005-cascade-geometric/README.md) | Factorial épocas × afín en Cascade R-CNN | Cerrado en `valid` · [hallazgos](exp-005-cascade-geometric/findings.md) |
 | [EXP-006](exp-006-yolo-warmup/README.md) | YOLOv10-S, duración del warm-up con LR inicial fijo | `cerrado` en fase A. Se conserva el warm-up de referencia · [hallazgos](exp-006-yolo-warmup/findings.md) |
 | [EXP-007](exp-007-yolo-staged-transfer/README.md) | YOLOv10-S, duración de la congelación del backbone | `cerrado` en `valid`. B confirma 15 épocas y C selecciona 20 · [hallazgos](exp-007-yolo-staged-transfer/findings.md) |
+| [EXP-008](exp-008-cascade-freezing/README.md) | Cascade R-CNN, duración de la congelación de ResNet-50 | Cerrado en `valid`, sin confirmación. El freezing no mejora los controles · [hallazgos](exp-008-cascade-freezing/findings.md) |
 
 [Metodología de los baselines](baseline/README.md) · [Resultados, diagnósticos y decisiones](baseline/findings.md)
 
