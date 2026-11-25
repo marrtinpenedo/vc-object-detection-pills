@@ -19,6 +19,17 @@ analysis = import_module(f"{MODULE}.analyze_c")
 planner = import_module(f"{MODULE}.campaign")
 evidence = import_module(f"{MODULE}.evidence")
 A = REPO / "experiments/exp-007-yolo-staged-transfer/results/phase-a"
+C = A.with_name("phase-c")
+
+
+def historical_checkouts(root):
+    old, published = (root / name for name in ("original", "published"))
+    revision = (C / "source-commit").read_text().strip()
+    for folder, commit in ((old, provenance.ORIGINAL), (published, revision)):
+        folder.mkdir()
+        archive = subprocess.check_output(["git", "archive", commit], cwd=REPO)
+        subprocess.run(["tar", "-x", "-C", str(folder)], input=archive, check=True)
+    return old, published, revision
 
 
 class EvidenceTest(unittest.TestCase):
@@ -53,22 +64,16 @@ class EvidenceTest(unittest.TestCase):
 
     def test_authorizes_only_the_pinned_scientific_delta(self):
         with TemporaryDirectory() as tmp:
-            old = Path(tmp) / "old"
-            old.mkdir()
-            archive = subprocess.check_output(["git", "archive", provenance.ORIGINAL], cwd=REPO)
-            subprocess.run(["tar", "-x", "-C", str(old)], input=archive, check=True)
-            historical, extension = provenance.verify_revisions(old, REPO, A)
+            old, published, revision = historical_checkouts(Path(tmp))
+            historical, extension = provenance.verify_revisions(old, published, A)
             provenance.verify_commit(REPO, provenance.ORIGINAL, historical)
+            provenance.verify_commit(REPO, revision, extension)
             with self.assertRaisesRegex(ValueError, "Huella Git incompatible"):
                 provenance.verify_commit(REPO, provenance.ORIGINAL, extension)
-            new = Path(tmp) / "new"
-            for file in extension:
-                (new / file).parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(REPO / file, new / file)
-            with (new / "scripts/evaluate_baseline.py").open("a") as stream:
+            with (published / "scripts/evaluate_baseline.py").open("a") as stream:
                 stream.write("# unexpected change\n")
             with self.assertRaisesRegex(ValueError, "no autorizado"):
-                provenance.verify_revisions(old, new, A)
+                provenance.verify_revisions(old, published, A)
 
     def test_reuses_historical_predictions_with_new_benchmark_only(self):
         analysis.verify_evidence(A)
@@ -108,11 +113,9 @@ class EvidenceTest(unittest.TestCase):
                          "requiere anotaciones locales de validación y pycocotools")
     def test_cohort_accepts_authorized_training_sources_without_relabeling_evaluation(self):
         with TemporaryDirectory() as tmp:
-            old, mixed = Path(tmp) / "old", Path(tmp) / "mixed"
-            old.mkdir()
-            archive = subprocess.check_output(["git", "archive", provenance.ORIGINAL], cwd=REPO)
-            subprocess.run(["tar", "-x", "-C", str(old)], input=archive, check=True)
-            original, extension = provenance.verify_revisions(old, REPO, A)
+            old, published, _ = historical_checkouts(Path(tmp))
+            mixed = Path(tmp) / "mixed"
+            original, extension = provenance.verify_revisions(old, published, A)
             arm = "freeze-15"
             slot = mixed / "s2026" / arm
             shutil.copytree(A / "s2026" / arm, slot)

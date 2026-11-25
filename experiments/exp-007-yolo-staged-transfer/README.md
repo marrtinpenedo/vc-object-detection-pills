@@ -90,13 +90,13 @@ Los 13 entrenamientos nuevos de C usan el checkout de la ampliación. Las evalua
 
 La campaña de ampliación ya terminó. Sus 23 trabajos completados corresponden a 17 entrenamientos, cinco evaluaciones y el smoke de congelación permanente. El procedimiento siguiente documenta su lanzamiento. Para verificar las evidencias sin ejecutar modelos, usar la reproducción local.
 
-Ejecutar en Bash desde el clon local después de versionar la revisión aprobada. Definir `CESGA_SSH` como en la [guía de transferencia](../../docs/cesga.md#transferencia-y-actualización-del-código). Se transfiere un checkout nuevo y se conserva intacta la copia histórica.
+Para reconstruir el despliegue histórico, ejecutar en Bash desde el clon local. La evidencia de la fase C fija la revisión autorizada. Definir `CESGA_SSH` como en la [guía de transferencia](../../docs/cesga.md#transferencia-y-actualización-del-código). Se transfiere un checkout nuevo y se conserva intacta la copia histórica.
 
 ```bash
 (
   set -euo pipefail
   : "${CESGA_SSH:?}"
-  revision=$(git rev-parse --verify HEAD)
+  revision=$(git rev-parse --verify "$(cat experiments/exp-007-yolo-staged-transfer/results/phase-c/source-commit)^{commit}")
   test "$revision" != ed7f9a6ef75afa9c66673bf8f03d34be2fa0c228
   git cat-file -e "$revision:experiments/exp-007-yolo-staged-transfer/campaign.py"
   project="vc-object-detection-pills-${revision:0:12}"
