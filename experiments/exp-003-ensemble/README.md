@@ -16,7 +16,7 @@ Desde la raíz, con el dataset original y el entorno local de análisis, ejecuta
 MPLBACKEND=Agg uv run --no-project --python 3.11 \
   --with pycocotools==2.0.8 --with numpy==1.26.4 --with pillow==10.4.0 \
   --with matplotlib==3.9.4 --with pyyaml==6.0.4 \
-  python -m experiments.exp-003-ensemble.analyze
+  python -m experiments.exp-003-ensemble.analyze --output results/exp-003-ensemble-reproduction
 ```
 
 Añadir `--offline` si todas las dependencias figuran en la caché de `uv`. También se puede usar el intérprete local que ya las tenga. Se verifican el inventario, la procedencia y el COCO reconstruido. Se publican las métricas, las predicciones fusionadas, las PR, las tablas y el recibo de la regla. Los resultados se computan en CPU y usan exclusivamente `valid`. [Hallazgos](findings.md)

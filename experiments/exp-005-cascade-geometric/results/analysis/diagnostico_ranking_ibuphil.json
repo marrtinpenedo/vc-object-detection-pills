@@ -1,0 +1,21 @@
+{
+  "scope": "Contrafactual diagnóstico con predicciones en memoria. La métrica oficial usa todas las cajas.",
+  "condition": "exp005-d",
+  "removed_prediction": {
+    "image_id": 13,
+    "category_id": 2,
+    "bbox": [
+      279.77288818359375,
+      325.75335693359375,
+      127.328857421875,
+      257.93377685546875
+    ],
+    "score": 0.030020378530025482
+  },
+  "map_official": 0.8068911748422507,
+  "map_counterfactual": 0.8631411748422507,
+  "ap_ibuphil_official": 0.45,
+  "ap_ibuphil_counterfactual": 0.8999999999999999,
+  "other_classes_unchanged": true,
+  "operating_point_unchanged": true
+}

@@ -1,0 +1,557 @@
+{
+  "snapshot_sha256": "2b98ece5c736735e4602a992c1847958be74cbee6a52b3daa03143cf91f1b3d9",
+  "base_commit": "f5b3aa7056a1ea2901b75a9578df11378b965df4",
+  "source_sha256": {
+    "configs/baseline/cascade.json": "ab0678ca257bc488302b1d90aeb09632bc79bafd418e92d3eea1d931dd313689",
+    "configs/baseline/yolo.json": "9ba1ce007121e88f53b237d20f946797beaad7de5e4c778acb391049088d26c0",
+    "configs/campaign/exp-003-005.json": "5a8f5d4662f709b231ee73ae5ca904eb73c42485180bef54133de3462a3a511e",
+    "scripts/baseline_cascade.py": "2b9d0bb8daffdd0851183c5d64bc09d40424c446171cfd56cb12833a1ed01346",
+    "scripts/baseline_data.py": "7304c9ace086e024614be5ce93fdf93c7b25e477d9ab0871e87af23b7371730d",
+    "scripts/baseline_metrics.py": "45c5f735249bd7d9a5dd4fc747af8ebb3ad510ccb8c4c5ef48c0237e5ca0d786",
+    "scripts/baseline_run.py": "13e14a09968f6960a9766aea41944fe8f776c6e073bd61850efa1f9b84ba60f0",
+    "scripts/baseline_yolo.py": "e09ab5c28ac04b920f5e6445a0d5e8f3ddadaf24ad3f0253659385a2f6ecb333",
+    "scripts/campaign.py": "74b2ebe59f2fc44f8f5295bb56c2f653681b631d5ca3ed88921e6033f0a1ee3a",
+    "scripts/download_dataset.py": "afc2085805be4b090a0439cc7c36efccaa1f55734d624d36f5f7e291b9b3eed7",
+    "scripts/evaluate_baseline.py": "3344efed54405825a4d6f6e96415635e4ef790d38ce01d2f6f1f16a993077a5b",
+    "scripts/geometric.py": "48f26974c89f110f15ef9f3fc3f68f4e90431963f2fa5a3f5718bbce1d70e874",
+    "scripts/photometric.py": "4ca04e3ccf60ec8d3c7b8d59a04a4c464fb2abe234a512b8d13c6897d6cac89c",
+    "scripts/train_baseline.py": "bac3eef27b6ff48191f081c163a5d4e85a4ebb83cda3cfd414f2d0dcbb4d091f",
+    "scripts/verify_baseline.py": "d035986d8a88f3e8e3a67a0c6cef2fe454b1128c1aeea443903861d219c4fcef",
+    "slurm/campaign.sh": "4c681bc5c46341802b09b9ebe9734c0e44f2949ff379cb08c5c64dfa31898d3b",
+    "tests/test_geometry.py": "635eb21398ba0fa2aefb49f185d91d2cc632a0b85b5107c4c08935ad808e760b"
+  },
+  "snapshots": {
+    "2b98ece5c736735e4602a992c1847958be74cbee6a52b3daa03143cf91f1b3d9": {
+      "base_commit": "f5b3aa7056a1ea2901b75a9578df11378b965df4",
+      "sha256": {
+        "configs/baseline/cascade.json": "ab0678ca257bc488302b1d90aeb09632bc79bafd418e92d3eea1d931dd313689",
+        "configs/baseline/yolo.json": "9ba1ce007121e88f53b237d20f946797beaad7de5e4c778acb391049088d26c0",
+        "configs/campaign/exp-003-005.json": "5a8f5d4662f709b231ee73ae5ca904eb73c42485180bef54133de3462a3a511e",
+        "scripts/baseline_cascade.py": "2b9d0bb8daffdd0851183c5d64bc09d40424c446171cfd56cb12833a1ed01346",
+        "scripts/baseline_data.py": "7304c9ace086e024614be5ce93fdf93c7b25e477d9ab0871e87af23b7371730d",
+        "scripts/baseline_metrics.py": "45c5f735249bd7d9a5dd4fc747af8ebb3ad510ccb8c4c5ef48c0237e5ca0d786",
+        "scripts/baseline_run.py": "13e14a09968f6960a9766aea41944fe8f776c6e073bd61850efa1f9b84ba60f0",
+        "scripts/baseline_yolo.py": "e09ab5c28ac04b920f5e6445a0d5e8f3ddadaf24ad3f0253659385a2f6ecb333",
+        "scripts/campaign.py": "74b2ebe59f2fc44f8f5295bb56c2f653681b631d5ca3ed88921e6033f0a1ee3a",
+        "scripts/download_dataset.py": "afc2085805be4b090a0439cc7c36efccaa1f55734d624d36f5f7e291b9b3eed7",
+        "scripts/evaluate_baseline.py": "3344efed54405825a4d6f6e96415635e4ef790d38ce01d2f6f1f16a993077a5b",
+        "scripts/geometric.py": "48f26974c89f110f15ef9f3fc3f68f4e90431963f2fa5a3f5718bbce1d70e874",
+        "scripts/photometric.py": "4ca04e3ccf60ec8d3c7b8d59a04a4c464fb2abe234a512b8d13c6897d6cac89c",
+        "scripts/train_baseline.py": "bac3eef27b6ff48191f081c163a5d4e85a4ebb83cda3cfd414f2d0dcbb4d091f",
+        "scripts/verify_baseline.py": "d035986d8a88f3e8e3a67a0c6cef2fe454b1128c1aeea443903861d219c4fcef",
+        "slurm/campaign.sh": "4c681bc5c46341802b09b9ebe9734c0e44f2949ff379cb08c5c64dfa31898d3b",
+        "tests/test_geometry.py": "635eb21398ba0fa2aefb49f185d91d2cc632a0b85b5107c4c08935ad808e760b"
+      }
+    },
+    "23e048675002dd0bbd678b184ef674288813a10517179fedb32914caad762978": {
+      "base_commit": "f5b3aa7056a1ea2901b75a9578df11378b965df4",
+      "sha256": {
+        "configs/baseline/cascade.json": "ab0678ca257bc488302b1d90aeb09632bc79bafd418e92d3eea1d931dd313689",
+        "configs/baseline/yolo.json": "9ba1ce007121e88f53b237d20f946797beaad7de5e4c778acb391049088d26c0",
+        "configs/campaign/exp-003-005.json": "5a8f5d4662f709b231ee73ae5ca904eb73c42485180bef54133de3462a3a511e",
+        "scripts/baseline_cascade.py": "2b9d0bb8daffdd0851183c5d64bc09d40424c446171cfd56cb12833a1ed01346",
+        "scripts/baseline_data.py": "7304c9ace086e024614be5ce93fdf93c7b25e477d9ab0871e87af23b7371730d",
+        "scripts/baseline_metrics.py": "45c5f735249bd7d9a5dd4fc747af8ebb3ad510ccb8c4c5ef48c0237e5ca0d786",
+        "scripts/baseline_run.py": "13e14a09968f6960a9766aea41944fe8f776c6e073bd61850efa1f9b84ba60f0",
+        "scripts/baseline_yolo.py": "e09ab5c28ac04b920f5e6445a0d5e8f3ddadaf24ad3f0253659385a2f6ecb333",
+        "scripts/campaign.py": "f4a488671f78a8d645f79e9a1841cdc76c7e75b37fa7e65bf28bdb36b004cf79",
+        "scripts/download_dataset.py": "afc2085805be4b090a0439cc7c36efccaa1f55734d624d36f5f7e291b9b3eed7",
+        "scripts/evaluate_baseline.py": "3344efed54405825a4d6f6e96415635e4ef790d38ce01d2f6f1f16a993077a5b",
+        "scripts/geometric.py": "48f26974c89f110f15ef9f3fc3f68f4e90431963f2fa5a3f5718bbce1d70e874",
+        "scripts/photometric.py": "4ca04e3ccf60ec8d3c7b8d59a04a4c464fb2abe234a512b8d13c6897d6cac89c",
+        "scripts/train_baseline.py": "bac3eef27b6ff48191f081c163a5d4e85a4ebb83cda3cfd414f2d0dcbb4d091f",
+        "scripts/verify_baseline.py": "d035986d8a88f3e8e3a67a0c6cef2fe454b1128c1aeea443903861d219c4fcef",
+        "slurm/campaign.sh": "4c681bc5c46341802b09b9ebe9734c0e44f2949ff379cb08c5c64dfa31898d3b",
+        "tests/test_geometry.py": "70b2591334496587e58a8b9f4455d7b62afe9fed4faa8513653e001d8c7613b0"
+      }
+    }
+  },
+  "valid_coco_sha256": "8da7dc75022c67fe9e4d806559e8110f89a2cbb8850948f1d89ce5208cdead7c",
+  "seed": 2026,
+  "slurm_states": {
+    "11994101": "FAILED",
+    "11994102": "COMPLETED",
+    "11994104": "CANCELLED",
+    "11994105": "CANCELLED",
+    "11994106": "CANCELLED",
+    "11994107": "CANCELLED",
+    "11994108": "CANCELLED",
+    "11994109": "CANCELLED",
+    "11994110": "CANCELLED",
+    "11994111": "CANCELLED",
+    "11994112": "CANCELLED",
+    "11994113": "CANCELLED",
+    "11994114": "COMPLETED",
+    "11994115": "COMPLETED",
+    "11994116": "COMPLETED",
+    "11994117": "COMPLETED",
+    "11994118": "COMPLETED",
+    "11994119": "COMPLETED",
+    "11994120": "COMPLETED",
+    "11994121": "COMPLETED",
+    "12020249": "COMPLETED",
+    "12020250": "COMPLETED",
+    "12020251": "COMPLETED",
+    "12020252": "COMPLETED",
+    "12020253": "COMPLETED",
+    "12020254": "COMPLETED",
+    "12020255": "COMPLETED",
+    "12020256": "COMPLETED",
+    "12020257": "COMPLETED",
+    "12020258": "COMPLETED",
+    "12020259": "COMPLETED"
+  },
+  "conditions": {
+    "yolo": {
+      "a": {
+        "training_job": "12020250",
+        "evaluation_job": "12020251",
+        "preflight_job": "12020249",
+        "snapshot_sha256": "23e048675002dd0bbd678b184ef674288813a10517179fedb32914caad762978",
+        "checkpoint_sha256": "60fa28238edd389967f1c1b44ad9cda8463b691fb4fa026032fdded540080ab8",
+        "training_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c210-6",
+          "job_id": "12020250",
+          "python": "3.11.18"
+        },
+        "evaluation_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c208-10",
+          "job_id": "12020251",
+          "python": "3.11.18"
+        },
+        "benchmark_protocol": {
+          "protocol": true,
+          "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+          "hardware": {
+            "job_id": "12020251",
+            "host": "c208-10",
+            "gpu": "NVIDIA A100-PCIE-40GB",
+            "compute_capability": [
+              8,
+              0
+            ],
+            "cuda_runtime": "12.1",
+            "nvidia_driver": "580.178.04",
+            "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+          }
+        }
+      },
+      "b": {
+        "training_job": "12020252",
+        "evaluation_job": "12020253",
+        "preflight_job": "12020249",
+        "snapshot_sha256": "23e048675002dd0bbd678b184ef674288813a10517179fedb32914caad762978",
+        "checkpoint_sha256": "6ea7d8fdc290c7c934e9c7f2b327d98cdde1703fa0e2974cb3c6a213965ca00d",
+        "training_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c208-14",
+          "job_id": "12020252",
+          "python": "3.11.18"
+        },
+        "evaluation_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c208-10",
+          "job_id": "12020253",
+          "python": "3.11.18"
+        },
+        "benchmark_protocol": {
+          "protocol": true,
+          "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+          "hardware": {
+            "job_id": "12020253",
+            "host": "c208-10",
+            "gpu": "NVIDIA A100-PCIE-40GB",
+            "compute_capability": [
+              8,
+              0
+            ],
+            "cuda_runtime": "12.1",
+            "nvidia_driver": "580.178.04",
+            "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+          }
+        }
+      },
+      "c": {
+        "training_job": "12020254",
+        "evaluation_job": "12020255",
+        "preflight_job": "12020249",
+        "snapshot_sha256": "23e048675002dd0bbd678b184ef674288813a10517179fedb32914caad762978",
+        "checkpoint_sha256": "64cbc4e18f81cd76947dc4474f1e0e1855d26d485d46eb2fc1f4f2c40f99e819",
+        "training_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c208-12",
+          "job_id": "12020254",
+          "python": "3.11.18"
+        },
+        "evaluation_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c208-2",
+          "job_id": "12020255",
+          "python": "3.11.18"
+        },
+        "benchmark_protocol": {
+          "protocol": true,
+          "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+          "hardware": {
+            "job_id": "12020255",
+            "host": "c208-2",
+            "gpu": "NVIDIA A100-PCIE-40GB",
+            "compute_capability": [
+              8,
+              0
+            ],
+            "cuda_runtime": "12.1",
+            "nvidia_driver": "580.178.04",
+            "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+          }
+        }
+      },
+      "d": {
+        "training_job": "12020256",
+        "evaluation_job": "12020257",
+        "preflight_job": "12020249",
+        "snapshot_sha256": "23e048675002dd0bbd678b184ef674288813a10517179fedb32914caad762978",
+        "checkpoint_sha256": "502e1895770c33ff0c778b1508ec709df4c24747cdfdec4ff62d700f804b272f",
+        "training_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c208-10",
+          "job_id": "12020256",
+          "python": "3.11.18"
+        },
+        "evaluation_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c208-10",
+          "job_id": "12020257",
+          "python": "3.11.18"
+        },
+        "benchmark_protocol": {
+          "protocol": true,
+          "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+          "hardware": {
+            "job_id": "12020257",
+            "host": "c208-10",
+            "gpu": "NVIDIA A100-PCIE-40GB",
+            "compute_capability": [
+              8,
+              0
+            ],
+            "cuda_runtime": "12.1",
+            "nvidia_driver": "580.178.04",
+            "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+          }
+        }
+      },
+      "e": {
+        "training_job": "12020258",
+        "evaluation_job": "12020259",
+        "preflight_job": "12020249",
+        "snapshot_sha256": "23e048675002dd0bbd678b184ef674288813a10517179fedb32914caad762978",
+        "checkpoint_sha256": "728d84ef4b77218073d932b9530a98346773d7c675fe1af8d055fa5662c25410",
+        "training_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c210-6",
+          "job_id": "12020258",
+          "python": "3.11.18"
+        },
+        "evaluation_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c210-6",
+          "job_id": "12020259",
+          "python": "3.11.18"
+        },
+        "benchmark_protocol": {
+          "protocol": true,
+          "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+          "hardware": {
+            "job_id": "12020259",
+            "host": "c210-6",
+            "gpu": "NVIDIA A100-PCIE-40GB",
+            "compute_capability": [
+              8,
+              0
+            ],
+            "cuda_runtime": "12.1",
+            "nvidia_driver": "580.178.04",
+            "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+          }
+        }
+      }
+    },
+    "cascade": {
+      "a": {
+        "training_job": "11994114",
+        "evaluation_job": "11994115",
+        "preflight_job": "11994102",
+        "snapshot_sha256": "2b98ece5c736735e4602a992c1847958be74cbee6a52b3daa03143cf91f1b3d9",
+        "checkpoint_sha256": "29e98751e67abd8ca94748f6097a2437e7f840350c1975d84a8885c7ebe9a96d",
+        "training_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c210-10",
+          "job_id": "11994114",
+          "python": "3.11.18"
+        },
+        "evaluation_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c208-1",
+          "job_id": "11994115",
+          "python": "3.11.18"
+        },
+        "benchmark_protocol": {
+          "protocol": true,
+          "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+          "hardware": {
+            "job_id": "11994115",
+            "host": "c208-1",
+            "gpu": "NVIDIA A100-PCIE-40GB",
+            "compute_capability": [
+              8,
+              0
+            ],
+            "cuda_runtime": "12.1",
+            "nvidia_driver": "580.178.04",
+            "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+          }
+        }
+      },
+      "b": {
+        "training_job": "11994116",
+        "evaluation_job": "11994117",
+        "preflight_job": "11994102",
+        "snapshot_sha256": "2b98ece5c736735e4602a992c1847958be74cbee6a52b3daa03143cf91f1b3d9",
+        "checkpoint_sha256": "bbaf6a6c49e4902e114fd1709c28debbef5f2b421cabefb87d6e0efd76e5db60",
+        "training_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c210-5",
+          "job_id": "11994116",
+          "python": "3.11.18"
+        },
+        "evaluation_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c209-10",
+          "job_id": "11994117",
+          "python": "3.11.18"
+        },
+        "benchmark_protocol": {
+          "protocol": true,
+          "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+          "hardware": {
+            "job_id": "11994117",
+            "host": "c209-10",
+            "gpu": "NVIDIA A100-PCIE-40GB",
+            "compute_capability": [
+              8,
+              0
+            ],
+            "cuda_runtime": "12.1",
+            "nvidia_driver": "580.178.04",
+            "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+          }
+        }
+      },
+      "c": {
+        "training_job": "11994118",
+        "evaluation_job": "11994119",
+        "preflight_job": "11994102",
+        "snapshot_sha256": "2b98ece5c736735e4602a992c1847958be74cbee6a52b3daa03143cf91f1b3d9",
+        "checkpoint_sha256": "20c9a486117c33763dfa8e065eb7af3c165677f7985a07fe25c3eb3517964643",
+        "training_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c209-2",
+          "job_id": "11994118",
+          "python": "3.11.18"
+        },
+        "evaluation_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c208-1",
+          "job_id": "11994119",
+          "python": "3.11.18"
+        },
+        "benchmark_protocol": {
+          "protocol": true,
+          "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+          "hardware": {
+            "job_id": "11994119",
+            "host": "c208-1",
+            "gpu": "NVIDIA A100-PCIE-40GB",
+            "compute_capability": [
+              8,
+              0
+            ],
+            "cuda_runtime": "12.1",
+            "nvidia_driver": "580.178.04",
+            "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+          }
+        }
+      },
+      "d": {
+        "training_job": "11994120",
+        "evaluation_job": "11994121",
+        "preflight_job": "11994102",
+        "snapshot_sha256": "2b98ece5c736735e4602a992c1847958be74cbee6a52b3daa03143cf91f1b3d9",
+        "checkpoint_sha256": "76635323e59157775aab763be4cc52084e7cfbaf560524703a19af765d6a6326",
+        "training_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c209-15",
+          "job_id": "11994120",
+          "python": "3.11.18"
+        },
+        "evaluation_hardware": {
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+          "host": "c210-5",
+          "job_id": "11994121",
+          "python": "3.11.18"
+        },
+        "benchmark_protocol": {
+          "protocol": true,
+          "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+          "hardware": {
+            "job_id": "11994121",
+            "host": "c210-5",
+            "gpu": "NVIDIA A100-PCIE-40GB",
+            "compute_capability": [
+              8,
+              0
+            ],
+            "cuda_runtime": "12.1",
+            "nvidia_driver": "580.178.04",
+            "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+          }
+        }
+      }
+    }
+  },
+  "pending": [],
+  "qualitative_valid_images_available": {
+    "yolo": 90,
+    "cascade": 90
+  },
+  "latency_comparison": "Descriptiva por trabajo. Las evaluaciones se ejecutan en asignaciones independientes."
+}

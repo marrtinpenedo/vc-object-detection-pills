@@ -1,13 +1,13 @@
 # Recuperación del preflight YOLO 11994101
 
-El mock anterior devolvía 64 o 32 para toda llamada a `random.uniform`. En Ultralytics 8.3.161, `BaseMixTransform` llama primero a `uniform(0, 1)` y sale si el número supera `p`. Con `p=1`, el test continuaba con la imagen original y la afín, sin componer Mosaic. Una reconstrucción local de los JPEG de prueba reprodujo los 6 717 elementos distintos de 12 288. Los sorteos separados del test fijan la activación, el centro Y/X y el paso de BGR a RGB de `Format`. La cadena es `Mosaic → afín → LetterBox → Format` en entrenamiento y `LetterBox → Format` en validación. Se conserva la igualdad exacta de píxeles para el caso determinista y se añaden comprobaciones explícitas de clases, cajas recortadas, colación e integridad de las anotaciones. La receta, el código de entrenamiento y los sondeos con inicialización COCO, forward y backward conservan sus huellas. [Test nativo](../../tests/test_geometry.py) · [Implementación fijada de Ultralytics](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/data/augment.py)
+El mock anterior devolvía 64 o 32 para toda llamada a `random.uniform`. En Ultralytics 8.3.161, `BaseMixTransform` llama primero a `uniform(0, 1)` y sale si el número supera `p`. Con `p=1`, el test continuaba con la imagen original y la afín, sin componer Mosaic. Una reconstrucción local de los JPEG de prueba reprodujo los 6 717 elementos distintos de 12 288. Los sorteos separados del test fijan la activación, el centro Y/X y el paso de BGR a RGB de `Format`. La cadena es `Mosaic → afín → LetterBox → Format` en entrenamiento y `LetterBox → Format` en validación. Se conserva la igualdad exacta de píxeles para el caso determinista y se añaden comprobaciones explícitas de clases, cajas recortadas, colación e integridad de las anotaciones. La receta, el código de entrenamiento y los sondeos con inicialización COCO, forward y backward conservan sus huellas. [Test nativo](../../../tests/test_geometry.py) · [Implementación fijada de Ultralytics](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/data/augment.py)
 
 ## Transferir y reintentar
 
-Desde la raíz del repositorio en el portátil, transferir **solo** el tar incremental. Contiene `scripts/campaign.py`, `tests/test_geometry.py` y el descriptor `snapshot.json`.
+El [tar incremental archivado](../../../experiments/exp-004-yolo-factorial/results/evidence/campaign-003-005-yolo-recovery.delta.tar.gz) contiene `scripts/campaign.py`, `tests/test_geometry.py` y el descriptor `snapshot.json`.
 
 ```bash
-scp results/campaign-003-005-yolo-recovery.delta.tar.gz USUARIO_CESGA@ft3.cesga.es:
+scp experiments/exp-004-yolo-factorial/results/evidence/campaign-003-005-yolo-recovery.delta.tar.gz USUARIO_CESGA@ft3.cesga.es:
 ```
 
 En CESGA, conservar la copia desplegada inicialmente y extraer el parche sobre una copia nueva. El ejemplo usa las rutas del despliegue documentado. Si se usó otra ruta de código, ajustar `original`. Si el lanzamiento inicial usó `PILLS_CAMPAIGN_WORK` o `--root`, proporcionar exactamente los mismos valores al ejecutar los comandos de campaña.

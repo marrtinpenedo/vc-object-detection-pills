@@ -1,6 +1,6 @@
 # EXP-004 y EXP-005 · Cierre de validación
 
-Se reprodujeron las nueve condiciones desde sus predicciones oficiales. El importador verificó el inventario de la descarga `81d797854c9d5c1fcc32fb44e5eadeb05551dfe979fd962d5df027ec2f4673df`. El análisis comprobó el COCO de validación, los hashes de `best`, las curvas PR y las cadenas completas, con Cascade en `2b98ece5c736` y YOLO en `23e048675002`. Los resultados reproducidos coinciden con los nueve valores comunicados de mAP oficial y los nueve de sensibilidad al redondear a cuatro decimales. [Auditoría](../../results/campaign-003-005-analysis/auditoria.json) · [Tabla completa](../../results/campaign-003-005-analysis/resumen.csv) · [Resumen ejecutivo](../../results/campaign-003-005-analysis/resumen-ejecutivo.md) · [Figura para la presentación](../../results/campaign-003-005-analysis/map_condiciones.png)
+Se reprodujeron las nueve condiciones desde sus predicciones oficiales. El importador verificó el inventario de la descarga `81d797854c9d5c1fcc32fb44e5eadeb05551dfe979fd962d5df027ec2f4673df`. El análisis comprobó el COCO de validación, los hashes de `best`, las curvas PR y las cadenas completas, con Cascade en `2b98ece5c736` y YOLO en `23e048675002`. Los resultados reproducidos coinciden con los nueve valores comunicados de mAP oficial y los nueve de sensibilidad al redondear a cuatro decimales. [Auditoría](../../../experiments/exp-004-yolo-factorial/results/evidence/auditoria.json) · [Tabla completa](../../../experiments/exp-004-yolo-factorial/results/evidence/resumen.csv) · [Figura para la presentación](../../../experiments/exp-004-yolo-factorial/results/evidence/map_condiciones.png)
 
 ## Resumen para la presentación
 
@@ -18,13 +18,13 @@ Se reprodujeron las nueve condiciones desde sus predicciones oficiales. El impor
 | Cascade R-CNN | C · 30, solo afín | **0,8830** | 0,8805 |
 | Cascade R-CNN | D · 100, solo afín | 0,8069 | 0,8579 |
 
-- **YOLO.** D−B mejora +11,22 pp oficialmente y +12,82 pp sin Ibuphil. D−E mejora +3,95 y +4,51 pp respectivamente. Cipro, Ibuphil Cold, Xyzall y red impulsan D−B, y `white` retrocede. D alcanza 93,88 % de recall con 18 FP. C conserva mejor precisión (86,41 % frente a 83,64 %) y mayor AP50/AP75 con un presupuesto de 30 épocas. [EXP-004](../exp-004-yolo-factorial/findings.md)
-- **Cascade.** C−A mejora +8,18 pp oficialmente y pierde 1,37 pp a siete clases. Ibuphil aporta +9,38 pp al mAP oficial y las otras siete restan 1,20 pp. D−C cae 7,61 pp oficiales y 2,26 pp sin Ibuphil. C y D conservan 94,90 % de recall operativo. En D, un FP de baja confianza pasa por delante de la única detección correcta de Ibuphil. [EXP-005](../exp-005-cascade-geometric/findings.md)
-- **Épocas y tiempo de inferencia.** B−A cambia +0,57 pp en YOLO y +0,14 pp en Cascade, con descensos a siete clases. El scheduler coseno recorre horizontes distintos y con 100 épocas hay más oportunidades de seleccionar el máximo. YOLO D promedió 10,87 ms por imagen y Cascade C 29,50 ms, en asignaciones A100 independientes con batch 1. [Curvas YOLO](../../results/campaign-003-005-analysis/exp-004/entrenamiento.png) · [Curvas Cascade](../../results/campaign-003-005-analysis/exp-005/entrenamiento.png)
+- **YOLO.** D−B mejora +11,22 pp oficialmente y +12,82 pp sin Ibuphil. D−E mejora +3,95 y +4,51 pp respectivamente. Cipro, Ibuphil Cold, Xyzall y red impulsan D−B, y `white` retrocede. D alcanza 93,88 % de recall con 18 FP. C conserva mejor precisión (86,41 % frente a 83,64 %) y mayor AP50/AP75 con un presupuesto de 30 épocas. [EXP-004](../../../experiments/exp-004-yolo-factorial/findings.md)
+- **Cascade.** C−A mejora +8,18 pp oficialmente y pierde 1,37 pp a siete clases. Ibuphil aporta +9,38 pp al mAP oficial y las otras siete restan 1,20 pp. D−C cae 7,61 pp oficiales y 2,26 pp sin Ibuphil. C y D conservan 94,90 % de recall operativo. En D, un FP de baja confianza pasa por delante de la única detección correcta de Ibuphil. [EXP-005](../../../experiments/exp-005-cascade-geometric/findings.md)
+- **Épocas y tiempo de inferencia.** B−A cambia +0,57 pp en YOLO y +0,14 pp en Cascade, con descensos a siete clases. El scheduler coseno recorre horizontes distintos y con 100 épocas hay más oportunidades de seleccionar el máximo. YOLO D promedió 10,87 ms por imagen y Cascade C 29,50 ms, en asignaciones A100 independientes con batch 1. [Curvas YOLO](../../../experiments/exp-004-yolo-factorial/results/analysis/entrenamiento.png) · [Curvas Cascade](../../../experiments/exp-005-cascade-geometric/results/analysis/entrenamiento.png)
 
 ## Comparación con las baselines y EXP-007
 
-Se recalcularon dos baselines y doce evaluaciones de referencia de EXP-007 fase C, cuatro por semilla. Todas coinciden con sus JSON y curvas PR publicados y comparten los hashes de datos de esta campaña. Las baselines históricas son referencias descriptivas. Los contrastes factoriales usan los controles contemporáneos. [Baseline histórica](../baseline/findings.md) · [EXP-007, fase C](https://github.com/marrtinpenedo/vc-object-detection-pills/blob/6acc2efea86324de1cd039fbcb34df2f0252d95a/experiments/exp-007-yolo-staged-transfer/findings.md#fase-c--duración-de-la-congelación) · [Tabla de referencias](../../results/campaign-003-005-analysis/referencias_validacion.csv)
+Se recalcularon dos baselines y doce evaluaciones de referencia de EXP-007 fase C, cuatro por semilla. Todas coinciden con sus JSON y curvas PR publicados y comparten los hashes de datos de esta campaña. Las baselines históricas son referencias descriptivas. Los contrastes factoriales usan los controles contemporáneos. [Baseline histórica](../../../experiments/baseline/findings.md) · [EXP-007, fase C](https://github.com/marrtinpenedo/vc-object-detection-pills/blob/6acc2efea86324de1cd039fbcb34df2f0252d95a/experiments/exp-007-yolo-staged-transfer/findings.md#fase-c--duración-de-la-congelación) · [Tabla de referencias](../../../experiments/exp-004-yolo-factorial/results/evidence/referencias_validacion.csv)
 
 | Referencia | mAP oficial | mAP sin Ibuphil |
 | --- | ---: | ---: |
@@ -45,7 +45,7 @@ YOLO D gana 11,79 pp oficiales frente a la baseline. Frente a `freeze-20` en la 
 
 La geometría de YOLO ofrece una ganancia consistente entre las dos duraciones en la semilla observada. La afín de Cascade merece replicación antes de adoptarse por su aparente mejora oficial. La selección de `best` y las comparaciones se hicieron sobre las mismas 90 imágenes. La campaña factorial aporta una sola semilla. El test queda reservado.
 
-## Exportación selectiva
+## Exportación selectiva histórica
 
 En CESGA, desde la copia de la recuperación. El lanzador usa la raíz `results/campaign-003-005` dentro de `PILLS_CAMPAIGN_WORK`.
 
@@ -65,14 +65,16 @@ El tar contiene los descriptores, el registro de intentos, los estados de SLURM,
 
 ## Reproducción local
 
+La [evidencia archivada](../../../experiments/exp-004-yolo-factorial/results/evidence/README.md) permite reproducir sin acceder a CESGA. Las anotaciones originales de `train` y `valid` deben estar disponibles en `data/pills-sxdht` o indicarse mediante `--data`. Las imágenes de `valid` se usan únicamente para generar ejemplos anotados.
+
 ```bash
-.venv/bin/python -m experiments.campaign-003-005.import_results \
-  results/campaign-003-005-results-recovered.tar.gz results/campaign-003-005-import
+.venv/bin/python -m scripts.campaign_analysis.import_results \
+  experiments/exp-004-yolo-factorial/results/evidence/campaign-003-005-results-recovered.tar.gz results/campaign-003-005-import
 
 MPLBACKEND=Agg uv run --no-project --python 3.11 \
   --with pycocotools==2.0.8 --with numpy==1.26.4 --with pillow==10.4.0 \
   --with matplotlib==3.9.4 --with pyyaml==6.0.4 \
-  python -m experiments.campaign-003-005.analyze \
+  python -m scripts.campaign_analysis.analyze \
   results/campaign-003-005-import results/campaign-003-005-analysis \
   --snapshot-sha256 2b98ece5c736735e4602a992c1847958be74cbee6a52b3daa03143cf91f1b3d9 \
   --recovery-sha256 23e048675002dd0bbd678b184ef674288813a10517179fedb32914caad762978 \
@@ -85,4 +87,4 @@ El cierre exige nueve cadenas `preflight → train → eval` completas. Cascade 
 
 El resultado principal es mAP COCO@0,50:0,95 de las ocho clases. Los contrastes muestran cuánto aporta Ibuphil 600 mg al cambio oficial y cuánto aportan las otras siete. La sensibilidad usa el promedio de siete. La precisión y el recall describen el punto operativo con confianza 0,25 e IoU 0,50. El análisis utiliza semilla 2026 y las 90 imágenes de validación. La evaluación de test queda reservada para candidatos congelados.
 
-[EXP-004](../exp-004-yolo-factorial/findings.md) · [EXP-005](../exp-005-cascade-geometric/findings.md)
+[EXP-004](../../../experiments/exp-004-yolo-factorial/findings.md) · [EXP-005](../../../experiments/exp-005-cascade-geometric/findings.md)

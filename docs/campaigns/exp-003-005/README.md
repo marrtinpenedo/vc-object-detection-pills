@@ -1,6 +1,6 @@
 # Campaña EXP-003 a EXP-005
 
-[Ensemble local](../exp-003-ensemble/README.md) · [Factorial YOLO](../exp-004-yolo-factorial/README.md) · [Factorial Cascade](../exp-005-cascade-geometric/README.md) · [Cierre de validación](findings.md) · [Manifiesto](../../configs/campaign/exp-003-005.json)
+[Ensemble local](../../../experiments/exp-003-ensemble/README.md) · [Factorial YOLO](../../../experiments/exp-004-yolo-factorial/README.md) · [Factorial Cascade](../../../experiments/exp-005-cascade-geometric/README.md) · [Cierre de validación](findings.md) · [Manifiesto](../../../configs/campaign/exp-003-005.json)
 
 La receta queda congelada tras contrastar los lanzadores históricos de RF100 y auditar las cajas de entrenamiento. [Informe de política geométrica](geometric-policy.md)
 
@@ -15,14 +15,12 @@ A y C duran 30 épocas. B, D y E duran 100. Todos los entrenamientos usan semill
 
 `python -m scripts.campaign plan` imprime el grafo sin enviar trabajos. El lanzador guarda un manifiesto resuelto con recetas, rutas, hashes y dependencias, y materializa los JSON para el lanzador base. Verifica el SHA-256 del manifiesto de datos, el COCO de `valid`, los pesos y el snapshot. Los jobs también verifican entradas, receta y procedencia. Los dos preflights ejecutan el contrato de cargador real para su framework y un sondeo con pesos COCO, inferencia y forward/backward de A y C. Se usa C para las transformaciones que también usan D; los presupuestos de 100 épocas se verifican por configuración y auditoría. Las pruebas con mocks quedan en la suite local. El lanzador de login nunca importa el runtime GPU.
 
-## Transferencia y lanzamiento
+## Transferencia y lanzamiento históricos
 
-Desde el portátil, usar el tar ya preparado o recrear una copia nueva al cambiar los fuentes. El snapshot contiene solo los archivos de ejecución y sus SHA-256. Su identidad es el SHA-256 del descriptor interior `snapshot.json`. El commit base es informativo porque el tar puede incluir cambios locales de campaña. Crear un directorio nuevo por snapshot y conservar intacto el código desplegado mientras haya trabajos activos.
+El [archivo original](../../../experiments/exp-004-yolo-factorial/results/evidence/campaign-003-005.tar.gz) conserva los bytes usados en CESGA y su descriptor `snapshot.json`. El hash del descriptor identifica el snapshot. El commit base indica el punto de partida de un árbol que todavía tenía cambios locales. Para reproducir esa ejecución hay que extraer el archivo original. Un `bundle` desde el checkout integrado genera un snapshot distinto. La [evidencia archivada](../../../experiments/exp-004-yolo-factorial/results/evidence/README.md) conserva las dos versiones y el parche.
 
 ```bash
-mkdir -p results
-.venv/bin/python -m scripts.campaign bundle results/campaign-003-005.tar.gz
-scp results/campaign-003-005.tar.gz USUARIO_CESGA@ft3.cesga.es:
+scp experiments/exp-004-yolo-factorial/results/evidence/campaign-003-005.tar.gz USUARIO_CESGA@ft3.cesga.es:
 ```
 
 Después de la transferencia, ejecutar **una vez** en CESGA. Para un snapshot nuevo usar un directorio de código distinto y añadir `--root RUTA_DE_RESULTADOS_NUEVA` al lanzamiento.
@@ -69,15 +67,15 @@ El export selectivo guarda configuraciones efectivas, recibos, estados, historia
 
 Para la campaña final con los dos snapshots, descargar la exportación indicada en el [cierre de validación](findings.md). El comando de cierre fija las dos huellas y exige nueve cadenas exitosas.
 
-Desde el portátil, importar en un destino nuevo. Las importaciones son separadas por descarga y conservan el archivo de procedencia.
+Desde el portátil, importar en un destino nuevo. El paquete compartido se conserva dentro de los [resultados de EXP-004](../../../experiments/exp-004-yolo-factorial/results/evidence/README.md) y también contiene EXP-005. La implementación de análisis, importación y auditoría se trasladó de `experiments/campaign-003-005/` a `scripts/campaign_analysis/`. Los manifiestos de ejecución conservan `configs/campaign/exp-003-005.json`, `scripts/campaign.py`, `slurm/campaign.sh` y las rutas de salida originales.
 
 ```bash
-.venv/bin/python -m experiments.campaign-003-005.import_results \
-  results/campaign-003-005-results.tar.gz results/campaign-003-005-import
+.venv/bin/python -m scripts.campaign_analysis.import_results \
+  experiments/exp-004-yolo-factorial/results/evidence/campaign-003-005-results-recovered.tar.gz results/campaign-003-005-import
 MPLBACKEND=Agg uv run --no-project --python 3.11 \
   --with pycocotools==2.0.8 --with numpy==1.26.4 --with pillow==10.4.0 \
   --with matplotlib==3.9.4 --with pyyaml==6.0.4 \
-  python -m experiments.campaign-003-005.analyze \
+  python -m scripts.campaign_analysis.analyze \
   results/campaign-003-005-import results/campaign-003-005-analysis
 ```
 

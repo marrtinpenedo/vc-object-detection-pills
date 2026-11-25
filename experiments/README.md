@@ -18,7 +18,7 @@
 
 La numeración de la campaña asigna EXP-003 al ensemble y EXP-004/005 a los factoriales. Las propuestas al cierre de EXP-002 usaban una numeración provisional.
 
-La [campaña EXP-003 a EXP-005](campaign-003-005/README.md) completó los dos factoriales. El [cierre de validación](campaign-003-005/findings.md) recoge los nueve resultados reproducidos, el contraste con EXP-007 y los candidatos para combinar geometría y congelación en YOLO.
+La [campaña EXP-003 a EXP-005](../docs/campaigns/exp-003-005/README.md) completó los dos factoriales. El [cierre de validación](../docs/campaigns/exp-003-005/findings.md) recoge los nueve resultados reproducidos, el contraste con EXP-007 y los candidatos para combinar geometría y congelación en YOLO.
 
 La evaluación final en `test` se reserva hasta fijar las recetas, los checkpoints y el punto operativo.
 

@@ -1,0 +1,14 @@
+arm,clase_real,clase_predicha,n
+A,Cipro 500,Ibuphil Cold 400-60,1
+A,Cipro 500,Xyzall 5mg,6
+A,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+B,Cipro 500,Ibuphil Cold 400-60,1
+B,Cipro 500,Xyzall 5mg,1
+B,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+C,Cipro 500,Ibuphil Cold 400-60,1
+C,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+D,Cipro 500,Ibuphil Cold 400-60,1
+E,Cipro 500,Ibuphil Cold 400-60,1
+E,Cipro 500,Xyzall 5mg,1
+E,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+E,Xyzall 5mg,Cipro 500,1

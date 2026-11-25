@@ -30,7 +30,7 @@ Como antecedentes de alcance distinto, Panphuech et al. usan flip horizontal en 
 
 ## Auditoría de la receta sobre train
 
-Simulé 31 600 intentos por rama, con las 316 imágenes, 351 cajas y semilla 2026. Forcé el sorteo inicial a uno para medir el rechazo geométrico por separado, volví a ponderar por la probabilidad nominal 0,5 y comparé ±8° con ±15° manteniendo el resto fijo. Para Mosaic reproduje solo la colocación y recorte de cajas en el lienzo cuadrado de cuatro teselas de Ultralytics 8.3.161. Se trata de una simulación de anotaciones y frecuencias, sin inferencia ni evaluación de mAP. [Código de auditoría](audit_geometry.py) · [Mosaic en Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/data/augment.py)
+Simulé 31 600 intentos por rama, con las 316 imágenes, 351 cajas y semilla 2026. Forcé el sorteo inicial a uno para medir el rechazo geométrico por separado, volví a ponderar por la probabilidad nominal 0,5 y comparé ±8° con ±15° manteniendo el resto fijo. Para Mosaic reproduje solo la colocación y recorte de cajas en el lienzo cuadrado de cuatro teselas de Ultralytics 8.3.161. Se trata de una simulación de anotaciones y frecuencias, sin inferencia ni evaluación de mAP. [Código de auditoría](../../../scripts/campaign_analysis/audit_geometry.py) · [Mosaic en Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/data/augment.py)
 
 | Rotación | Rechazo si se intenta, imagen simple | Rechazo si se intenta, detrás de Mosaic | Afín aplicada, imagen simple / detrás de Mosaic | Inflación mediana / p95 de área por rotación en imagen simple, descontando escala |
 | --- | ---: | ---: | ---: | ---: |
@@ -40,7 +40,7 @@ Simulé 31 600 intentos por rama, con las 316 imágenes, 351 cajas y semilla 202
 Con Mosaic al 30 %, la mezcla estima **42,9 % de afín efectiva, 21,3 % de flip y 64,6 % de muestras con al menos una transformación efectiva** en C/D. En Cascade C/D y YOLO E, se estiman 49,5 % de afín efectiva y 24,7 % de flip. Al rechazar una afín posterior a Mosaic se conserva el mosaico. La reducción de 1280 a 640 divide aproximadamente entre cuatro el área de una caja sin otros cambios. En `train`, 29 cajas que superan 32² px² pasarían por debajo de ese umbral al reducirlas a la mitad por lado, además de las dos que ya estaban por debajo. Este cálculo describe el lienzo de entrenamiento. El AP por tamaño se calcula con el COCO original.
 
 ```bash
-.venv/bin/python -m experiments.campaign-003-005.audit_geometry
+.venv/bin/python -m scripts.campaign_analysis.audit_geometry
 ```
 
 ## Parámetros congelados

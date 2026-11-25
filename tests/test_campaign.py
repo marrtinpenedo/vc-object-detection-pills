@@ -11,8 +11,8 @@ from unittest.mock import patch
 from scripts import campaign
 from scripts.baseline_data import read_json, sha256, write_json
 
-importer = import_module("experiments.campaign-003-005.import_results")
-analysis = import_module("experiments.campaign-003-005.analyze")
+importer = import_module("scripts.campaign_analysis.import_results")
+analysis = import_module("scripts.campaign_analysis.analyze")
 ensemble = import_module("experiments.exp-003-ensemble.analyze")
 
 
@@ -186,7 +186,7 @@ class CampaignTest(unittest.TestCase):
         self.assertTrue(all(r["delta"] is None and r["pending_arms"] for r in remaining))
 
     def test_class_contributions_explain_reversal_in_official_map(self):
-        reporting = import_module("experiments.campaign-003-005.reporting")
+        reporting = import_module("scripts.campaign_analysis.reporting")
         rare = reporting.RARE_CLASS
         names = [rare, *(f"class {i}" for i in range(7))]
         a = dict.fromkeys(names, 0.9)
