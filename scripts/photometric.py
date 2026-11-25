@@ -38,14 +38,18 @@ class PhotometricSampler:
         self.worker_seed = None
         self.rng = None
 
-    def sample(self, worker=None):
+    def worker_rng(self, worker):
         seed = self.seed if worker is None else worker.seed
         if self.rng is None or seed != self.worker_seed:
             self.worker_seed = seed
             self.rng = random.Random(seed)
-        if self.rng.random() >= self.spec["probability"]:
+        return self.rng
+
+    def sample(self, worker=None):
+        rng = self.worker_rng(worker)
+        if rng.random() >= self.spec["probability"]:
             return None
         return (
-            self.rng.uniform(1 - self.spec["brightness"], 1 + self.spec["brightness"]),
-            self.rng.uniform(1 - self.spec["contrast"], 1 + self.spec["contrast"]),
+            rng.uniform(1 - self.spec["brightness"], 1 + self.spec["brightness"]),
+            rng.uniform(1 - self.spec["contrast"], 1 + self.spec["contrast"]),
         )

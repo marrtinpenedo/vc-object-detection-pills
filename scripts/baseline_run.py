@@ -66,8 +66,19 @@ def publish_copy(source, destination):
 def load_config(backend, path, overrides):
     shape = read_json(REPO / "configs" / "baseline" / f"{backend}.json")
     spec = read_json(path) if path else shape.copy()
-    if spec.keys() - {"photometric"} != shape.keys():
+    if spec.keys() - {"photometric", "geometric", "mosaic"} != shape.keys():
         raise ValueError(f"Claves de configuración diferentes de {sorted(shape)}")
+    if "mosaic" in spec:
+        probability = spec["mosaic"]
+        if (backend != "yolo" or "geometric" not in spec or type(probability) not in (int, float)
+                or not 0 < probability <= 1):
+            raise ValueError("mosaic requiere YOLO, geometría y una probabilidad en (0, 1]")
+    if "geometric" in spec:
+        from scripts.geometric import validate_geometric
+
+        if "photometric" in spec:
+            raise ValueError("La receta admite una sola política de augmentación")
+        validate_geometric(spec["geometric"])
     if "photometric" in spec:
         from scripts.photometric import validate_photometric
 
