@@ -37,6 +37,8 @@ def main():
     if args.check_config:
         print(json.dumps(spec, indent=2))
         return
+    if spec.get("freeze_backbone_epochs", 0) and (args.resume or args.pause_after is not None):
+        parser.error("El ajuste por etapas requiere una ejecución continua, sin --resume ni --pause-after")
     if any(value is None for value in (args.data, args.weights, args.output)):
         parser.error("indica --data, --weights y --output")
     if args.pause_after is not None and (args.initialize or not 0 < args.pause_after < spec["epochs"]):

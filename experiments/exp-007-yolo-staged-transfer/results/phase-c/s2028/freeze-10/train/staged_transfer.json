@@ -1,0 +1,1788 @@
+{
+  "freeze_backbone_epochs": 10,
+  "modules": [
+    {
+      "index": 0,
+      "type": "Conv",
+      "part": "backbone"
+    },
+    {
+      "index": 1,
+      "type": "Conv",
+      "part": "backbone"
+    },
+    {
+      "index": 2,
+      "type": "C2f",
+      "part": "backbone"
+    },
+    {
+      "index": 3,
+      "type": "Conv",
+      "part": "backbone"
+    },
+    {
+      "index": 4,
+      "type": "C2f",
+      "part": "backbone"
+    },
+    {
+      "index": 5,
+      "type": "SCDown",
+      "part": "backbone"
+    },
+    {
+      "index": 6,
+      "type": "C2f",
+      "part": "backbone"
+    },
+    {
+      "index": 7,
+      "type": "SCDown",
+      "part": "backbone"
+    },
+    {
+      "index": 8,
+      "type": "C2fCIB",
+      "part": "backbone"
+    },
+    {
+      "index": 9,
+      "type": "SPPF",
+      "part": "backbone"
+    },
+    {
+      "index": 10,
+      "type": "PSA",
+      "part": "backbone"
+    },
+    {
+      "index": 11,
+      "type": "Upsample",
+      "part": "neck"
+    },
+    {
+      "index": 12,
+      "type": "Concat",
+      "part": "neck"
+    },
+    {
+      "index": 13,
+      "type": "C2f",
+      "part": "neck"
+    },
+    {
+      "index": 14,
+      "type": "Upsample",
+      "part": "neck"
+    },
+    {
+      "index": 15,
+      "type": "Concat",
+      "part": "neck"
+    },
+    {
+      "index": 16,
+      "type": "C2f",
+      "part": "neck"
+    },
+    {
+      "index": 17,
+      "type": "Conv",
+      "part": "neck"
+    },
+    {
+      "index": 18,
+      "type": "Concat",
+      "part": "neck"
+    },
+    {
+      "index": 19,
+      "type": "C2f",
+      "part": "neck"
+    },
+    {
+      "index": 20,
+      "type": "SCDown",
+      "part": "neck"
+    },
+    {
+      "index": 21,
+      "type": "Concat",
+      "part": "neck"
+    },
+    {
+      "index": 22,
+      "type": "C2fCIB",
+      "part": "neck"
+    },
+    {
+      "index": 23,
+      "type": "v10Detect",
+      "part": "detector"
+    }
+  ],
+  "backbone_parameters": [
+    "model.0.conv.weight",
+    "model.0.bn.weight",
+    "model.0.bn.bias",
+    "model.1.conv.weight",
+    "model.1.bn.weight",
+    "model.1.bn.bias",
+    "model.2.cv1.conv.weight",
+    "model.2.cv1.bn.weight",
+    "model.2.cv1.bn.bias",
+    "model.2.cv2.conv.weight",
+    "model.2.cv2.bn.weight",
+    "model.2.cv2.bn.bias",
+    "model.2.m.0.cv1.conv.weight",
+    "model.2.m.0.cv1.bn.weight",
+    "model.2.m.0.cv1.bn.bias",
+    "model.2.m.0.cv2.conv.weight",
+    "model.2.m.0.cv2.bn.weight",
+    "model.2.m.0.cv2.bn.bias",
+    "model.3.conv.weight",
+    "model.3.bn.weight",
+    "model.3.bn.bias",
+    "model.4.cv1.conv.weight",
+    "model.4.cv1.bn.weight",
+    "model.4.cv1.bn.bias",
+    "model.4.cv2.conv.weight",
+    "model.4.cv2.bn.weight",
+    "model.4.cv2.bn.bias",
+    "model.4.m.0.cv1.conv.weight",
+    "model.4.m.0.cv1.bn.weight",
+    "model.4.m.0.cv1.bn.bias",
+    "model.4.m.0.cv2.conv.weight",
+    "model.4.m.0.cv2.bn.weight",
+    "model.4.m.0.cv2.bn.bias",
+    "model.4.m.1.cv1.conv.weight",
+    "model.4.m.1.cv1.bn.weight",
+    "model.4.m.1.cv1.bn.bias",
+    "model.4.m.1.cv2.conv.weight",
+    "model.4.m.1.cv2.bn.weight",
+    "model.4.m.1.cv2.bn.bias",
+    "model.5.cv1.conv.weight",
+    "model.5.cv1.bn.weight",
+    "model.5.cv1.bn.bias",
+    "model.5.cv2.conv.weight",
+    "model.5.cv2.bn.weight",
+    "model.5.cv2.bn.bias",
+    "model.6.cv1.conv.weight",
+    "model.6.cv1.bn.weight",
+    "model.6.cv1.bn.bias",
+    "model.6.cv2.conv.weight",
+    "model.6.cv2.bn.weight",
+    "model.6.cv2.bn.bias",
+    "model.6.m.0.cv1.conv.weight",
+    "model.6.m.0.cv1.bn.weight",
+    "model.6.m.0.cv1.bn.bias",
+    "model.6.m.0.cv2.conv.weight",
+    "model.6.m.0.cv2.bn.weight",
+    "model.6.m.0.cv2.bn.bias",
+    "model.6.m.1.cv1.conv.weight",
+    "model.6.m.1.cv1.bn.weight",
+    "model.6.m.1.cv1.bn.bias",
+    "model.6.m.1.cv2.conv.weight",
+    "model.6.m.1.cv2.bn.weight",
+    "model.6.m.1.cv2.bn.bias",
+    "model.7.cv1.conv.weight",
+    "model.7.cv1.bn.weight",
+    "model.7.cv1.bn.bias",
+    "model.7.cv2.conv.weight",
+    "model.7.cv2.bn.weight",
+    "model.7.cv2.bn.bias",
+    "model.8.cv1.conv.weight",
+    "model.8.cv1.bn.weight",
+    "model.8.cv1.bn.bias",
+    "model.8.cv2.conv.weight",
+    "model.8.cv2.bn.weight",
+    "model.8.cv2.bn.bias",
+    "model.8.m.0.cv1.0.conv.weight",
+    "model.8.m.0.cv1.0.bn.weight",
+    "model.8.m.0.cv1.0.bn.bias",
+    "model.8.m.0.cv1.1.conv.weight",
+    "model.8.m.0.cv1.1.bn.weight",
+    "model.8.m.0.cv1.1.bn.bias",
+    "model.8.m.0.cv1.2.conv.conv.weight",
+    "model.8.m.0.cv1.2.conv.bn.weight",
+    "model.8.m.0.cv1.2.conv.bn.bias",
+    "model.8.m.0.cv1.2.conv1.conv.weight",
+    "model.8.m.0.cv1.2.conv1.bn.weight",
+    "model.8.m.0.cv1.2.conv1.bn.bias",
+    "model.8.m.0.cv1.3.conv.weight",
+    "model.8.m.0.cv1.3.bn.weight",
+    "model.8.m.0.cv1.3.bn.bias",
+    "model.8.m.0.cv1.4.conv.weight",
+    "model.8.m.0.cv1.4.bn.weight",
+    "model.8.m.0.cv1.4.bn.bias",
+    "model.9.cv1.conv.weight",
+    "model.9.cv1.bn.weight",
+    "model.9.cv1.bn.bias",
+    "model.9.cv2.conv.weight",
+    "model.9.cv2.bn.weight",
+    "model.9.cv2.bn.bias",
+    "model.10.cv1.conv.weight",
+    "model.10.cv1.bn.weight",
+    "model.10.cv1.bn.bias",
+    "model.10.cv2.conv.weight",
+    "model.10.cv2.bn.weight",
+    "model.10.cv2.bn.bias",
+    "model.10.attn.qkv.conv.weight",
+    "model.10.attn.qkv.bn.weight",
+    "model.10.attn.qkv.bn.bias",
+    "model.10.attn.proj.conv.weight",
+    "model.10.attn.proj.bn.weight",
+    "model.10.attn.proj.bn.bias",
+    "model.10.attn.pe.conv.weight",
+    "model.10.attn.pe.bn.weight",
+    "model.10.attn.pe.bn.bias",
+    "model.10.ffn.0.conv.weight",
+    "model.10.ffn.0.bn.weight",
+    "model.10.ffn.0.bn.bias",
+    "model.10.ffn.1.conv.weight",
+    "model.10.ffn.1.bn.weight",
+    "model.10.ffn.1.bn.bias"
+  ],
+  "backbone_buffers": [
+    "model.0.bn.running_mean",
+    "model.0.bn.running_var",
+    "model.0.bn.num_batches_tracked",
+    "model.1.bn.running_mean",
+    "model.1.bn.running_var",
+    "model.1.bn.num_batches_tracked",
+    "model.2.cv1.bn.running_mean",
+    "model.2.cv1.bn.running_var",
+    "model.2.cv1.bn.num_batches_tracked",
+    "model.2.cv2.bn.running_mean",
+    "model.2.cv2.bn.running_var",
+    "model.2.cv2.bn.num_batches_tracked",
+    "model.2.m.0.cv1.bn.running_mean",
+    "model.2.m.0.cv1.bn.running_var",
+    "model.2.m.0.cv1.bn.num_batches_tracked",
+    "model.2.m.0.cv2.bn.running_mean",
+    "model.2.m.0.cv2.bn.running_var",
+    "model.2.m.0.cv2.bn.num_batches_tracked",
+    "model.3.bn.running_mean",
+    "model.3.bn.running_var",
+    "model.3.bn.num_batches_tracked",
+    "model.4.cv1.bn.running_mean",
+    "model.4.cv1.bn.running_var",
+    "model.4.cv1.bn.num_batches_tracked",
+    "model.4.cv2.bn.running_mean",
+    "model.4.cv2.bn.running_var",
+    "model.4.cv2.bn.num_batches_tracked",
+    "model.4.m.0.cv1.bn.running_mean",
+    "model.4.m.0.cv1.bn.running_var",
+    "model.4.m.0.cv1.bn.num_batches_tracked",
+    "model.4.m.0.cv2.bn.running_mean",
+    "model.4.m.0.cv2.bn.running_var",
+    "model.4.m.0.cv2.bn.num_batches_tracked",
+    "model.4.m.1.cv1.bn.running_mean",
+    "model.4.m.1.cv1.bn.running_var",
+    "model.4.m.1.cv1.bn.num_batches_tracked",
+    "model.4.m.1.cv2.bn.running_mean",
+    "model.4.m.1.cv2.bn.running_var",
+    "model.4.m.1.cv2.bn.num_batches_tracked",
+    "model.5.cv1.bn.running_mean",
+    "model.5.cv1.bn.running_var",
+    "model.5.cv1.bn.num_batches_tracked",
+    "model.5.cv2.bn.running_mean",
+    "model.5.cv2.bn.running_var",
+    "model.5.cv2.bn.num_batches_tracked",
+    "model.6.cv1.bn.running_mean",
+    "model.6.cv1.bn.running_var",
+    "model.6.cv1.bn.num_batches_tracked",
+    "model.6.cv2.bn.running_mean",
+    "model.6.cv2.bn.running_var",
+    "model.6.cv2.bn.num_batches_tracked",
+    "model.6.m.0.cv1.bn.running_mean",
+    "model.6.m.0.cv1.bn.running_var",
+    "model.6.m.0.cv1.bn.num_batches_tracked",
+    "model.6.m.0.cv2.bn.running_mean",
+    "model.6.m.0.cv2.bn.running_var",
+    "model.6.m.0.cv2.bn.num_batches_tracked",
+    "model.6.m.1.cv1.bn.running_mean",
+    "model.6.m.1.cv1.bn.running_var",
+    "model.6.m.1.cv1.bn.num_batches_tracked",
+    "model.6.m.1.cv2.bn.running_mean",
+    "model.6.m.1.cv2.bn.running_var",
+    "model.6.m.1.cv2.bn.num_batches_tracked",
+    "model.7.cv1.bn.running_mean",
+    "model.7.cv1.bn.running_var",
+    "model.7.cv1.bn.num_batches_tracked",
+    "model.7.cv2.bn.running_mean",
+    "model.7.cv2.bn.running_var",
+    "model.7.cv2.bn.num_batches_tracked",
+    "model.8.cv1.bn.running_mean",
+    "model.8.cv1.bn.running_var",
+    "model.8.cv1.bn.num_batches_tracked",
+    "model.8.cv2.bn.running_mean",
+    "model.8.cv2.bn.running_var",
+    "model.8.cv2.bn.num_batches_tracked",
+    "model.8.m.0.cv1.0.bn.running_mean",
+    "model.8.m.0.cv1.0.bn.running_var",
+    "model.8.m.0.cv1.0.bn.num_batches_tracked",
+    "model.8.m.0.cv1.1.bn.running_mean",
+    "model.8.m.0.cv1.1.bn.running_var",
+    "model.8.m.0.cv1.1.bn.num_batches_tracked",
+    "model.8.m.0.cv1.2.conv.bn.running_mean",
+    "model.8.m.0.cv1.2.conv.bn.running_var",
+    "model.8.m.0.cv1.2.conv.bn.num_batches_tracked",
+    "model.8.m.0.cv1.2.conv1.bn.running_mean",
+    "model.8.m.0.cv1.2.conv1.bn.running_var",
+    "model.8.m.0.cv1.2.conv1.bn.num_batches_tracked",
+    "model.8.m.0.cv1.3.bn.running_mean",
+    "model.8.m.0.cv1.3.bn.running_var",
+    "model.8.m.0.cv1.3.bn.num_batches_tracked",
+    "model.8.m.0.cv1.4.bn.running_mean",
+    "model.8.m.0.cv1.4.bn.running_var",
+    "model.8.m.0.cv1.4.bn.num_batches_tracked",
+    "model.9.cv1.bn.running_mean",
+    "model.9.cv1.bn.running_var",
+    "model.9.cv1.bn.num_batches_tracked",
+    "model.9.cv2.bn.running_mean",
+    "model.9.cv2.bn.running_var",
+    "model.9.cv2.bn.num_batches_tracked",
+    "model.10.cv1.bn.running_mean",
+    "model.10.cv1.bn.running_var",
+    "model.10.cv1.bn.num_batches_tracked",
+    "model.10.cv2.bn.running_mean",
+    "model.10.cv2.bn.running_var",
+    "model.10.cv2.bn.num_batches_tracked",
+    "model.10.attn.qkv.bn.running_mean",
+    "model.10.attn.qkv.bn.running_var",
+    "model.10.attn.qkv.bn.num_batches_tracked",
+    "model.10.attn.proj.bn.running_mean",
+    "model.10.attn.proj.bn.running_var",
+    "model.10.attn.proj.bn.num_batches_tracked",
+    "model.10.attn.pe.bn.running_mean",
+    "model.10.attn.pe.bn.running_var",
+    "model.10.attn.pe.bn.num_batches_tracked",
+    "model.10.ffn.0.bn.running_mean",
+    "model.10.ffn.0.bn.running_var",
+    "model.10.ffn.0.bn.num_batches_tracked",
+    "model.10.ffn.1.bn.running_mean",
+    "model.10.ffn.1.bn.running_var",
+    "model.10.ffn.1.bn.num_batches_tracked"
+  ],
+  "backbone_batch_norm": [
+    "model.0.bn",
+    "model.1.bn",
+    "model.2.cv1.bn",
+    "model.2.cv2.bn",
+    "model.2.m.0.cv1.bn",
+    "model.2.m.0.cv2.bn",
+    "model.3.bn",
+    "model.4.cv1.bn",
+    "model.4.cv2.bn",
+    "model.4.m.0.cv1.bn",
+    "model.4.m.0.cv2.bn",
+    "model.4.m.1.cv1.bn",
+    "model.4.m.1.cv2.bn",
+    "model.5.cv1.bn",
+    "model.5.cv2.bn",
+    "model.6.cv1.bn",
+    "model.6.cv2.bn",
+    "model.6.m.0.cv1.bn",
+    "model.6.m.0.cv2.bn",
+    "model.6.m.1.cv1.bn",
+    "model.6.m.1.cv2.bn",
+    "model.7.cv1.bn",
+    "model.7.cv2.bn",
+    "model.8.cv1.bn",
+    "model.8.cv2.bn",
+    "model.8.m.0.cv1.0.bn",
+    "model.8.m.0.cv1.1.bn",
+    "model.8.m.0.cv1.2.conv.bn",
+    "model.8.m.0.cv1.2.conv1.bn",
+    "model.8.m.0.cv1.3.bn",
+    "model.8.m.0.cv1.4.bn",
+    "model.9.cv1.bn",
+    "model.9.cv2.bn",
+    "model.10.cv1.bn",
+    "model.10.cv2.bn",
+    "model.10.attn.qkv.bn",
+    "model.10.attn.proj.bn",
+    "model.10.attn.pe.bn",
+    "model.10.ffn.0.bn",
+    "model.10.ffn.1.bn"
+  ],
+  "internally_frozen": [
+    "model.23.dfl.conv.weight"
+  ],
+  "parameters_total": 8072544,
+  "frozen_initial": 3888816,
+  "frozen_initial_pct": 48.1733639358299,
+  "frozen_after_thaw": 16,
+  "optimizer": "AdamW",
+  "optimizer_groups": [
+    {
+      "index": 0,
+      "parameters": [
+        "model.0.bn.bias",
+        "model.1.bn.bias",
+        "model.2.cv1.bn.bias",
+        "model.2.cv2.bn.bias",
+        "model.2.m.0.cv1.bn.bias",
+        "model.2.m.0.cv2.bn.bias",
+        "model.3.bn.bias",
+        "model.4.cv1.bn.bias",
+        "model.4.cv2.bn.bias",
+        "model.4.m.0.cv1.bn.bias",
+        "model.4.m.0.cv2.bn.bias",
+        "model.4.m.1.cv1.bn.bias",
+        "model.4.m.1.cv2.bn.bias",
+        "model.5.cv1.bn.bias",
+        "model.5.cv2.bn.bias",
+        "model.6.cv1.bn.bias",
+        "model.6.cv2.bn.bias",
+        "model.6.m.0.cv1.bn.bias",
+        "model.6.m.0.cv2.bn.bias",
+        "model.6.m.1.cv1.bn.bias",
+        "model.6.m.1.cv2.bn.bias",
+        "model.7.cv1.bn.bias",
+        "model.7.cv2.bn.bias",
+        "model.8.cv1.bn.bias",
+        "model.8.cv2.bn.bias",
+        "model.8.m.0.cv1.0.bn.bias",
+        "model.8.m.0.cv1.1.bn.bias",
+        "model.8.m.0.cv1.2.conv.bn.bias",
+        "model.8.m.0.cv1.2.conv1.bn.bias",
+        "model.8.m.0.cv1.3.bn.bias",
+        "model.8.m.0.cv1.4.bn.bias",
+        "model.9.cv1.bn.bias",
+        "model.9.cv2.bn.bias",
+        "model.10.cv1.bn.bias",
+        "model.10.cv2.bn.bias",
+        "model.10.attn.qkv.bn.bias",
+        "model.10.attn.proj.bn.bias",
+        "model.10.attn.pe.bn.bias",
+        "model.10.ffn.0.bn.bias",
+        "model.10.ffn.1.bn.bias",
+        "model.13.cv1.bn.bias",
+        "model.13.cv2.bn.bias",
+        "model.13.m.0.cv1.bn.bias",
+        "model.13.m.0.cv2.bn.bias",
+        "model.16.cv1.bn.bias",
+        "model.16.cv2.bn.bias",
+        "model.16.m.0.cv1.bn.bias",
+        "model.16.m.0.cv2.bn.bias",
+        "model.17.bn.bias",
+        "model.19.cv1.bn.bias",
+        "model.19.cv2.bn.bias",
+        "model.19.m.0.cv1.bn.bias",
+        "model.19.m.0.cv2.bn.bias",
+        "model.20.cv1.bn.bias",
+        "model.20.cv2.bn.bias",
+        "model.22.cv1.bn.bias",
+        "model.22.cv2.bn.bias",
+        "model.22.m.0.cv1.0.bn.bias",
+        "model.22.m.0.cv1.1.bn.bias",
+        "model.22.m.0.cv1.2.conv.bn.bias",
+        "model.22.m.0.cv1.2.conv1.bn.bias",
+        "model.22.m.0.cv1.3.bn.bias",
+        "model.22.m.0.cv1.4.bn.bias",
+        "model.23.cv2.0.0.bn.bias",
+        "model.23.cv2.0.1.bn.bias",
+        "model.23.cv2.0.2.bias",
+        "model.23.cv2.1.0.bn.bias",
+        "model.23.cv2.1.1.bn.bias",
+        "model.23.cv2.1.2.bias",
+        "model.23.cv2.2.0.bn.bias",
+        "model.23.cv2.2.1.bn.bias",
+        "model.23.cv2.2.2.bias",
+        "model.23.cv3.0.0.0.bn.bias",
+        "model.23.cv3.0.0.1.bn.bias",
+        "model.23.cv3.0.1.0.bn.bias",
+        "model.23.cv3.0.1.1.bn.bias",
+        "model.23.cv3.0.2.bias",
+        "model.23.cv3.1.0.0.bn.bias",
+        "model.23.cv3.1.0.1.bn.bias",
+        "model.23.cv3.1.1.0.bn.bias",
+        "model.23.cv3.1.1.1.bn.bias",
+        "model.23.cv3.1.2.bias",
+        "model.23.cv3.2.0.0.bn.bias",
+        "model.23.cv3.2.0.1.bn.bias",
+        "model.23.cv3.2.1.0.bn.bias",
+        "model.23.cv3.2.1.1.bn.bias",
+        "model.23.cv3.2.2.bias",
+        "model.23.one2one_cv2.0.0.bn.bias",
+        "model.23.one2one_cv2.0.1.bn.bias",
+        "model.23.one2one_cv2.0.2.bias",
+        "model.23.one2one_cv2.1.0.bn.bias",
+        "model.23.one2one_cv2.1.1.bn.bias",
+        "model.23.one2one_cv2.1.2.bias",
+        "model.23.one2one_cv2.2.0.bn.bias",
+        "model.23.one2one_cv2.2.1.bn.bias",
+        "model.23.one2one_cv2.2.2.bias",
+        "model.23.one2one_cv3.0.0.0.bn.bias",
+        "model.23.one2one_cv3.0.0.1.bn.bias",
+        "model.23.one2one_cv3.0.1.0.bn.bias",
+        "model.23.one2one_cv3.0.1.1.bn.bias",
+        "model.23.one2one_cv3.0.2.bias",
+        "model.23.one2one_cv3.1.0.0.bn.bias",
+        "model.23.one2one_cv3.1.0.1.bn.bias",
+        "model.23.one2one_cv3.1.1.0.bn.bias",
+        "model.23.one2one_cv3.1.1.1.bn.bias",
+        "model.23.one2one_cv3.1.2.bias",
+        "model.23.one2one_cv3.2.0.0.bn.bias",
+        "model.23.one2one_cv3.2.0.1.bn.bias",
+        "model.23.one2one_cv3.2.1.0.bn.bias",
+        "model.23.one2one_cv3.2.1.1.bn.bias",
+        "model.23.one2one_cv3.2.2.bias"
+      ],
+      "initial_lr": 0.001,
+      "weight_decay": 0.0,
+      "betas": [
+        0.9,
+        0.999
+      ]
+    },
+    {
+      "index": 1,
+      "parameters": [
+        "model.0.conv.weight",
+        "model.1.conv.weight",
+        "model.2.cv1.conv.weight",
+        "model.2.cv2.conv.weight",
+        "model.2.m.0.cv1.conv.weight",
+        "model.2.m.0.cv2.conv.weight",
+        "model.3.conv.weight",
+        "model.4.cv1.conv.weight",
+        "model.4.cv2.conv.weight",
+        "model.4.m.0.cv1.conv.weight",
+        "model.4.m.0.cv2.conv.weight",
+        "model.4.m.1.cv1.conv.weight",
+        "model.4.m.1.cv2.conv.weight",
+        "model.5.cv1.conv.weight",
+        "model.5.cv2.conv.weight",
+        "model.6.cv1.conv.weight",
+        "model.6.cv2.conv.weight",
+        "model.6.m.0.cv1.conv.weight",
+        "model.6.m.0.cv2.conv.weight",
+        "model.6.m.1.cv1.conv.weight",
+        "model.6.m.1.cv2.conv.weight",
+        "model.7.cv1.conv.weight",
+        "model.7.cv2.conv.weight",
+        "model.8.cv1.conv.weight",
+        "model.8.cv2.conv.weight",
+        "model.8.m.0.cv1.0.conv.weight",
+        "model.8.m.0.cv1.1.conv.weight",
+        "model.8.m.0.cv1.2.conv.conv.weight",
+        "model.8.m.0.cv1.2.conv1.conv.weight",
+        "model.8.m.0.cv1.3.conv.weight",
+        "model.8.m.0.cv1.4.conv.weight",
+        "model.9.cv1.conv.weight",
+        "model.9.cv2.conv.weight",
+        "model.10.cv1.conv.weight",
+        "model.10.cv2.conv.weight",
+        "model.10.attn.qkv.conv.weight",
+        "model.10.attn.proj.conv.weight",
+        "model.10.attn.pe.conv.weight",
+        "model.10.ffn.0.conv.weight",
+        "model.10.ffn.1.conv.weight",
+        "model.13.cv1.conv.weight",
+        "model.13.cv2.conv.weight",
+        "model.13.m.0.cv1.conv.weight",
+        "model.13.m.0.cv2.conv.weight",
+        "model.16.cv1.conv.weight",
+        "model.16.cv2.conv.weight",
+        "model.16.m.0.cv1.conv.weight",
+        "model.16.m.0.cv2.conv.weight",
+        "model.17.conv.weight",
+        "model.19.cv1.conv.weight",
+        "model.19.cv2.conv.weight",
+        "model.19.m.0.cv1.conv.weight",
+        "model.19.m.0.cv2.conv.weight",
+        "model.20.cv1.conv.weight",
+        "model.20.cv2.conv.weight",
+        "model.22.cv1.conv.weight",
+        "model.22.cv2.conv.weight",
+        "model.22.m.0.cv1.0.conv.weight",
+        "model.22.m.0.cv1.1.conv.weight",
+        "model.22.m.0.cv1.2.conv.conv.weight",
+        "model.22.m.0.cv1.2.conv1.conv.weight",
+        "model.22.m.0.cv1.3.conv.weight",
+        "model.22.m.0.cv1.4.conv.weight",
+        "model.23.cv2.0.0.conv.weight",
+        "model.23.cv2.0.1.conv.weight",
+        "model.23.cv2.0.2.weight",
+        "model.23.cv2.1.0.conv.weight",
+        "model.23.cv2.1.1.conv.weight",
+        "model.23.cv2.1.2.weight",
+        "model.23.cv2.2.0.conv.weight",
+        "model.23.cv2.2.1.conv.weight",
+        "model.23.cv2.2.2.weight",
+        "model.23.cv3.0.0.0.conv.weight",
+        "model.23.cv3.0.0.1.conv.weight",
+        "model.23.cv3.0.1.0.conv.weight",
+        "model.23.cv3.0.1.1.conv.weight",
+        "model.23.cv3.0.2.weight",
+        "model.23.cv3.1.0.0.conv.weight",
+        "model.23.cv3.1.0.1.conv.weight",
+        "model.23.cv3.1.1.0.conv.weight",
+        "model.23.cv3.1.1.1.conv.weight",
+        "model.23.cv3.1.2.weight",
+        "model.23.cv3.2.0.0.conv.weight",
+        "model.23.cv3.2.0.1.conv.weight",
+        "model.23.cv3.2.1.0.conv.weight",
+        "model.23.cv3.2.1.1.conv.weight",
+        "model.23.cv3.2.2.weight",
+        "model.23.dfl.conv.weight",
+        "model.23.one2one_cv2.0.0.conv.weight",
+        "model.23.one2one_cv2.0.1.conv.weight",
+        "model.23.one2one_cv2.0.2.weight",
+        "model.23.one2one_cv2.1.0.conv.weight",
+        "model.23.one2one_cv2.1.1.conv.weight",
+        "model.23.one2one_cv2.1.2.weight",
+        "model.23.one2one_cv2.2.0.conv.weight",
+        "model.23.one2one_cv2.2.1.conv.weight",
+        "model.23.one2one_cv2.2.2.weight",
+        "model.23.one2one_cv3.0.0.0.conv.weight",
+        "model.23.one2one_cv3.0.0.1.conv.weight",
+        "model.23.one2one_cv3.0.1.0.conv.weight",
+        "model.23.one2one_cv3.0.1.1.conv.weight",
+        "model.23.one2one_cv3.0.2.weight",
+        "model.23.one2one_cv3.1.0.0.conv.weight",
+        "model.23.one2one_cv3.1.0.1.conv.weight",
+        "model.23.one2one_cv3.1.1.0.conv.weight",
+        "model.23.one2one_cv3.1.1.1.conv.weight",
+        "model.23.one2one_cv3.1.2.weight",
+        "model.23.one2one_cv3.2.0.0.conv.weight",
+        "model.23.one2one_cv3.2.0.1.conv.weight",
+        "model.23.one2one_cv3.2.1.0.conv.weight",
+        "model.23.one2one_cv3.2.1.1.conv.weight",
+        "model.23.one2one_cv3.2.2.weight"
+      ],
+      "initial_lr": 0.001,
+      "weight_decay": 0.0005,
+      "betas": [
+        0.9,
+        0.999
+      ]
+    },
+    {
+      "index": 2,
+      "parameters": [
+        "model.0.bn.weight",
+        "model.1.bn.weight",
+        "model.2.cv1.bn.weight",
+        "model.2.cv2.bn.weight",
+        "model.2.m.0.cv1.bn.weight",
+        "model.2.m.0.cv2.bn.weight",
+        "model.3.bn.weight",
+        "model.4.cv1.bn.weight",
+        "model.4.cv2.bn.weight",
+        "model.4.m.0.cv1.bn.weight",
+        "model.4.m.0.cv2.bn.weight",
+        "model.4.m.1.cv1.bn.weight",
+        "model.4.m.1.cv2.bn.weight",
+        "model.5.cv1.bn.weight",
+        "model.5.cv2.bn.weight",
+        "model.6.cv1.bn.weight",
+        "model.6.cv2.bn.weight",
+        "model.6.m.0.cv1.bn.weight",
+        "model.6.m.0.cv2.bn.weight",
+        "model.6.m.1.cv1.bn.weight",
+        "model.6.m.1.cv2.bn.weight",
+        "model.7.cv1.bn.weight",
+        "model.7.cv2.bn.weight",
+        "model.8.cv1.bn.weight",
+        "model.8.cv2.bn.weight",
+        "model.8.m.0.cv1.0.bn.weight",
+        "model.8.m.0.cv1.1.bn.weight",
+        "model.8.m.0.cv1.2.conv.bn.weight",
+        "model.8.m.0.cv1.2.conv1.bn.weight",
+        "model.8.m.0.cv1.3.bn.weight",
+        "model.8.m.0.cv1.4.bn.weight",
+        "model.9.cv1.bn.weight",
+        "model.9.cv2.bn.weight",
+        "model.10.cv1.bn.weight",
+        "model.10.cv2.bn.weight",
+        "model.10.attn.qkv.bn.weight",
+        "model.10.attn.proj.bn.weight",
+        "model.10.attn.pe.bn.weight",
+        "model.10.ffn.0.bn.weight",
+        "model.10.ffn.1.bn.weight",
+        "model.13.cv1.bn.weight",
+        "model.13.cv2.bn.weight",
+        "model.13.m.0.cv1.bn.weight",
+        "model.13.m.0.cv2.bn.weight",
+        "model.16.cv1.bn.weight",
+        "model.16.cv2.bn.weight",
+        "model.16.m.0.cv1.bn.weight",
+        "model.16.m.0.cv2.bn.weight",
+        "model.17.bn.weight",
+        "model.19.cv1.bn.weight",
+        "model.19.cv2.bn.weight",
+        "model.19.m.0.cv1.bn.weight",
+        "model.19.m.0.cv2.bn.weight",
+        "model.20.cv1.bn.weight",
+        "model.20.cv2.bn.weight",
+        "model.22.cv1.bn.weight",
+        "model.22.cv2.bn.weight",
+        "model.22.m.0.cv1.0.bn.weight",
+        "model.22.m.0.cv1.1.bn.weight",
+        "model.22.m.0.cv1.2.conv.bn.weight",
+        "model.22.m.0.cv1.2.conv1.bn.weight",
+        "model.22.m.0.cv1.3.bn.weight",
+        "model.22.m.0.cv1.4.bn.weight",
+        "model.23.cv2.0.0.bn.weight",
+        "model.23.cv2.0.1.bn.weight",
+        "model.23.cv2.1.0.bn.weight",
+        "model.23.cv2.1.1.bn.weight",
+        "model.23.cv2.2.0.bn.weight",
+        "model.23.cv2.2.1.bn.weight",
+        "model.23.cv3.0.0.0.bn.weight",
+        "model.23.cv3.0.0.1.bn.weight",
+        "model.23.cv3.0.1.0.bn.weight",
+        "model.23.cv3.0.1.1.bn.weight",
+        "model.23.cv3.1.0.0.bn.weight",
+        "model.23.cv3.1.0.1.bn.weight",
+        "model.23.cv3.1.1.0.bn.weight",
+        "model.23.cv3.1.1.1.bn.weight",
+        "model.23.cv3.2.0.0.bn.weight",
+        "model.23.cv3.2.0.1.bn.weight",
+        "model.23.cv3.2.1.0.bn.weight",
+        "model.23.cv3.2.1.1.bn.weight",
+        "model.23.one2one_cv2.0.0.bn.weight",
+        "model.23.one2one_cv2.0.1.bn.weight",
+        "model.23.one2one_cv2.1.0.bn.weight",
+        "model.23.one2one_cv2.1.1.bn.weight",
+        "model.23.one2one_cv2.2.0.bn.weight",
+        "model.23.one2one_cv2.2.1.bn.weight",
+        "model.23.one2one_cv3.0.0.0.bn.weight",
+        "model.23.one2one_cv3.0.0.1.bn.weight",
+        "model.23.one2one_cv3.0.1.0.bn.weight",
+        "model.23.one2one_cv3.0.1.1.bn.weight",
+        "model.23.one2one_cv3.1.0.0.bn.weight",
+        "model.23.one2one_cv3.1.0.1.bn.weight",
+        "model.23.one2one_cv3.1.1.0.bn.weight",
+        "model.23.one2one_cv3.1.1.1.bn.weight",
+        "model.23.one2one_cv3.2.0.0.bn.weight",
+        "model.23.one2one_cv3.2.0.1.bn.weight",
+        "model.23.one2one_cv3.2.1.0.bn.weight",
+        "model.23.one2one_cv3.2.1.1.bn.weight"
+      ],
+      "initial_lr": 0.001,
+      "weight_decay": 0.0,
+      "betas": [
+        0.9,
+        0.999
+      ]
+    }
+  ],
+  "samples": {
+    "backbone": "model.0.conv.weight",
+    "neck": "model.13.cv1.conv.weight",
+    "one2many": "model.23.cv3.0.0.0.conv.weight",
+    "one2one": "model.23.one2one_cv3.0.0.0.conv.weight"
+  },
+  "initial_backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+  "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+  "thaw_epoch": 11,
+  "optimizer_groups_verified_at_thaw": true,
+  "epochs": [
+    {
+      "epoch": 1,
+      "backbone_frozen": true,
+      "backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": false,
+      "backbone_bn_steps": 0,
+      "nonzero_gradients": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 0,
+        "neck": 40,
+        "one2many": 40,
+        "one2one": 40
+      },
+      "scheduler_epoch": 0,
+      "ema_updates": 40,
+      "lr": [
+        0.001,
+        0.00039000000000000005,
+        0.00039000000000000005
+      ]
+    },
+    {
+      "epoch": 2,
+      "backbone_frozen": true,
+      "backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": false,
+      "backbone_bn_steps": 0,
+      "nonzero_gradients": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 0,
+        "neck": 80,
+        "one2many": 80,
+        "one2one": 80
+      },
+      "scheduler_epoch": 1,
+      "ema_updates": 80,
+      "lr": [
+        0.0009979443412369445,
+        0.0007879443412369446,
+        0.0007879443412369446
+      ]
+    },
+    {
+      "epoch": 3,
+      "backbone_frozen": true,
+      "backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": false,
+      "backbone_bn_steps": 0,
+      "nonzero_gradients": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 0,
+        "neck": 120,
+        "one2many": 120,
+        "one2one": 120
+      },
+      "scheduler_epoch": 2,
+      "ema_updates": 120,
+      "lr": [
+        0.0009896201103485576,
+        0.0009896201103485576,
+        0.0009896201103485576
+      ]
+    },
+    {
+      "epoch": 4,
+      "backbone_frozen": true,
+      "backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": false,
+      "backbone_bn_steps": 0,
+      "nonzero_gradients": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 0,
+        "neck": 160,
+        "one2many": 160,
+        "one2one": 160
+      },
+      "scheduler_epoch": 3,
+      "ema_updates": 160,
+      "lr": [
+        0.000976751845240198,
+        0.000976751845240198,
+        0.000976751845240198
+      ]
+    },
+    {
+      "epoch": 5,
+      "backbone_frozen": true,
+      "backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": false,
+      "backbone_bn_steps": 0,
+      "nonzero_gradients": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 0,
+        "neck": 200,
+        "one2many": 200,
+        "one2one": 200
+      },
+      "scheduler_epoch": 4,
+      "ema_updates": 200,
+      "lr": [
+        0.0009589340923802355,
+        0.0009589340923802355,
+        0.0009589340923802355
+      ]
+    },
+    {
+      "epoch": 6,
+      "backbone_frozen": true,
+      "backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": false,
+      "backbone_bn_steps": 0,
+      "nonzero_gradients": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 0,
+        "neck": 240,
+        "one2many": 240,
+        "one2one": 240
+      },
+      "scheduler_epoch": 5,
+      "ema_updates": 240,
+      "lr": [
+        0.0009363620667976084,
+        0.0009363620667976084,
+        0.0009363620667976084
+      ]
+    },
+    {
+      "epoch": 7,
+      "backbone_frozen": true,
+      "backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": false,
+      "backbone_bn_steps": 0,
+      "nonzero_gradients": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 0,
+        "neck": 280,
+        "one2many": 280,
+        "one2one": 280
+      },
+      "scheduler_epoch": 6,
+      "ema_updates": 280,
+      "lr": [
+        0.0009092830723281,
+        0.0009092830723281,
+        0.0009092830723281
+      ]
+    },
+    {
+      "epoch": 8,
+      "backbone_frozen": true,
+      "backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": false,
+      "backbone_bn_steps": 0,
+      "nonzero_gradients": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 0,
+        "neck": 320,
+        "one2many": 320,
+        "one2one": 320
+      },
+      "scheduler_epoch": 7,
+      "ema_updates": 320,
+      "lr": [
+        0.0008779937921017623,
+        0.0008779937921017623,
+        0.0008779937921017623
+      ]
+    },
+    {
+      "epoch": 9,
+      "backbone_frozen": true,
+      "backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": false,
+      "backbone_bn_steps": 0,
+      "nonzero_gradients": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 0,
+        "neck": 360,
+        "one2many": 360,
+        "one2one": 360
+      },
+      "scheduler_epoch": 8,
+      "ema_updates": 360,
+      "lr": [
+        0.0008428370380204577,
+        0.0008428370380204577,
+        0.0008428370380204577
+      ]
+    },
+    {
+      "epoch": 10,
+      "backbone_frozen": true,
+      "backbone_sha256": "ba24efc80d03722b482306a288377b94d6bd43054b52dce060ea8fe1b875f025",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": false,
+      "backbone_bn_steps": 0,
+      "nonzero_gradients": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 0,
+        "neck": 400,
+        "one2many": 400,
+        "one2one": 400
+      },
+      "scheduler_epoch": 9,
+      "ema_updates": 400,
+      "lr": [
+        0.0008041979948389248,
+        0.0008041979948389248,
+        0.0008041979948389248
+      ]
+    },
+    {
+      "epoch": 11,
+      "backbone_frozen": false,
+      "backbone_sha256": "dfb9ba9627d1a7927303e1c2bbec9a73ec7d1b07fc1c3c85a43d591f640983be",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 40,
+        "neck": 440,
+        "one2many": 440,
+        "one2one": 440
+      },
+      "scheduler_epoch": 10,
+      "ema_updates": 440,
+      "lr": [
+        0.0007625,
+        0.0007625,
+        0.0007625
+      ]
+    },
+    {
+      "epoch": 12,
+      "backbone_frozen": false,
+      "backbone_sha256": "cefa2570c1702645f8187fa9e9ef871de115a002536c257a7eec8af7fa90c898",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 80,
+        "neck": 480,
+        "one2many": 480,
+        "one2one": 480
+      },
+      "scheduler_epoch": 11,
+      "ema_updates": 480,
+      "lr": [
+        0.0007181999054610052,
+        0.0007181999054610052,
+        0.0007181999054610052
+      ]
+    },
+    {
+      "epoch": 13,
+      "backbone_frozen": false,
+      "backbone_sha256": "e4ab3996f3b964ba8c6e5e4fcc83602506319f576b924a590dda9db09d422363",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 120,
+        "neck": 520,
+        "one2many": 520,
+        "one2one": 520
+      },
+      "scheduler_epoch": 12,
+      "ema_updates": 520,
+      "lr": [
+        0.0006717830723281,
+        0.0006717830723281,
+        0.0006717830723281
+      ]
+    },
+    {
+      "epoch": 14,
+      "backbone_frozen": false,
+      "backbone_sha256": "ec6f4c3114c8d50964dc8cbf00ff29a8732a5191b0e49638fdde56fdffe87a32",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 160,
+        "neck": 560,
+        "one2many": 560,
+        "one2one": 560
+      },
+      "scheduler_epoch": 13,
+      "ema_updates": 560,
+      "lr": [
+        0.0006237580531384357,
+        0.0006237580531384357,
+        0.0006237580531384357
+      ]
+    },
+    {
+      "epoch": 15,
+      "backbone_frozen": false,
+      "backbone_sha256": "ebf46424385c0a9397d20faa3d0c82e77bf93dced9754b4d68f7501de392e5da",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 200,
+        "neck": 600,
+        "one2many": 600,
+        "one2one": 600
+      },
+      "scheduler_epoch": 14,
+      "ema_updates": 600,
+      "lr": [
+        0.0005746510200521354,
+        0.0005746510200521354,
+        0.0005746510200521354
+      ]
+    },
+    {
+      "epoch": 16,
+      "backbone_frozen": false,
+      "backbone_sha256": "f97ed292ab7cb9d704f8bc8bffdfe2f70d0a0018a5cb3db4e67687a9d9f40199",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 240,
+        "neck": 640,
+        "one2many": 640,
+        "one2one": 640
+      },
+      "scheduler_epoch": 15,
+      "ema_updates": 640,
+      "lr": [
+        0.0005250000000000002,
+        0.0005250000000000002,
+        0.0005250000000000002
+      ]
+    },
+    {
+      "epoch": 17,
+      "backbone_frozen": false,
+      "backbone_sha256": "5be77723cb421f66beba53bc203f7f03937f9eaa91ba46053dba4da424b5c41e",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 280,
+        "neck": 680,
+        "one2many": 680,
+        "one2one": 680
+      },
+      "scheduler_epoch": 16,
+      "ema_updates": 680,
+      "lr": [
+        0.0004753489799478647,
+        0.0004753489799478647,
+        0.0004753489799478647
+      ]
+    },
+    {
+      "epoch": 18,
+      "backbone_frozen": false,
+      "backbone_sha256": "6b6adf44f892cdeea2a613bdb6562c73e1a9cce673d61d55138944ff39feb38c",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 320,
+        "neck": 720,
+        "one2many": 720,
+        "one2one": 720
+      },
+      "scheduler_epoch": 17,
+      "ema_updates": 720,
+      "lr": [
+        0.00042624194686156436,
+        0.00042624194686156436,
+        0.00042624194686156436
+      ]
+    },
+    {
+      "epoch": 19,
+      "backbone_frozen": false,
+      "backbone_sha256": "d8847271a098dc576d696fc4f9a52a5c66cab2a77f2153686a15edbaa7be57ac",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 360,
+        "neck": 760,
+        "one2many": 760,
+        "one2one": 760
+      },
+      "scheduler_epoch": 18,
+      "ema_updates": 760,
+      "lr": [
+        0.0003782169276719,
+        0.0003782169276719,
+        0.0003782169276719
+      ]
+    },
+    {
+      "epoch": 20,
+      "backbone_frozen": false,
+      "backbone_sha256": "b4c07d02e34c5366f37fcd0b638c9fe1db91da0e8c1bd28e1923da7c89dfc0f4",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 400,
+        "neck": 800,
+        "one2many": 800,
+        "one2one": 800
+      },
+      "scheduler_epoch": 19,
+      "ema_updates": 800,
+      "lr": [
+        0.00033180009453899495,
+        0.00033180009453899495,
+        0.00033180009453899495
+      ]
+    },
+    {
+      "epoch": 21,
+      "backbone_frozen": false,
+      "backbone_sha256": "ff26fc4a061378a7e581912dbab2420e9d0c5bca6b6536b10d847ce81b423902",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 440,
+        "neck": 840,
+        "one2many": 840,
+        "one2one": 840
+      },
+      "scheduler_epoch": 20,
+      "ema_updates": 840,
+      "lr": [
+        0.0002875000000000001,
+        0.0002875000000000001,
+        0.0002875000000000001
+      ]
+    },
+    {
+      "epoch": 22,
+      "backbone_frozen": false,
+      "backbone_sha256": "dddc8f317320a8e2840b3aa526bdc33226db1dcfc5f112e2ca989e0188f8d49b",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 480,
+        "neck": 880,
+        "one2many": 880,
+        "one2one": 880
+      },
+      "scheduler_epoch": 21,
+      "ema_updates": 880,
+      "lr": [
+        0.00024580200516107544,
+        0.00024580200516107544,
+        0.00024580200516107544
+      ]
+    },
+    {
+      "epoch": 23,
+      "backbone_frozen": false,
+      "backbone_sha256": "6da5b78f1e9d860dab5786f9b48dc037457929f7f079ae74af0ceb609789d2a2",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 520,
+        "neck": 920,
+        "one2many": 920,
+        "one2one": 920
+      },
+      "scheduler_epoch": 22,
+      "ema_updates": 920,
+      "lr": [
+        0.00020716296197954254,
+        0.00020716296197954254,
+        0.00020716296197954254
+      ]
+    },
+    {
+      "epoch": 24,
+      "backbone_frozen": false,
+      "backbone_sha256": "3cbc5d7f9df655c043eac2caae5fa14f5600441394925e56320bbe0203ce372b",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 560,
+        "neck": 960,
+        "one2many": 960,
+        "one2one": 960
+      },
+      "scheduler_epoch": 23,
+      "ema_updates": 960,
+      "lr": [
+        0.00017200620789823784,
+        0.00017200620789823784,
+        0.00017200620789823784
+      ]
+    },
+    {
+      "epoch": 25,
+      "backbone_frozen": false,
+      "backbone_sha256": "59fd606ab6def294321c64073b8772d7062b7879c4e386a57f432b7990a1d98e",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 600,
+        "neck": 1000,
+        "one2many": 1000,
+        "one2one": 1000
+      },
+      "scheduler_epoch": 24,
+      "ema_updates": 1000,
+      "lr": [
+        0.00014071692767190003,
+        0.00014071692767190003,
+        0.00014071692767190003
+      ]
+    },
+    {
+      "epoch": 26,
+      "backbone_frozen": false,
+      "backbone_sha256": "805022ea311b5b204b9c71fb69ff816843ed8de7c47bc5e3fd7138d020db5530",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 640,
+        "neck": 1040,
+        "one2many": 1040,
+        "one2one": 1040
+      },
+      "scheduler_epoch": 25,
+      "ema_updates": 1040,
+      "lr": [
+        0.00011363793320239158,
+        0.00011363793320239158,
+        0.00011363793320239158
+      ]
+    },
+    {
+      "epoch": 27,
+      "backbone_frozen": false,
+      "backbone_sha256": "cc4d8cb3cb7aad38777d7c06fa82f0705ff6f5b572230a2ef9a737257c9553f6",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 680,
+        "neck": 1080,
+        "one2many": 1080,
+        "one2one": 1080
+      },
+      "scheduler_epoch": 26,
+      "ema_updates": 1080,
+      "lr": [
+        9.106590761976463e-05,
+        9.106590761976463e-05,
+        9.106590761976463e-05
+      ]
+    },
+    {
+      "epoch": 28,
+      "backbone_frozen": false,
+      "backbone_sha256": "f26b045b7d8634834a90ccee494f8339720b34b1d909d0cbed896f24cbe1530c",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 720,
+        "neck": 1120,
+        "one2many": 1120,
+        "one2one": 1120
+      },
+      "scheduler_epoch": 27,
+      "ema_updates": 1120,
+      "lr": [
+        7.324815475980206e-05,
+        7.324815475980206e-05,
+        7.324815475980206e-05
+      ]
+    },
+    {
+      "epoch": 29,
+      "backbone_frozen": false,
+      "backbone_sha256": "1ec8065a9826c5de82f7fb7fdf42941300f49ebbda0e2a557cc533620a739219",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 760,
+        "neck": 1160,
+        "one2many": 1160,
+        "one2one": 1160
+      },
+      "scheduler_epoch": 28,
+      "ema_updates": 1160,
+      "lr": [
+        6.0379889651442365e-05,
+        6.0379889651442365e-05,
+        6.0379889651442365e-05
+      ]
+    },
+    {
+      "epoch": 30,
+      "backbone_frozen": false,
+      "backbone_sha256": "9866d5b951c1a30d0e0bd901d0da79f3ce55403d616a3e7f16587db6c0fd151b",
+      "internal_sha256": "58dda328598e2f7fe472621bfc54935aaa354d1a6ebcaf9562cd743fd575eb19",
+      "frozen_gradients_absent": true,
+      "backbone_bn_training": true,
+      "backbone_bn_steps": 40,
+      "nonzero_gradients": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "updated": {
+        "backbone": true,
+        "neck": true,
+        "one2many": true,
+        "one2one": true
+      },
+      "adamw_steps": {
+        "backbone": 800,
+        "neck": 1200,
+        "one2many": 1200,
+        "one2one": 1200
+      },
+      "scheduler_epoch": 29,
+      "ema_updates": 1200,
+      "lr": [
+        5.260209970007013e-05,
+        5.260209970007013e-05,
+        5.260209970007013e-05
+      ]
+    }
+  ]
+}

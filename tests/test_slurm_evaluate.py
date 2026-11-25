@@ -223,6 +223,19 @@ class EvaluationLauncherTest(unittest.TestCase):
         self.assertIsNone(read_json(out / "solo/metrics.json")["benchmark"])
         self.assertFalse((out / ".ultralytics").exists())
 
+    def test_staged_training_config_is_preserved_by_generic_evaluation(self):
+        run = self.training(self.root / "freeze-5/train", "yolo")
+        provenance = read_json(run / "run.json")
+        provenance["run"]["config"]["freeze_backbone_epochs"] = 5
+        write_json(run / "run.json", provenance)
+        out = self.root / "staged-eval"
+        result = self.launch(*self.options(out, ("freeze-5", run)), "--check-slurm")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue((out / "verified.ok").is_file())
+        metrics = read_json(out / "freeze-5/metrics.json")
+        self.assertEqual(metrics["model_config"]["freeze_backbone_epochs"], 5)
+        self.assertEqual(metrics["checkpoint_sha256"], sha256(run / "best.pt"))
+
     def test_two_yolo_runs_preserve_exp006_inventory_and_provenance(self):
         paths = [self.training(self.root / f"s2026/{arm}/train", "yolo", warmup, job)
                  for arm, warmup, job in (("control", 1.0, "12"), ("warmup-5", 5.0, "13"))]

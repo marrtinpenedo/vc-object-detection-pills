@@ -1,0 +1,21 @@
+{
+  "architecture": "yolov10s.pt",
+  "epochs": 30,
+  "batch": 8,
+  "imgsz": 640,
+  "workers": 4,
+  "seed": 2028,
+  "precision": "fp32",
+  "optimizer": "AdamW",
+  "lr": 0.001,
+  "momentum": 0.9,
+  "weight_decay": 0.0005,
+  "scheduler": "cosine",
+  "final_lr_factor": 0.05,
+  "warmup_epochs": 1.0,
+  "warmup_momentum": 0.8,
+  "warmup_bias_lr": 0.001,
+  "eval_every_epochs": 1,
+  "checkpoint_every_epochs": 1,
+  "freeze_backbone_epochs": 30
+}

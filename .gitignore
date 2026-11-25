@@ -33,6 +33,16 @@ lightning_logs/
 !/experiments/exp-002-photometric/results/s2026/cascade/*/evaluation/examples/failure-61.jpg
 !/experiments/exp-002-photometric/results/s2026/yolo/*/evaluation/examples/failure-19.jpg
 
+# Registros de trabajo y listas de descarga locales de EXP-007
+/experiments/exp-007-yolo-staged-transfer/results/**/*.train.sacct
+/experiments/exp-007-yolo-staged-transfer/results/**/train.job
+/experiments/exp-007-yolo-staged-transfer/results/**/train.path
+/experiments/exp-007-yolo-staged-transfer/results/**/eval.job
+/experiments/exp-007-yolo-staged-transfer/results/**/verified.ok
+/experiments/exp-007-yolo-staged-transfer/results/**/download.files
+/experiments/exp-007-yolo-staged-transfer/results/**/downloaded.sha256
+/experiments/exp-007-yolo-staged-transfer/results/phase-*/queue/
+
 # Logs SLURM del baseline en la raíz
 /pills-cascade-[0-9]*.out
 /pills-cascade-[0-9]*.err
