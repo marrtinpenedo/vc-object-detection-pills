@@ -1,0 +1,722 @@
+{
+  "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+  "preflights": [
+    "12026504"
+  ],
+  "conditions": {
+    "f000-control": {
+      "training_job": "12026505",
+      "evaluation_job": "12026506",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "40f29e88eedc89ea677e108b3b6be2594cba0fdeba127a4dca1369d50145e4fe",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-7",
+        "job_id": "12026505",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-16",
+        "job_id": "12026506",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026506",
+          "host": "c207-16",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": null,
+      "freezing_verified": false
+    },
+    "f000-geom": {
+      "training_job": "12026507",
+      "evaluation_job": "12026508",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "7b904e94efb3068c30cb660c2ef643ec3d25af9eb4234305b21f0bdc100c6d83",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-14",
+        "job_id": "12026507",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-16",
+        "job_id": "12026508",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026508",
+          "host": "c207-16",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": null,
+      "freezing_verified": false
+    },
+    "f010-control": {
+      "training_job": "12026509",
+      "evaluation_job": "12026510",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "b6322d08d04ef779c0bbaa1922e69b5e3b18395c2a02e794b055b168bfa27211",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-1",
+        "job_id": "12026509",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-16",
+        "job_id": "12026510",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026510",
+          "host": "c207-16",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 11,
+      "freezing_verified": true
+    },
+    "f010-geom": {
+      "training_job": "12026511",
+      "evaluation_job": "12026512",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "4c5571fa6da8c687dafeb404fb104fb101214f92b44a4331ae7b7f27a08e5894",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-12",
+        "job_id": "12026511",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-11",
+        "job_id": "12026512",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026512",
+          "host": "c208-11",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 11,
+      "freezing_verified": true
+    },
+    "f020-control": {
+      "training_job": "12026513",
+      "evaluation_job": "12026514",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "5dc69e572d56b05f52af295070ddc1ff4ad9e0a0281a6422697640fd4643f608",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-7",
+        "job_id": "12026513",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-16",
+        "job_id": "12026514",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026514",
+          "host": "c207-16",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 21,
+      "freezing_verified": true
+    },
+    "f020-geom": {
+      "training_job": "12026515",
+      "evaluation_job": "12026516",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "6271940240196bb06e4c83a29af584afea450831b86ef0a81d557e828d7fd20f",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-7",
+        "job_id": "12026515",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-11",
+        "job_id": "12026516",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026516",
+          "host": "c208-11",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 21,
+      "freezing_verified": true
+    },
+    "f040-control": {
+      "training_job": "12026517",
+      "evaluation_job": "12026518",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "1b6465dc0797cce61ca988a58a3bdb4845f6531214f769abc59d1ee47adabc86",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-16",
+        "job_id": "12026517",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-16",
+        "job_id": "12026518",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026518",
+          "host": "c207-16",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 41,
+      "freezing_verified": true
+    },
+    "f040-geom": {
+      "training_job": "12026519",
+      "evaluation_job": "12026520",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "41f62d4cdd58ab0b5d42999dc53e7d8c7bca473d94af3630b46f136b0226a398",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-7",
+        "job_id": "12026519",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-5",
+        "job_id": "12026520",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026520",
+          "host": "c208-5",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 41,
+      "freezing_verified": true
+    },
+    "f060-control": {
+      "training_job": "12026521",
+      "evaluation_job": "12026522",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "67cf9d9d954b57db9c8d5b2082efbfa151795a9029646ee9d3ac3a71a3dd2250",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-5",
+        "job_id": "12026521",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-11",
+        "job_id": "12026522",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026522",
+          "host": "c208-11",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 61,
+      "freezing_verified": true
+    },
+    "f060-geom": {
+      "training_job": "12026523",
+      "evaluation_job": "12026524",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "c9e3879324f5d12953a5b345046a111a9f0a85182aa3d905f054a6d3838d6f02",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-8",
+        "job_id": "12026523",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-8",
+        "job_id": "12026524",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026524",
+          "host": "c209-8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 61,
+      "freezing_verified": true
+    },
+    "f080-control": {
+      "training_job": "12026525",
+      "evaluation_job": "12026526",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "9663d0f38ad90dccaf76d83a1a828f5e3e8589e99d8f0e1a46fb9a3fe0c57912",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-1",
+        "job_id": "12026525",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-1",
+        "job_id": "12026526",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026526",
+          "host": "c209-1",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81,
+      "freezing_verified": true
+    },
+    "f080-geom": {
+      "training_job": "12026527",
+      "evaluation_job": "12026528",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "2a89fcb9917b459b8210f1cb028c946303820b306d269fb9eb4c4d8405a1ffe1",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-7",
+        "job_id": "12026527",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-1",
+        "job_id": "12026528",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026528",
+          "host": "c209-1",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81,
+      "freezing_verified": true
+    },
+    "f100-control": {
+      "training_job": "12026529",
+      "evaluation_job": "12026530",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "3dccb265713445fa7acb8c35701d67592e05a8ff0cdce8b3dabf53e0dc31be78",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-7",
+        "job_id": "12026529",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-13",
+        "job_id": "12026530",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026530",
+          "host": "c210-13",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": null,
+      "freezing_verified": true
+    },
+    "f100-geom": {
+      "training_job": "12026531",
+      "evaluation_job": "12026532",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "82001d5f157e80c32c4158e9687a32a2128ae45f99decbe1536f5ff4c7181b62",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-12",
+        "job_id": "12026531",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-7",
+        "job_id": "12026532",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026532",
+          "host": "c210-7",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": null,
+      "freezing_verified": true
+    }
+  }
+}

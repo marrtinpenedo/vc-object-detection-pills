@@ -1,0 +1,258 @@
+{
+  "controller_sha256": "b7498c3a2e059bf035831f1ff13aa0ab2fa6ad5a6673bcad6f09669ff32d910a",
+  "verified_inventory_entries": 40,
+  "reference": {
+    "snapshot_sha256": "8d479bfd14b079057f12d94fee5e3d412a3b0905ea114f39509695965f0ef170",
+    "inventory_sha256": "d118144a84095371b2a54168ee625f92ab59a07f8d47f799dc644fdfe7cfbd56",
+    "arms": {
+      "e100-f000": {
+        "condition": {
+          "name": "e100-f000",
+          "backend": "cascade",
+          "epochs": 100
+        },
+        "config": {
+          "architecture": "Misc/cascade_mask_rcnn_R_50_FPN_3x.yaml",
+          "epochs": 100,
+          "batch": 4,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "SGD",
+          "lr": 0.0025,
+          "momentum": 0.9,
+          "weight_decay": 0.0001,
+          "weight_decay_norm": 0.0,
+          "scheduler": "WarmupCosineLR",
+          "warmup_iterations": 79,
+          "warmup_factor": 0.1,
+          "gradient_clip_norm": 10.0,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1,
+          "nms_iou": 0.5
+        },
+        "training_job": "12022443",
+        "evaluation_job": "12022444",
+        "preflight_job": "12022434",
+        "best_sha256": "256c1820865ee07326ad1e26c3c2645f42fc54612e2ef38889a1a1c21c930dd7",
+        "predictions_sha256": "43fa743bda44560cca1c50fcbab8ea40c8f822c0782bbf17516bfbdf0e33ec68"
+      }
+    }
+  },
+  "attempts": {
+    "preflight-cascade": [
+      {
+        "attempt": 1,
+        "id": "12029015",
+        "job_name": "pills-76c3546d-8d479bfd-preflight-cascade-01",
+        "snapshot_sha256": "8d479bfd14b079057f12d94fee5e3d412a3b0905ea114f39509695965f0ef170",
+        "parent_id": null,
+        "afterok": false
+      }
+    ],
+    "train-e100-f000-s2027": [
+      {
+        "attempt": 1,
+        "id": "12029017",
+        "job_name": "pills-76c3546d-8d479bfd-train-e100-f000-s2027-01",
+        "snapshot_sha256": "8d479bfd14b079057f12d94fee5e3d412a3b0905ea114f39509695965f0ef170",
+        "parent_id": "12029015",
+        "afterok": true
+      }
+    ],
+    "eval-e100-f000-s2027": [
+      {
+        "attempt": 1,
+        "id": "12029019",
+        "job_name": "pills-76c3546d-8d479bfd-eval-e100-f000-s2027-01",
+        "snapshot_sha256": "8d479bfd14b079057f12d94fee5e3d412a3b0905ea114f39509695965f0ef170",
+        "parent_id": "12029017",
+        "afterok": true
+      }
+    ],
+    "train-e100-f000-s2028": [
+      {
+        "attempt": 1,
+        "id": "12029020",
+        "job_name": "pills-76c3546d-8d479bfd-train-e100-f000-s2028-01",
+        "snapshot_sha256": "8d479bfd14b079057f12d94fee5e3d412a3b0905ea114f39509695965f0ef170",
+        "parent_id": "12029015",
+        "afterok": true
+      }
+    ],
+    "eval-e100-f000-s2028": [
+      {
+        "attempt": 1,
+        "id": "12029021",
+        "job_name": "pills-76c3546d-8d479bfd-eval-e100-f000-s2028-01",
+        "snapshot_sha256": "8d479bfd14b079057f12d94fee5e3d412a3b0905ea114f39509695965f0ef170",
+        "parent_id": "12029020",
+        "afterok": true
+      }
+    ]
+  },
+  "slurm_states": {
+    "12029015": "COMPLETED",
+    "12029017": "COMPLETED",
+    "12029019": "COMPLETED",
+    "12029020": "COMPLETED",
+    "12029021": "COMPLETED"
+  },
+  "completed_jobs": {
+    "preflight-cascade": "12029015",
+    "train-e100-f000-s2027": "12029017",
+    "eval-e100-f000-s2027": "12029019",
+    "train-e100-f000-s2028": "12029020",
+    "eval-e100-f000-s2028": "12029021"
+  },
+  "conditions": {
+    "e100-f000": {
+      "training_job": "12022443",
+      "evaluation_job": "12022444",
+      "preflight_job": "12022434",
+      "snapshot_sha256": "8d479bfd14b079057f12d94fee5e3d412a3b0905ea114f39509695965f0ef170",
+      "checkpoint_sha256": "256c1820865ee07326ad1e26c3c2645f42fc54612e2ef38889a1a1c21c930dd7",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-6",
+        "job_id": "12022443",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-6",
+        "job_id": "12022444",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12022444",
+          "host": "c207-6",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      }
+    },
+    "e100-f000-s2027": {
+      "training_job": "12029017",
+      "evaluation_job": "12029019",
+      "preflight_job": "12029015",
+      "snapshot_sha256": "8d479bfd14b079057f12d94fee5e3d412a3b0905ea114f39509695965f0ef170",
+      "checkpoint_sha256": "744e7237849b83607a770f8cd230d37e462bed2edd47ce81e4ba240b09a8c4c8",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-6",
+        "job_id": "12029017",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-6",
+        "job_id": "12029019",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12029019",
+          "host": "c210-6",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      }
+    },
+    "e100-f000-s2028": {
+      "training_job": "12029020",
+      "evaluation_job": "12029021",
+      "preflight_job": "12029015",
+      "snapshot_sha256": "8d479bfd14b079057f12d94fee5e3d412a3b0905ea114f39509695965f0ef170",
+      "checkpoint_sha256": "ea776413d092c8574dcaed2ff6ce69ad8a26fd893e6985b06db475e32046d617",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-6",
+        "job_id": "12029020",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-6",
+        "job_id": "12029021",
+        "python": "3.11.18"
+      },
+      "benchmark_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12029021",
+          "host": "c207-6",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      }
+    }
+  }
+}

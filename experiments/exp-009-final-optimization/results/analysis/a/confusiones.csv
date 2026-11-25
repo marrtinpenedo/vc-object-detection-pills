@@ -1,0 +1,36 @@
+arm,clase_real,clase_predicha,n
+F000-CONTROL,Cipro 500,Ibuphil Cold 400-60,1
+F000-CONTROL,Cipro 500,Xyzall 5mg,1
+F000-CONTROL,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F000-GEOM,Cipro 500,Ibuphil Cold 400-60,1
+F010-CONTROL,Cipro 500,Ibuphil Cold 400-60,1
+F010-CONTROL,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F010-GEOM,Cipro 500,Ibuphil Cold 400-60,1
+F010-GEOM,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F020-CONTROL,Cipro 500,Ibuphil Cold 400-60,1
+F020-CONTROL,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F020-GEOM,Cipro 500,Ibuphil Cold 400-60,1
+F020-GEOM,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F020-GEOM,red,Ibuphil Cold 400-60,1
+F040-CONTROL,Cipro 500,Ibuphil Cold 400-60,1
+F040-CONTROL,Cipro 500,Xyzall 5mg,1
+F040-CONTROL,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F040-GEOM,Cipro 500,Ibuphil Cold 400-60,1
+F040-GEOM,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F060-CONTROL,Cipro 500,Ibuphil Cold 400-60,1
+F060-CONTROL,Cipro 500,Xyzall 5mg,1
+F060-CONTROL,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F060-GEOM,Cipro 500,Ibuphil Cold 400-60,1
+F060-GEOM,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F080-CONTROL,Cipro 500,Ibuphil Cold 400-60,1
+F080-CONTROL,Cipro 500,Xyzall 5mg,1
+F080-CONTROL,white,Xyzall 5mg,1
+F080-GEOM,Cipro 500,Ibuphil Cold 400-60,1
+F080-GEOM,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F080-GEOM,red,Ibuphil Cold 400-60,1
+F100-CONTROL,Cipro 500,Ibuphil Cold 400-60,1
+F100-CONTROL,Cipro 500,Xyzall 5mg,1
+F100-CONTROL,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F100-GEOM,Cipro 500,Ibuphil Cold 400-60,1
+F100-GEOM,Ibuphil 600 mg,Ibuphil Cold 400-60,1
+F100-GEOM,Xyzall 5mg,Cipro 500,1
