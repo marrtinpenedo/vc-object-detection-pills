@@ -1,0 +1,433 @@
+{
+  "scope": "proposal",
+  "exploratory_seed": 2026,
+  "confirmation_seeds": [
+    2027,
+    2028
+  ],
+  "new_trainings": 12,
+  "dataset_manifest_sha256": "79987cbeab9737d1377e3f056b745c8f0fb5845eb915ff12c32741b12e43bda9",
+  "valid_coco_sha256": "8da7dc75022c67fe9e4d806559e8110f89a2cbb8850948f1d89ce5208cdead7c",
+  "weights": {
+    "yolo": {
+      "path": "checkpoints/yolov10s.pt",
+      "sha256": "65fa8332c38a7189597a268897bce6c1026f9499711b9761fb0c2c639b91d4d6"
+    }
+  },
+  "evaluation": {
+    "split": "valid",
+    "checkpoint": "best",
+    "warmup": 20,
+    "iterations": 100
+  },
+  "photo_selection": {
+    "f080-geom-photo": {
+      "paired_control": "f080-geom",
+      "map_gain": 0.013178743947184435,
+      "map7_gain": 0.0150614216539251
+    },
+    "f080-control-photo": {
+      "paired_control": "f080-control",
+      "map_gain": 0.016080796124808394,
+      "map7_gain": 0.004092338428352438
+    }
+  },
+  "recipes": {
+    "f000-control": {
+      "architecture": "yolov10s.pt",
+      "epochs": 100,
+      "batch": 8,
+      "imgsz": 640,
+      "workers": 4,
+      "seed": 2026,
+      "precision": "fp32",
+      "optimizer": "AdamW",
+      "lr": 0.001,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "scheduler": "cosine",
+      "final_lr_factor": 0.05,
+      "warmup_epochs": 1.0,
+      "warmup_momentum": 0.8,
+      "warmup_bias_lr": 0.001,
+      "eval_every_epochs": 1,
+      "checkpoint_every_epochs": 1
+    },
+    "f000-geom": {
+      "architecture": "yolov10s.pt",
+      "epochs": 100,
+      "batch": 8,
+      "imgsz": 640,
+      "workers": 4,
+      "seed": 2026,
+      "precision": "fp32",
+      "optimizer": "AdamW",
+      "lr": 0.001,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "scheduler": "cosine",
+      "final_lr_factor": 0.05,
+      "warmup_epochs": 1.0,
+      "warmup_momentum": 0.8,
+      "warmup_bias_lr": 0.001,
+      "eval_every_epochs": 1,
+      "checkpoint_every_epochs": 1,
+      "geometric": {
+        "probability": 0.5,
+        "degrees": 8,
+        "translate": 0.04,
+        "scale": 0.1,
+        "flip": 0.5
+      },
+      "mosaic": 0.3
+    },
+    "f080-control": {
+      "architecture": "yolov10s.pt",
+      "epochs": 100,
+      "batch": 8,
+      "imgsz": 640,
+      "workers": 4,
+      "seed": 2026,
+      "precision": "fp32",
+      "optimizer": "AdamW",
+      "lr": 0.001,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "scheduler": "cosine",
+      "final_lr_factor": 0.05,
+      "warmup_epochs": 1.0,
+      "warmup_momentum": 0.8,
+      "warmup_bias_lr": 0.001,
+      "eval_every_epochs": 1,
+      "checkpoint_every_epochs": 1,
+      "freeze_backbone_epochs": 80
+    },
+    "f080-geom": {
+      "architecture": "yolov10s.pt",
+      "epochs": 100,
+      "batch": 8,
+      "imgsz": 640,
+      "workers": 4,
+      "seed": 2026,
+      "precision": "fp32",
+      "optimizer": "AdamW",
+      "lr": 0.001,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "scheduler": "cosine",
+      "final_lr_factor": 0.05,
+      "warmup_epochs": 1.0,
+      "warmup_momentum": 0.8,
+      "warmup_bias_lr": 0.001,
+      "eval_every_epochs": 1,
+      "checkpoint_every_epochs": 1,
+      "freeze_backbone_epochs": 80,
+      "geometric": {
+        "probability": 0.5,
+        "degrees": 8,
+        "translate": 0.04,
+        "scale": 0.1,
+        "flip": 0.5
+      },
+      "mosaic": 0.3
+    },
+    "f080-geom-photo": {
+      "architecture": "yolov10s.pt",
+      "epochs": 100,
+      "batch": 8,
+      "imgsz": 640,
+      "workers": 4,
+      "seed": 2026,
+      "precision": "fp32",
+      "optimizer": "AdamW",
+      "lr": 0.001,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "scheduler": "cosine",
+      "final_lr_factor": 0.05,
+      "warmup_epochs": 1.0,
+      "warmup_momentum": 0.8,
+      "warmup_bias_lr": 0.001,
+      "eval_every_epochs": 1,
+      "checkpoint_every_epochs": 1,
+      "freeze_backbone_epochs": 80,
+      "geometric": {
+        "probability": 0.5,
+        "degrees": 8,
+        "translate": 0.04,
+        "scale": 0.1,
+        "flip": 0.5
+      },
+      "mosaic": 0.3,
+      "photometric": {
+        "probability": 0.5,
+        "brightness": 0.1,
+        "contrast": 0.1
+      }
+    },
+    "f080-control-photo": {
+      "architecture": "yolov10s.pt",
+      "epochs": 100,
+      "batch": 8,
+      "imgsz": 640,
+      "workers": 4,
+      "seed": 2026,
+      "precision": "fp32",
+      "optimizer": "AdamW",
+      "lr": 0.001,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "scheduler": "cosine",
+      "final_lr_factor": 0.05,
+      "warmup_epochs": 1.0,
+      "warmup_momentum": 0.8,
+      "warmup_bias_lr": 0.001,
+      "eval_every_epochs": 1,
+      "checkpoint_every_epochs": 1,
+      "freeze_backbone_epochs": 80,
+      "photometric": {
+        "probability": 0.5,
+        "brightness": 0.1,
+        "contrast": 0.1
+      }
+    }
+  },
+  "validation_2026": {
+    "f000-control": {
+      "training_job": "12026505",
+      "evaluation_job": "12026506",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "40f29e88eedc89ea677e108b3b6be2594cba0fdeba127a4dca1369d50145e4fe",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-7",
+        "job_id": "12026505",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-16",
+        "job_id": "12026506",
+        "python": "3.11.18"
+      }
+    },
+    "f000-geom": {
+      "training_job": "12026507",
+      "evaluation_job": "12026508",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "7b904e94efb3068c30cb660c2ef643ec3d25af9eb4234305b21f0bdc100c6d83",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-14",
+        "job_id": "12026507",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-16",
+        "job_id": "12026508",
+        "python": "3.11.18"
+      }
+    },
+    "f080-control": {
+      "training_job": "12026525",
+      "evaluation_job": "12026526",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "9663d0f38ad90dccaf76d83a1a828f5e3e8589e99d8f0e1a46fb9a3fe0c57912",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-1",
+        "job_id": "12026525",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-1",
+        "job_id": "12026526",
+        "python": "3.11.18"
+      }
+    },
+    "f080-geom": {
+      "training_job": "12026527",
+      "evaluation_job": "12026528",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "2a89fcb9917b459b8210f1cb028c946303820b306d269fb9eb4c4d8405a1ffe1",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-7",
+        "job_id": "12026527",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-1",
+        "job_id": "12026528",
+        "python": "3.11.18"
+      }
+    },
+    "f080-geom-photo": {
+      "training_job": "12028995",
+      "evaluation_job": "12028996",
+      "preflight_job": "12028987",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "395cd10c9d074833161e318bf664c92dd068ce6551c2a70430e2cec6a039f250",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-2",
+        "job_id": "12028995",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-5",
+        "job_id": "12028996",
+        "python": "3.11.18"
+      }
+    },
+    "f080-control-photo": {
+      "training_job": "12028993",
+      "evaluation_job": "12028994",
+      "preflight_job": "12028987",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_sha256": "ac11e9fc5bcf6100b4800bb6f682e0743511d03eaacd78b91a31721315754de2",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-2",
+        "job_id": "12028993",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-5",
+        "job_id": "12028994",
+        "python": "3.11.18"
+      }
+    }
+  },
+  "contrasts": {
+    "freezing_sin_geometria": {
+      "f000-control": -1,
+      "f080-control": 1
+    },
+    "freezing_con_geometria": {
+      "f000-geom": -1,
+      "f080-geom": 1
+    },
+    "geometria_f000": {
+      "f000-control": -1,
+      "f000-geom": 1
+    },
+    "geometria_f080": {
+      "f080-control": -1,
+      "f080-geom": 1
+    },
+    "freezing_x_geometria_sin_fotometria": {
+      "f000-control": 1,
+      "f000-geom": -1,
+      "f080-control": -1,
+      "f080-geom": 1
+    },
+    "fotometria_f080-geom": {
+      "f080-geom": -1,
+      "f080-geom-photo": 1
+    },
+    "fotometria_f080-control": {
+      "f080-control": -1,
+      "f080-control-photo": 1
+    },
+    "geometria_x_fotometria_f080": {
+      "f080-control": 1,
+      "f080-geom": -1,
+      "f080-control-photo": -1,
+      "f080-geom-photo": 1
+    }
+  }
+}

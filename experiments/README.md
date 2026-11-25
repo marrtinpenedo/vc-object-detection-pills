@@ -12,6 +12,7 @@
 | [EXP-006](exp-006-yolo-warmup/README.md) | YOLOv10-S, duración del warm-up con LR inicial fijo | `cerrado` en fase A. Se conserva el warm-up de referencia · [hallazgos](exp-006-yolo-warmup/findings.md) |
 | [EXP-007](exp-007-yolo-staged-transfer/README.md) | YOLOv10-S, duración de la congelación del backbone | `cerrado` en `valid`. B confirma 15 épocas y C selecciona 20 · [hallazgos](exp-007-yolo-staged-transfer/findings.md) |
 | [EXP-008](exp-008-cascade-freezing/README.md) | Cascade R-CNN, duración de la congelación de ResNet-50 | Cerrado en `valid`, sin confirmación. El freezing no mejora los controles · [hallazgos](exp-008-cascade-freezing/findings.md) |
+| [EXP-009](exp-009-final-optimization/README.md) | Optimización final multifactorial | Cerrado en validación y test · [hallazgos](exp-009-final-optimization/findings.md) · [informe final](exp-009-final-optimization/final-results.md) |
 
 [Metodología de los baselines](baseline/README.md) · [Resultados, diagnósticos y decisiones](baseline/findings.md)
 
@@ -21,7 +22,7 @@ La numeración de la campaña asigna EXP-003 al ensemble y EXP-004/005 a los fac
 
 La [campaña EXP-003 a EXP-005](../docs/campaigns/exp-003-005/README.md) completó los dos factoriales. El [cierre de validación](../docs/campaigns/exp-003-005/findings.md) recoge los nueve resultados reproducidos, el contraste con EXP-007 y los candidatos para combinar geometría y congelación en YOLO.
 
-La evaluación final en `test` se reserva hasta fijar las recetas, los checkpoints y el punto operativo.
+Los checkpoints y el punto operativo de EXP-009 se fijaron en validación. La [evaluación final en test](exp-009-final-optimization/final-results.md) está reproducida y cuenta con el recibo SLURM.
 
 ## Registro de un experimento
 

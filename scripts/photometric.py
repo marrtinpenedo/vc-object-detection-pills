@@ -32,14 +32,15 @@ def adjust_luminance(image, brightness, contrast):
 class PhotometricSampler:
     """Keep a separate random stream per loader worker."""
 
-    def __init__(self, spec, seed):
+    def __init__(self, spec, seed, *, stream=0):
         self.spec = spec
         self.seed = seed
+        self.stream = stream
         self.worker_seed = None
         self.rng = None
 
     def worker_rng(self, worker):
-        seed = self.seed if worker is None else worker.seed
+        seed = (self.seed if worker is None else worker.seed) ^ self.stream
         if self.rng is None or seed != self.worker_seed:
             self.worker_seed = seed
             self.rng = random.Random(seed)

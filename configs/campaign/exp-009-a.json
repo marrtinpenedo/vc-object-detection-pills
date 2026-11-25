@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "seed": 2026,
+  "dataset": "Francesco/pills-sxdht",
+  "dataset_relpath": "data/pills-prepared",
+  "dataset_manifest_sha256": "79987cbeab9737d1377e3f056b745c8f0fb5845eb915ff12c32741b12e43bda9",
+  "valid_coco_sha256": "8da7dc75022c67fe9e4d806559e8110f89a2cbb8850948f1d89ce5208cdead7c",
+  "evaluation": {
+    "split": "valid",
+    "checkpoint": "best",
+    "warmup": 20,
+    "iterations": 100
+  },
+  "geometric": {
+    "probability": 0.5,
+    "degrees": 8,
+    "translate": 0.04,
+    "scale": 0.1,
+    "flip": 0.5
+  },
+  "mosaic_probability": 0.3,
+  "experiment": "EXP-009",
+  "phase": "A",
+  "weights": {
+    "yolo": {
+      "path": "checkpoints/yolov10s.pt",
+      "sha256": "65fa8332c38a7189597a268897bce6c1026f9499711b9761fb0c2c639b91d4d6"
+    }
+  },
+  "packages": {
+    "yolo": [
+      "ultralytics",
+      "8.3.161"
+    ]
+  },
+  "conditions": [
+    {
+      "name": "f000-control",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": false,
+      "mosaic": false
+    },
+    {
+      "name": "f000-geom",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": true,
+      "mosaic": true
+    },
+    {
+      "name": "f010-control",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": false,
+      "mosaic": false,
+      "freeze_backbone_epochs": 10
+    },
+    {
+      "name": "f010-geom",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": true,
+      "mosaic": true,
+      "freeze_backbone_epochs": 10
+    },
+    {
+      "name": "f020-control",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": false,
+      "mosaic": false,
+      "freeze_backbone_epochs": 20
+    },
+    {
+      "name": "f020-geom",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": true,
+      "mosaic": true,
+      "freeze_backbone_epochs": 20
+    },
+    {
+      "name": "f040-control",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": false,
+      "mosaic": false,
+      "freeze_backbone_epochs": 40
+    },
+    {
+      "name": "f040-geom",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": true,
+      "mosaic": true,
+      "freeze_backbone_epochs": 40
+    },
+    {
+      "name": "f060-control",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": false,
+      "mosaic": false,
+      "freeze_backbone_epochs": 60
+    },
+    {
+      "name": "f060-geom",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": true,
+      "mosaic": true,
+      "freeze_backbone_epochs": 60
+    },
+    {
+      "name": "f080-control",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": false,
+      "mosaic": false,
+      "freeze_backbone_epochs": 80
+    },
+    {
+      "name": "f080-geom",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": true,
+      "mosaic": true,
+      "freeze_backbone_epochs": 80
+    },
+    {
+      "name": "f100-control",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": false,
+      "mosaic": false,
+      "freeze_backbone_epochs": 100
+    },
+    {
+      "name": "f100-geom",
+      "backend": "yolo",
+      "epochs": 100,
+      "geometric": true,
+      "mosaic": true,
+      "freeze_backbone_epochs": 100
+    }
+  ]
+}

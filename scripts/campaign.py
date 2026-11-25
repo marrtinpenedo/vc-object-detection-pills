@@ -17,6 +17,7 @@ from scripts.baseline_run import REPO, load_config
 
 PLAN = Path("configs/campaign/exp-003-005.json")
 EXP008 = Path("configs/campaign/exp-008.json")
+EXP009_A = Path("configs/campaign/exp-009-a.json")
 BATCH = Path("slurm/campaign.sh")
 SNAPSHOT = Path("snapshot.json")
 LEDGER = Path("jobs.json")
@@ -28,9 +29,11 @@ FAILED = {"BOOT_FAIL", "CANCELLED", "DEADLINE", "FAILED", "NODE_FAIL", "OUT_OF_M
           "PREEMPTED", "REVOKED", "TIMEOUT"}
 EXPORT_FILES = {
     "preflight": ("run.json", "status.json", "initialization.json", "ultralytics_runtime.json",
-                  "cascade_runtime.json", "detectron2.yaml", "weight_transfer.json", "cascade_freezing.json", "smoke.json"),
+                  "cascade_runtime.json", "detectron2.yaml", "weight_transfer.json", "cascade_freezing.json", "smoke.json",
+                  "parameters.json", "staged_transfer.json", "history.csv"),
     "train": ("run.json", "status.json", "history.csv", "ultralytics_runtime.json", "cascade_runtime.json",
-              "detectron2.yaml", "weight_transfer.json", "parameter_updates.json", "best.sha256", "cascade_freezing.json"),
+              "detectron2.yaml", "weight_transfer.json", "parameter_updates.json", "best.sha256", "cascade_freezing.json",
+              "parameters.json", "staged_transfer.json"),
     "eval": ("metrics.json", "predictions.json", "pr_curves.json"),
 }
 
@@ -77,7 +80,8 @@ def condition_config(plan, condition):
     backend = condition["backend"]
     overrides = {"epochs": condition["epochs"], "seed": plan["seed"]}
     if "freeze_backbone_epochs" in condition:
-        require(plan.get("experiment") == "EXP-008" and backend == "cascade", "Freezing fuera de EXP-008")
+        require((plan.get("experiment"), backend) in {("EXP-008", "cascade"), ("EXP-009", "yolo")},
+                "Freezing con backend incompatible")
         overrides["freeze_backbone_epochs"] = condition["freeze_backbone_epochs"]
     spec = load_config(backend, None, overrides)
     if condition.get("geometric"):
@@ -101,6 +105,8 @@ def graph(plan):
                                                    if c["backend"] == backend and c["epochs"] == 30]}
     if plan.get("experiment") == "EXP-008":
         nodes["preflight-cascade"]["probes"] = ["e030-f000", "smoke"]
+    if plan.get("experiment") == "EXP-009":
+        nodes["preflight-yolo"]["probes"] = ["f000-control", "smoke-temporal", "smoke-permanent"]
     for condition in plan["conditions"]:
         name, backend = condition["name"], condition["backend"]
         nodes[f"train-{name}"] = {"stage": "train", "backend": backend, "condition": name,
@@ -277,7 +283,8 @@ def launch(work, root, retry=False, failed_yolo_preflight=None, plan_path=PLAN):
             attempts.append(entry)
             # Persist intent before sbatch. A transport failure can be ambiguous.
             write_json(ledger_path, ledger)
-            campaign_option = ["exp008"] if plan_path == EXP008 else []
+            campaign_mode = {EXP008: "exp008", EXP009_A: "exp009-a"}.get(plan_path)
+            campaign_option = [campaign_mode] if campaign_mode else []
             command = ["sbatch", "--parsable", "--export=NONE", "--no-requeue", f"--job-name={job_name}",
                        "--time=" + ("06:00:00" if node["stage"] == "train" else "01:00:00"),
                        f"--output={root}/logs/%x-%j.out", f"--error={root}/logs/%x-%j.err",
@@ -355,6 +362,8 @@ def job(work, backend, root, name, attempt, plan_path=PLAN):
                 require(sha256(weights) == plan["weights"][backend]["sha256"], "Pesos COCO alterados")
                 run_module("scripts.cascade_staged_smoke", "--data", data, "--weights", weights, "--output", output / "smoke")
                 require(read_json(output / "smoke/smoke.json")["status"] == "complete", "Smoke sin transición")
+            elif plan_path == EXP009_A and condition in ("smoke-temporal", "smoke-permanent"):
+                yolo_stage_smoke(manifest, condition, data, weights, output / condition)
             else:
                 train(root, manifest, condition, backend, data, weights, output / condition, initialize=True)
     elif node["stage"] == "train":
@@ -369,6 +378,26 @@ def job(work, backend, root, name, attempt, plan_path=PLAN):
         require(metrics["checkpoint_sha256"] == (parent_dir / "training/best.sha256").read_text().strip(),
                 "El checkpoint evaluado difiere del publicado por el entrenamiento")
     write_json(output / "done.json", metadata)
+
+
+def yolo_smoke_recipe(manifest, name):
+    duration = {"smoke-temporal": 1, "smoke-permanent": 3}[name]
+    return {**manifest["recipes"]["f010-geom"], "epochs": 3, "freeze_backbone_epochs": duration}
+
+
+def yolo_stage_smoke(manifest, name, data, weights, output):
+    require(sha256(weights) == manifest["plan"]["weights"]["yolo"]["sha256"], "Pesos COCO del smoke alterados")
+    spec = yolo_smoke_recipe(manifest, name)
+    config = output.with_suffix(".json")
+    write_json(config, spec)
+    run_module("scripts.train_baseline", "yolo", "--data", data, "--weights", weights, "--config", config,
+               "--output", output)
+    audit = read_json(output / "staged_transfer.json")
+    duration = spec["freeze_backbone_epochs"]
+    require(read_json(output / "status.json")["status"] == "complete"
+            and [row["epoch"] for row in audit["epochs"]] == [1, 2, 3]
+            and [row["backbone_frozen"] for row in audit["epochs"]] == [epoch <= duration for epoch in (1, 2, 3)]
+            and audit["thaw_epoch"] == (2 if duration == 1 else None), f"Smoke YOLO incompleto: {name}")
 
 
 def train(root, manifest, condition, backend, data, weights, output, initialize=False):
@@ -482,7 +511,9 @@ def reconcile(root, name, job_id, confirmed_not_submitted):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--exp008", action="store_true", help="Campaña de freezing Cascade")
+    campaign = parser.add_mutually_exclusive_group()
+    campaign.add_argument("--exp008", action="store_true", help="Campaña de freezing Cascade")
+    campaign.add_argument("--exp009-a", action="store_true", help="Fase A de optimización final YOLO")
     subs = parser.add_subparsers(dest="mode", required=True)
     pack = subs.add_parser("bundle")
     pack.add_argument("output", type=Path)
@@ -509,7 +540,7 @@ def main():
     sub.add_argument("name")
     sub.add_argument("attempt", type=int)
     args = parser.parse_args()
-    plan_path = EXP008 if args.exp008 else PLAN
+    plan_path = EXP009_A if args.exp009_a else EXP008 if args.exp008 else PLAN
     if args.mode == "bundle":
         bundle(args.output, plan_path)
         return
@@ -518,12 +549,13 @@ def main():
         print(json.dumps({"plan": plan, "nodes": graph(plan)}, indent=2))
         return
     work = args.work.resolve()
-    default_root = "results/exp-008-freezing" if args.exp008 else "results/campaign-003-005"
+    default_root = {EXP008: "results/exp-008-freezing", EXP009_A: "results/exp-009-a"}.get(
+        plan_path, "results/campaign-003-005")
     root = args.root.resolve() if args.root else work / default_root
     if args.mode == "launch":
         launch(work, root, args.retry_failed, plan_path=plan_path)
     elif args.mode == "recover-yolo":
-        require(not args.exp008 and args.failed_preflight.isdecimal(), "Recuperación YOLO incompatible")
+        require(plan_path == PLAN and args.failed_preflight.isdecimal(), "Recuperación YOLO incompatible")
         launch(work, root, retry=True, failed_yolo_preflight=args.failed_preflight)
     elif args.mode == "status":
         status(root)

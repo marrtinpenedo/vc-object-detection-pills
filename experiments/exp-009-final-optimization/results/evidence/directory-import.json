@@ -1,0 +1,23 @@
+{
+  "kind": "local_projection",
+  "source_archive_sha256": "4b48b4268d13f72d7e1048a63a0019979d597456579b1c1acbf5e1ed0435a7f9",
+  "archive_root": "exp-009-final-test",
+  "local_inventory_only": true,
+  "ignored_members": [
+    ".ultralytics/settings.json",
+    "cascade/examples/correct-0.jpg",
+    "cascade/examples/correct-1.jpg",
+    "cascade/examples/correct-2.jpg",
+    "cascade/examples/correct-3.jpg",
+    "cascade/examples/correct-4.jpg",
+    "cascade/examples/failure-18.jpg",
+    "cascade/examples/failure-19.jpg",
+    "cascade/examples/failure-28.jpg",
+    "yolo/examples/correct-0.jpg",
+    "yolo/examples/correct-1.jpg",
+    "yolo/examples/correct-2.jpg",
+    "yolo/examples/correct-4.jpg",
+    "yolo/examples/correct-5.jpg",
+    "yolo/examples/failure-3.jpg"
+  ]
+}

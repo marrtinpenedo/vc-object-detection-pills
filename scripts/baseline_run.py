@@ -79,8 +79,8 @@ def load_config(backend, path, overrides):
     if "geometric" in spec:
         from scripts.geometric import validate_geometric
 
-        if "photometric" in spec:
-            raise ValueError("La receta admite una sola política de augmentación")
+        if "photometric" in spec and backend != "yolo":
+            raise ValueError("Cascade admite una sola política de augmentación")
         validate_geometric(spec["geometric"])
     if "photometric" in spec:
         from scripts.photometric import validate_photometric

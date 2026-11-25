@@ -1,0 +1,1606 @@
+{
+  "verified_inventory_entries": 187,
+  "inventory_sha256": "1e254ca6f5b1bc66fccee13bc6bd5fa8981c836f18a110173e5eb813c059890a",
+  "slurm_accounting": {
+    "sha256": "ceb10221a20011f4de90d2cbaa6bc4dfc1add09d1727a1209a07bedbd6bb9990",
+    "allocations": {
+      "12031892": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031893": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031894": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031895": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031896": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031897": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031898": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031899": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031900": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031901": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031902": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031903": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031904": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031905": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031906": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031907": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031908": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031909": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031910": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031911": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031912": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031913": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031914": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031915": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "12031916": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      }
+    }
+  },
+  "controller_sha256": "40e7bad8f078cca9b41210fca5f5b3c830f9f4a0cbaa330eefe9f266daeb3c40",
+  "references": {
+    "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+    "cohorts": {
+      "A": {
+        "inventory_sha256": "e1ec28268f17ab6741f623bae9b6b0ba1cd349c009a2e0b4be97a5a3c1726c7b"
+      },
+      "B": {
+        "inventory_sha256": "cd783256194e699770647a2df1b230155b33ab01b4f846434feab958b7cfb398",
+        "controller_sha256": "d3bd1764768f19f806655c572ef49e24f9b3790f97d3b696bac4513244d06a69"
+      }
+    },
+    "arms": {
+      "f000-control": {
+        "phase": "A",
+        "config": {
+          "architecture": "yolov10s.pt",
+          "epochs": 100,
+          "batch": 8,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "AdamW",
+          "lr": 0.001,
+          "momentum": 0.9,
+          "weight_decay": 0.0005,
+          "scheduler": "cosine",
+          "final_lr_factor": 0.05,
+          "warmup_epochs": 1.0,
+          "warmup_momentum": 0.8,
+          "warmup_bias_lr": 0.001,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1
+        },
+        "condition": {
+          "name": "f000-control",
+          "backend": "yolo",
+          "epochs": 100,
+          "geometric": false,
+          "mosaic": false
+        },
+        "preflight_job": "12026504",
+        "training_job": "12026505",
+        "evaluation_job": "12026506",
+        "best_sha256": "40f29e88eedc89ea677e108b3b6be2594cba0fdeba127a4dca1369d50145e4fe",
+        "predictions_sha256": "d3616e677c34f43e505623078efdcc8b75952455737a5f04f61954154bf62a4e"
+      },
+      "f000-geom": {
+        "phase": "A",
+        "config": {
+          "architecture": "yolov10s.pt",
+          "epochs": 100,
+          "batch": 8,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "AdamW",
+          "lr": 0.001,
+          "momentum": 0.9,
+          "weight_decay": 0.0005,
+          "scheduler": "cosine",
+          "final_lr_factor": 0.05,
+          "warmup_epochs": 1.0,
+          "warmup_momentum": 0.8,
+          "warmup_bias_lr": 0.001,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1,
+          "geometric": {
+            "probability": 0.5,
+            "degrees": 8,
+            "translate": 0.04,
+            "scale": 0.1,
+            "flip": 0.5
+          },
+          "mosaic": 0.3
+        },
+        "condition": {
+          "name": "f000-geom",
+          "backend": "yolo",
+          "epochs": 100,
+          "geometric": true,
+          "mosaic": true
+        },
+        "preflight_job": "12026504",
+        "training_job": "12026507",
+        "evaluation_job": "12026508",
+        "best_sha256": "7b904e94efb3068c30cb660c2ef643ec3d25af9eb4234305b21f0bdc100c6d83",
+        "predictions_sha256": "c4f777fb28963f5c97789130f4b7a146766f6c9d4bea4aede6b24bda37b98218"
+      },
+      "f080-control": {
+        "phase": "A",
+        "config": {
+          "architecture": "yolov10s.pt",
+          "epochs": 100,
+          "batch": 8,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "AdamW",
+          "lr": 0.001,
+          "momentum": 0.9,
+          "weight_decay": 0.0005,
+          "scheduler": "cosine",
+          "final_lr_factor": 0.05,
+          "warmup_epochs": 1.0,
+          "warmup_momentum": 0.8,
+          "warmup_bias_lr": 0.001,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1,
+          "freeze_backbone_epochs": 80
+        },
+        "condition": {
+          "name": "f080-control",
+          "backend": "yolo",
+          "epochs": 100,
+          "geometric": false,
+          "mosaic": false,
+          "freeze_backbone_epochs": 80
+        },
+        "preflight_job": "12026504",
+        "training_job": "12026525",
+        "evaluation_job": "12026526",
+        "best_sha256": "9663d0f38ad90dccaf76d83a1a828f5e3e8589e99d8f0e1a46fb9a3fe0c57912",
+        "predictions_sha256": "eccc0dace428dd0f352d720b5a5ec06faefac3b2ff9c020211aa60e16037870b"
+      },
+      "f080-geom": {
+        "phase": "A",
+        "config": {
+          "architecture": "yolov10s.pt",
+          "epochs": 100,
+          "batch": 8,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "AdamW",
+          "lr": 0.001,
+          "momentum": 0.9,
+          "weight_decay": 0.0005,
+          "scheduler": "cosine",
+          "final_lr_factor": 0.05,
+          "warmup_epochs": 1.0,
+          "warmup_momentum": 0.8,
+          "warmup_bias_lr": 0.001,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1,
+          "freeze_backbone_epochs": 80,
+          "geometric": {
+            "probability": 0.5,
+            "degrees": 8,
+            "translate": 0.04,
+            "scale": 0.1,
+            "flip": 0.5
+          },
+          "mosaic": 0.3
+        },
+        "condition": {
+          "name": "f080-geom",
+          "backend": "yolo",
+          "epochs": 100,
+          "geometric": true,
+          "mosaic": true,
+          "freeze_backbone_epochs": 80
+        },
+        "preflight_job": "12026504",
+        "training_job": "12026527",
+        "evaluation_job": "12026528",
+        "best_sha256": "2a89fcb9917b459b8210f1cb028c946303820b306d269fb9eb4c4d8405a1ffe1",
+        "predictions_sha256": "5f7b4b4a16d3120b1706a93aff31c583103bfe4b72f80ee8572cc006d52e2e7d"
+      },
+      "f080-control-photo": {
+        "phase": "B",
+        "config": {
+          "architecture": "yolov10s.pt",
+          "epochs": 100,
+          "batch": 8,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "AdamW",
+          "lr": 0.001,
+          "momentum": 0.9,
+          "weight_decay": 0.0005,
+          "scheduler": "cosine",
+          "final_lr_factor": 0.05,
+          "warmup_epochs": 1.0,
+          "warmup_momentum": 0.8,
+          "warmup_bias_lr": 0.001,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1,
+          "freeze_backbone_epochs": 80,
+          "photometric": {
+            "probability": 0.5,
+            "brightness": 0.1,
+            "contrast": 0.1
+          }
+        },
+        "condition": {
+          "name": "f080-control-photo",
+          "backend": "yolo",
+          "epochs": 100,
+          "geometric": false,
+          "mosaic": false,
+          "freeze_backbone_epochs": 80,
+          "reference": "f080-control",
+          "seed": 2026
+        },
+        "preflight_job": "12028987",
+        "training_job": "12028993",
+        "evaluation_job": "12028994",
+        "best_sha256": "ac11e9fc5bcf6100b4800bb6f682e0743511d03eaacd78b91a31721315754de2",
+        "predictions_sha256": "59c0577b9dfc688bc75276d6d8ff55dd0fe7c93d651cec179ad8765032f575e4"
+      },
+      "f080-geom-photo": {
+        "phase": "B",
+        "config": {
+          "architecture": "yolov10s.pt",
+          "epochs": 100,
+          "batch": 8,
+          "imgsz": 640,
+          "workers": 4,
+          "seed": 2026,
+          "precision": "fp32",
+          "optimizer": "AdamW",
+          "lr": 0.001,
+          "momentum": 0.9,
+          "weight_decay": 0.0005,
+          "scheduler": "cosine",
+          "final_lr_factor": 0.05,
+          "warmup_epochs": 1.0,
+          "warmup_momentum": 0.8,
+          "warmup_bias_lr": 0.001,
+          "eval_every_epochs": 1,
+          "checkpoint_every_epochs": 1,
+          "freeze_backbone_epochs": 80,
+          "geometric": {
+            "probability": 0.5,
+            "degrees": 8,
+            "translate": 0.04,
+            "scale": 0.1,
+            "flip": 0.5
+          },
+          "mosaic": 0.3,
+          "photometric": {
+            "probability": 0.5,
+            "brightness": 0.1,
+            "contrast": 0.1
+          }
+        },
+        "condition": {
+          "name": "f080-geom-photo",
+          "backend": "yolo",
+          "epochs": 100,
+          "geometric": true,
+          "mosaic": true,
+          "freeze_backbone_epochs": 80,
+          "reference": "f080-geom",
+          "seed": 2026
+        },
+        "preflight_job": "12028987",
+        "training_job": "12028995",
+        "evaluation_job": "12028996",
+        "best_sha256": "395cd10c9d074833161e318bf664c92dd068ce6551c2a70430e2cec6a039f250",
+        "predictions_sha256": "8024ae7b633773b6aa0f088a6f2a8e62813df3a88f5bf12b5e97ecb932fe4180"
+      }
+    }
+  },
+  "completed_jobs": {
+    "preflight-yolo": "12031892",
+    "train-a-s2027": "12031893",
+    "eval-a-s2027": "12031894",
+    "train-b-s2027": "12031895",
+    "eval-b-s2027": "12031896",
+    "train-c-s2027": "12031897",
+    "eval-c-s2027": "12031898",
+    "train-d-s2027": "12031899",
+    "eval-d-s2027": "12031900",
+    "train-e-s2027": "12031901",
+    "eval-e-s2027": "12031902",
+    "train-f-s2027": "12031903",
+    "eval-f-s2027": "12031904",
+    "train-a-s2028": "12031905",
+    "eval-a-s2028": "12031906",
+    "train-b-s2028": "12031907",
+    "eval-b-s2028": "12031908",
+    "train-c-s2028": "12031909",
+    "eval-c-s2028": "12031910",
+    "train-d-s2028": "12031911",
+    "eval-d-s2028": "12031912",
+    "train-e-s2028": "12031913",
+    "eval-e-s2028": "12031914",
+    "train-f-s2028": "12031915",
+    "eval-f-s2028": "12031916"
+  },
+  "attempts": {
+    "preflight-yolo": [
+      {
+        "attempt": 1,
+        "id": "12031892",
+        "job_name": "pills-305ac51f-8254e3e0-preflight-yolo-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": null,
+        "afterok": false
+      }
+    ],
+    "train-a-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031893",
+        "job_name": "pills-305ac51f-8254e3e0-train-a-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-a-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031894",
+        "job_name": "pills-305ac51f-8254e3e0-eval-a-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031893",
+        "afterok": true
+      }
+    ],
+    "train-b-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031895",
+        "job_name": "pills-305ac51f-8254e3e0-train-b-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-b-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031896",
+        "job_name": "pills-305ac51f-8254e3e0-eval-b-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031895",
+        "afterok": true
+      }
+    ],
+    "train-c-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031897",
+        "job_name": "pills-305ac51f-8254e3e0-train-c-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-c-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031898",
+        "job_name": "pills-305ac51f-8254e3e0-eval-c-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031897",
+        "afterok": true
+      }
+    ],
+    "train-d-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031899",
+        "job_name": "pills-305ac51f-8254e3e0-train-d-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-d-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031900",
+        "job_name": "pills-305ac51f-8254e3e0-eval-d-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031899",
+        "afterok": true
+      }
+    ],
+    "train-e-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031901",
+        "job_name": "pills-305ac51f-8254e3e0-train-e-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-e-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031902",
+        "job_name": "pills-305ac51f-8254e3e0-eval-e-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031901",
+        "afterok": true
+      }
+    ],
+    "train-f-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031903",
+        "job_name": "pills-305ac51f-8254e3e0-train-f-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-f-s2027": [
+      {
+        "attempt": 1,
+        "id": "12031904",
+        "job_name": "pills-305ac51f-8254e3e0-eval-f-s2027-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031903",
+        "afterok": true
+      }
+    ],
+    "train-a-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031905",
+        "job_name": "pills-305ac51f-8254e3e0-train-a-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-a-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031906",
+        "job_name": "pills-305ac51f-8254e3e0-eval-a-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031905",
+        "afterok": true
+      }
+    ],
+    "train-b-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031907",
+        "job_name": "pills-305ac51f-8254e3e0-train-b-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-b-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031908",
+        "job_name": "pills-305ac51f-8254e3e0-eval-b-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031907",
+        "afterok": true
+      }
+    ],
+    "train-c-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031909",
+        "job_name": "pills-305ac51f-8254e3e0-train-c-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-c-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031910",
+        "job_name": "pills-305ac51f-8254e3e0-eval-c-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031909",
+        "afterok": true
+      }
+    ],
+    "train-d-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031911",
+        "job_name": "pills-305ac51f-8254e3e0-train-d-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-d-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031912",
+        "job_name": "pills-305ac51f-8254e3e0-eval-d-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031911",
+        "afterok": true
+      }
+    ],
+    "train-e-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031913",
+        "job_name": "pills-305ac51f-8254e3e0-train-e-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-e-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031914",
+        "job_name": "pills-305ac51f-8254e3e0-eval-e-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031913",
+        "afterok": true
+      }
+    ],
+    "train-f-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031915",
+        "job_name": "pills-305ac51f-8254e3e0-train-f-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031892",
+        "afterok": true
+      }
+    ],
+    "eval-f-s2028": [
+      {
+        "attempt": 1,
+        "id": "12031916",
+        "job_name": "pills-305ac51f-8254e3e0-eval-f-s2028-01",
+        "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+        "parent_id": "12031915",
+        "afterok": true
+      }
+    ]
+  },
+  "slurm_states": {
+    "12031892": "COMPLETED",
+    "12031893": "COMPLETED",
+    "12031894": "COMPLETED",
+    "12031895": "COMPLETED",
+    "12031896": "COMPLETED",
+    "12031897": "COMPLETED",
+    "12031898": "COMPLETED",
+    "12031899": "COMPLETED",
+    "12031900": "COMPLETED",
+    "12031901": "COMPLETED",
+    "12031902": "COMPLETED",
+    "12031903": "COMPLETED",
+    "12031904": "COMPLETED",
+    "12031905": "COMPLETED",
+    "12031906": "COMPLETED",
+    "12031907": "COMPLETED",
+    "12031908": "COMPLETED",
+    "12031909": "COMPLETED",
+    "12031910": "COMPLETED",
+    "12031911": "COMPLETED",
+    "12031912": "COMPLETED",
+    "12031913": "COMPLETED",
+    "12031914": "COMPLETED",
+    "12031915": "COMPLETED",
+    "12031916": "COMPLETED"
+  },
+  "conditions": {
+    "A-s2026": {
+      "training_job": "12026505",
+      "evaluation_job": "12026506",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-a/jobs/train-f000-control/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "40f29e88eedc89ea677e108b3b6be2594cba0fdeba127a4dca1369d50145e4fe",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-7",
+        "job_id": "12026505",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-16",
+        "job_id": "12026506",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026506",
+          "host": "c207-16",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": null
+    },
+    "B-s2026": {
+      "training_job": "12026507",
+      "evaluation_job": "12026508",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-a/jobs/train-f000-geom/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "7b904e94efb3068c30cb660c2ef643ec3d25af9eb4234305b21f0bdc100c6d83",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-14",
+        "job_id": "12026507",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-16",
+        "job_id": "12026508",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026508",
+          "host": "c207-16",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": null
+    },
+    "C-s2026": {
+      "training_job": "12026525",
+      "evaluation_job": "12026526",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-a/jobs/train-f080-control/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "9663d0f38ad90dccaf76d83a1a828f5e3e8589e99d8f0e1a46fb9a3fe0c57912",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-1",
+        "job_id": "12026525",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-1",
+        "job_id": "12026526",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026526",
+          "host": "c209-1",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "D-s2026": {
+      "training_job": "12026527",
+      "evaluation_job": "12026528",
+      "preflight_job": "12026504",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-a/jobs/train-f080-geom/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "2a89fcb9917b459b8210f1cb028c946303820b306d269fb9eb4c4d8405a1ffe1",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-7",
+        "job_id": "12026527",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-1",
+        "job_id": "12026528",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12026528",
+          "host": "c209-1",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "E-s2026": {
+      "training_job": "12028993",
+      "evaluation_job": "12028994",
+      "preflight_job": "12028987",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-b/jobs/train-f080-control-photo/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "ac11e9fc5bcf6100b4800bb6f682e0743511d03eaacd78b91a31721315754de2",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-2",
+        "job_id": "12028993",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-5",
+        "job_id": "12028994",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12028994",
+          "host": "c210-5",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "F-s2026": {
+      "training_job": "12028995",
+      "evaluation_job": "12028996",
+      "preflight_job": "12028987",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-b/jobs/train-f080-geom-photo/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "395cd10c9d074833161e318bf664c92dd068ce6551c2a70430e2cec6a039f250",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-2",
+        "job_id": "12028995",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-5",
+        "job_id": "12028996",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12028996",
+          "host": "c210-5",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "A-s2027": {
+      "training_job": "12031893",
+      "evaluation_job": "12031894",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-a-s2027/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "038f2ec807569622bb24cbe6c738bb1ab0b2db275427f90566a879b9c9614f89",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-9",
+        "job_id": "12031893",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-9",
+        "job_id": "12031894",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031894",
+          "host": "c210-9",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": null
+    },
+    "B-s2027": {
+      "training_job": "12031895",
+      "evaluation_job": "12031896",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-b-s2027/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "cadc65d8bf84ef90a77c41d422bddb0b433025cd069b30c2ec71fa22c7a72158",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-9",
+        "job_id": "12031895",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-10",
+        "job_id": "12031896",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031896",
+          "host": "c210-10",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": null
+    },
+    "C-s2027": {
+      "training_job": "12031897",
+      "evaluation_job": "12031898",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-c-s2027/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "09386fc4d4b25c1e3e90fd582de91f36a62e9fce5fc72813273e38839daa736d",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-12",
+        "job_id": "12031897",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-14",
+        "job_id": "12031898",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031898",
+          "host": "c210-14",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "D-s2027": {
+      "training_job": "12031899",
+      "evaluation_job": "12031900",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-d-s2027/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "0607143d11c8ed014a7e77ac19dbe9fa297e72fe5c4ad519a9f22ccb9d8e9473",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-12",
+        "job_id": "12031899",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-14",
+        "job_id": "12031900",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031900",
+          "host": "c210-14",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "E-s2027": {
+      "training_job": "12031901",
+      "evaluation_job": "12031902",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-e-s2027/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "e97982596a4885e8874081a29eb8912eccfc2a33b76479472bb43dc00a7b9e58",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-3",
+        "job_id": "12031901",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-10",
+        "job_id": "12031902",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031902",
+          "host": "c210-10",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "F-s2027": {
+      "training_job": "12031903",
+      "evaluation_job": "12031904",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-f-s2027/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "6a84d9d1d5d02ff0c011fb84accf12fe9280609a10ad88824385fe3c04e1b70a",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-6",
+        "job_id": "12031903",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-14",
+        "job_id": "12031904",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031904",
+          "host": "c210-14",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "A-s2028": {
+      "training_job": "12031905",
+      "evaluation_job": "12031906",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-a-s2028/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "08d228aa630b9687ad19ce46f003f35219b1970688e8d4d9887d663fe5201615",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-8",
+        "job_id": "12031905",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c208-1",
+        "job_id": "12031906",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031906",
+          "host": "c208-1",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": null
+    },
+    "B-s2028": {
+      "training_job": "12031907",
+      "evaluation_job": "12031908",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-b-s2028/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "dfacabeb8c7b2ee7fdbd30c50655ffc9ce83657bd61ece52938f3123c10e2fe8",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-16",
+        "job_id": "12031907",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-16",
+        "job_id": "12031908",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031908",
+          "host": "c209-16",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": null
+    },
+    "C-s2028": {
+      "training_job": "12031909",
+      "evaluation_job": "12031910",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-c-s2028/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "0733547457909212b5d247c82c0f5a67a42b533597cd4e971d1dda242f64f97c",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-14",
+        "job_id": "12031909",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-14",
+        "job_id": "12031910",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031910",
+          "host": "c210-14",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "D-s2028": {
+      "training_job": "12031911",
+      "evaluation_job": "12031912",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-d-s2028/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "a042262f46695fa2ca05d580eb789ae87c14ff23433560abe82d45bb5b043597",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-14",
+        "job_id": "12031911",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-9",
+        "job_id": "12031912",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031912",
+          "host": "c210-9",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "E-s2028": {
+      "training_job": "12031913",
+      "evaluation_job": "12031914",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-e-s2028/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "6548d4336e54c8c9c7e186b56569ced3fd3a53aaca7d7757d5e888fc3d562075",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c207-14",
+        "job_id": "12031913",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c210-14",
+        "job_id": "12031914",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031914",
+          "host": "c210-14",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    },
+    "F-s2028": {
+      "training_job": "12031915",
+      "evaluation_job": "12031916",
+      "preflight_job": "12031892",
+      "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+      "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-f-s2028/attempt-01/training/weights/best.pt",
+      "checkpoint_sha256": "78ae2688c33e26f1217ac3685a5f50dea239f7fbf88d060f30f25957246dd015",
+      "training_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-3",
+        "job_id": "12031915",
+        "python": "3.11.18"
+      },
+      "evaluation_hardware": {
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+        "host": "c209-3",
+        "job_id": "12031916",
+        "python": "3.11.18"
+      },
+      "latency_protocol": {
+        "protocol": true,
+        "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+        "hardware": {
+          "job_id": "12031916",
+          "host": "c209-3",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "compute_capability": [
+            8,
+            0
+          ],
+          "cuda_runtime": "12.1",
+          "nvidia_driver": "580.178.04",
+          "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+        }
+      },
+      "thaw_epoch": 81
+    }
+  }
+}

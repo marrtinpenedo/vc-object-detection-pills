@@ -1,0 +1,198 @@
+{
+  "status": "pendiente_sha256_fisico",
+  "c_slurm_accounting_verified": true,
+  "approval_required": true,
+  "dataset_manifest_sha256": "79987cbeab9737d1377e3f056b745c8f0fb5845eb915ff12c32741b12e43bda9",
+  "valid_coco_sha256": "8da7dc75022c67fe9e4d806559e8110f89a2cbb8850948f1d89ce5208cdead7c",
+  "test_coco_expected_sha256_from_manifest": "eda7d1faf0e441fde5a81825b27efc073dba00595d7b4fb5f5fff793f3f5f2d4",
+  "evaluation_entrypoint_sha256": "3344efed54405825a4d6f6e96415635e4ef790d38ce01d2f6f1f16a993077a5b",
+  "operating_point": {
+    "score": 0.25,
+    "iou": 0.5
+  },
+  "benchmark": {
+    "warmup": 20,
+    "iterations": 100,
+    "batch": 1,
+    "precision": "fp32",
+    "image_size": 640
+  },
+  "yolo": {
+    "status": "propuesto_para_congelar",
+    "arm": "D",
+    "eligible_arms": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "seed": 2027,
+    "operating_point": {
+      "score": 0.25,
+      "iou": 0.5
+    },
+    "evaluation": {
+      "split": "valid",
+      "checkpoint": "best",
+      "warmup": 20,
+      "iterations": 100
+    },
+    "code_snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+    "weights": {
+      "path": "checkpoints/yolov10s.pt",
+      "sha256": "65fa8332c38a7189597a268897bce6c1026f9499711b9761fb0c2c639b91d4d6"
+    },
+    "dataset_manifest_sha256": "79987cbeab9737d1377e3f056b745c8f0fb5845eb915ff12c32741b12e43bda9",
+    "valid_coco_sha256": "8da7dc75022c67fe9e4d806559e8110f89a2cbb8850948f1d89ce5208cdead7c",
+    "recipe": {
+      "architecture": "yolov10s.pt",
+      "epochs": 100,
+      "batch": 8,
+      "imgsz": 640,
+      "workers": 4,
+      "seed": 2027,
+      "precision": "fp32",
+      "optimizer": "AdamW",
+      "lr": 0.001,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "scheduler": "cosine",
+      "final_lr_factor": 0.05,
+      "warmup_epochs": 1.0,
+      "warmup_momentum": 0.8,
+      "warmup_bias_lr": 0.001,
+      "eval_every_epochs": 1,
+      "checkpoint_every_epochs": 1,
+      "freeze_backbone_epochs": 80,
+      "geometric": {
+        "probability": 0.5,
+        "degrees": 8,
+        "translate": 0.04,
+        "scale": 0.1,
+        "flip": 0.5
+      },
+      "mosaic": 0.3
+    },
+    "validation": {
+      "map": 0.8838987981902585,
+      "ap50": 0.9859303238016109,
+      "ap75": 0.9859303238016109,
+      "ap_small": 0.29999999999999993,
+      "ap_medium": 0.9058721178240273,
+      "ap_large": 0.8955828763119981,
+      "map_without_ibuphil_600_mg": 0.8815986265031527,
+      "score": 0.25,
+      "iou": 0.5,
+      "tp": 92,
+      "fp": 4,
+      "fn": 6,
+      "precision": 0.9583333333333334,
+      "recall": 0.9387755102040817,
+      "best_epoch": 97,
+      "best_validation_map_history": 0.8832641895613285,
+      "last_validation_map_history": 0.869119,
+      "best_minus_last_history": 0.014145189561328486,
+      "mean_ms_per_image": 11.283616619184613,
+      "median_ms_per_image": 11.283635161817074,
+      "p95_ms_per_image": 11.319176154211164,
+      "fps_from_mean": 88.6240674199956,
+      "training_seconds": 728.9559684442356,
+      "peak_gpu_allocated_mib": 4875.056640625,
+      "peak_gpu_reserved_mib": 6038.0
+    },
+    "training_job": "12031899",
+    "evaluation_job": "12031900",
+    "preflight_job": "12031892",
+    "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+    "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-d-s2027/attempt-01/training/weights/best.pt",
+    "checkpoint_sha256": "0607143d11c8ed014a7e77ac19dbe9fa297e72fe5c4ad519a9f22ccb9d8e9473",
+    "training_hardware": {
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "compute_capability": [
+        8,
+        0
+      ],
+      "cuda_runtime": "12.1",
+      "nvidia_driver": "580.178.04",
+      "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+      "host": "c210-12",
+      "job_id": "12031899",
+      "python": "3.11.18"
+    },
+    "evaluation_hardware": {
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "compute_capability": [
+        8,
+        0
+      ],
+      "cuda_runtime": "12.1",
+      "nvidia_driver": "580.178.04",
+      "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz",
+      "host": "c210-14",
+      "job_id": "12031900",
+      "python": "3.11.18"
+    },
+    "latency_protocol": {
+      "protocol": true,
+      "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+      "hardware": {
+        "job_id": "12031900",
+        "host": "c210-14",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "compute_capability": [
+          8,
+          0
+        ],
+        "cuda_runtime": "12.1",
+        "nvidia_driver": "580.178.04",
+        "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+      }
+    },
+    "thaw_epoch": 81
+  },
+  "cascade": {
+    "arm": "e100-f000-s2027",
+    "seed": 2027,
+    "recipe": {
+      "architecture": "Misc/cascade_mask_rcnn_R_50_FPN_3x.yaml",
+      "epochs": 100,
+      "batch": 4,
+      "imgsz": 640,
+      "workers": 4,
+      "seed": 2027,
+      "precision": "fp32",
+      "optimizer": "SGD",
+      "lr": 0.0025,
+      "momentum": 0.9,
+      "weight_decay": 0.0001,
+      "weight_decay_norm": 0.0,
+      "scheduler": "WarmupCosineLR",
+      "warmup_iterations": 79,
+      "warmup_factor": 0.1,
+      "gradient_clip_norm": 10.0,
+      "eval_every_epochs": 1,
+      "checkpoint_every_epochs": 1,
+      "nms_iou": 0.5
+    },
+    "snapshot_sha256": "8d479bfd14b079057f12d94fee5e3d412a3b0905ea114f39509695965f0ef170",
+    "initial_weights": {
+      "path": "checkpoints/model_final_480dd8.pkl",
+      "sha256": "ae0899c187f60af3d7d00b410766f267754d26dd596c98035dae91029dea8a77"
+    },
+    "training_job": "12029017",
+    "evaluation_job": "12029019",
+    "checkpoint_path": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-d/jobs/train-e100-f000-s2027/attempt-01/training/best/model_best.pth",
+    "checkpoint_sha256": "744e7237849b83607a770f8cd230d37e462bed2edd47ce81e4ba240b09a8c4c8",
+    "validation": {
+      "map": 0.8378781016837947,
+      "map_without_ibuphil_600_mg": 0.893289259067194,
+      "ap50": 0.9186664545575436,
+      "ap75": 0.9186664545575436,
+      "precision": 0.9029126213592233,
+      "recall": 0.9489795918367347,
+      "mean_ms_per_image": 29.09301466308534,
+      "p95_ms_per_image": 29.409367498010397,
+      "best_epoch": 34
+    }
+  }
+}

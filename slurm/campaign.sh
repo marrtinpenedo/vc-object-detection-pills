@@ -15,6 +15,9 @@ if [[ ${1:-} == exp008 ]]; then
     campaign=(--exp008)
     login_backend=cascade
     shift
+elif [[ ${1:-} == exp009-a ]]; then
+    campaign=(--exp009-a)
+    shift
 fi
 mode="${1:?Uso: bash slurm/campaign.sh launch|status|collect|reconcile ...}"
 shift

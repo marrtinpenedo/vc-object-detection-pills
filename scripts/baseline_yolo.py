@@ -79,7 +79,8 @@ class CocoValidator(DetectionValidator):
 
 class YoloPhotometric:
     def __init__(self, spec, seed):
-        self.sampler = PhotometricSampler(spec, seed)
+        # Use an independent worker stream in both photometric cells of a factorial.
+        self.sampler = PhotometricSampler(spec, seed, stream=0x9E3779B97F4A7C15)
 
     def __call__(self, labels):
         gains = self.sampler.sample(get_worker_info())
@@ -159,18 +160,18 @@ class YoloTrainer(DetectionTrainer):
         )
         if counts.tolist() != [expected["ground_truth_by_category"][str(c["original_id"])] for c in self.classes]:
             raise RuntimeError(f"Ultralytics alteró el mapeo de clases de {split}")
-        if mode == "train" and self.photometric is not None:
+        if mode == "train" and (self.photometric is not None or self.geometric is not None):
             transforms = dataset.transforms.transforms
             if [type(transform).__name__ for transform in transforms] != ["LetterBox", "Format"]:
-                raise RuntimeError("EXP-002 requiere la cadena base LetterBox → Format")
-            transforms.insert(0, YoloPhotometric(self.photometric, self.args.seed))
-        if mode == "train" and self.geometric is not None:
-            transforms = dataset.transforms.transforms
-            if [type(transform).__name__ for transform in transforms] != ["LetterBox", "Format"]:
-                raise RuntimeError("La geometría requiere LetterBox → Format")
-            transforms.insert(0, YoloGeometry(self.geometric, self.args.seed))
-            if self.mosaic_probability:
-                transforms.insert(0, YoloMosaic(dataset, self.args.imgsz, self.mosaic_probability))
+                raise RuntimeError("La augmentación del proyecto requiere LetterBox → Format")
+            prefix = []
+            if self.geometric is not None:
+                if self.mosaic_probability:
+                    prefix.append(YoloMosaic(dataset, self.args.imgsz, self.mosaic_probability))
+                prefix.append(YoloGeometry(self.geometric, self.args.seed))
+            if self.photometric is not None:
+                prefix.append(YoloPhotometric(self.photometric, self.args.seed))
+            transforms[:0] = prefix
         return dataset
 
     def get_model(self, cfg=None, weights=None, verbose=True):

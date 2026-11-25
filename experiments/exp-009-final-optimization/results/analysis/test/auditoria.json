@@ -1,0 +1,149 @@
+{
+  "split": "test",
+  "image_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44
+  ],
+  "job_id": "12035833",
+  "slurm": {
+    "sha256": "aa5782a0eb04890a5eaaefde2f808ec7d0e68b07b7f2fb7dfd0b31ac8eb93118",
+    "allocations": {
+      "12035833": {
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      }
+    }
+  },
+  "import_source": {
+    "kind": "local_projection",
+    "source_archive_sha256": "4b48b4268d13f72d7e1048a63a0019979d597456579b1c1acbf5e1ed0435a7f9",
+    "archive_root": "exp-009-final-test",
+    "local_inventory_only": true,
+    "ignored_members": [
+      ".ultralytics/settings.json",
+      "cascade/examples/correct-0.jpg",
+      "cascade/examples/correct-1.jpg",
+      "cascade/examples/correct-2.jpg",
+      "cascade/examples/correct-3.jpg",
+      "cascade/examples/correct-4.jpg",
+      "cascade/examples/failure-18.jpg",
+      "cascade/examples/failure-19.jpg",
+      "cascade/examples/failure-28.jpg",
+      "yolo/examples/correct-0.jpg",
+      "yolo/examples/correct-1.jpg",
+      "yolo/examples/correct-2.jpg",
+      "yolo/examples/correct-4.jpg",
+      "yolo/examples/correct-5.jpg",
+      "yolo/examples/failure-3.jpg"
+    ]
+  },
+  "archive_inventory_sha256": "26657b93ccbc3e27ca53369515e85fd35aa389758e7ad548a5e25e1577268485",
+  "selection_sha256": "8daf1f3fb7f9bcaef4d5ea01a98626f9643cb31d35e107cb7b4c944e3a7e81c7",
+  "deployment_sha256": "af55d8b134f9d90281e000d98d990e9a1b63d06668380f112f834971a16b29aa",
+  "snapshot_sha256": "8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3",
+  "dataset_manifest_sha256": "79987cbeab9737d1377e3f056b745c8f0fb5845eb915ff12c32741b12e43bda9",
+  "coco_sha256": "eda7d1faf0e441fde5a81825b27efc073dba00595d7b4fb5f5fff793f3f5f2d4",
+  "launch": {
+    "job_id": "12035833",
+    "job_name": "pills-evaluate",
+    "submission": "/mnt/netapp2/Home_FT2/home/usc/cursos/curso1014/pills-exp009-c/runtime",
+    "launcher_sha256": {
+      "evaluate.sh": "c158dce6c0882ffbc32be655720e190430fda6b039e1a09a167c1ee20c0c485b",
+      "evaluate.py": "bb82c082a17a455a14e1057b1bfae9fc58eba9ce50d8b95e805da624882e0aef"
+    },
+    "data": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/data/pills-prepared",
+    "dataset_manifest_sha256": "79987cbeab9737d1377e3f056b745c8f0fb5845eb915ff12c32741b12e43bda9",
+    "coco_sha256": "eda7d1faf0e441fde5a81825b27efc073dba00595d7b4fb5f5fff793f3f5f2d4",
+    "split": "test",
+    "checkpoint_kind": "best",
+    "benchmark": true,
+    "warmup": 20,
+    "iterations": 100,
+    "examples": 5,
+    "example_image_ids": null,
+    "runs": {
+      "yolo": {
+        "run": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-d-s2027/attempt-01/training",
+        "backend": "yolo",
+        "python": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/envs/yolo/bin/python",
+        "checkpoint": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-c/jobs/train-d-s2027/attempt-01/training/weights/best.pt",
+        "checkpoint_sha256": "0607143d11c8ed014a7e77ac19dbe9fa297e72fe5c4ad519a9f22ccb9d8e9473",
+        "training_git_head": null,
+        "training_job_id": "12031899",
+        "training_slurm": "COMPLETED|0:0",
+        "imgsz": 640
+      },
+      "cascade": {
+        "run": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-d/jobs/train-e100-f000-s2027/attempt-01/training",
+        "backend": "cascade",
+        "python": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/envs/cascade/bin/python",
+        "checkpoint": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-009-d/jobs/train-e100-f000-s2027/attempt-01/training/best/model_best.pth",
+        "checkpoint_sha256": "744e7237849b83607a770f8cd230d37e462bed2edd47ce81e4ba240b09a8c4c8",
+        "training_git_head": null,
+        "training_job_id": "12029017",
+        "training_slurm": "COMPLETED|0:0",
+        "imgsz": 640
+      }
+    },
+    "selection_sha256": "8daf1f3fb7f9bcaef4d5ea01a98626f9643cb31d35e107cb7b4c944e3a7e81c7"
+  },
+  "benchmark": {
+    "protocol": true,
+    "scope": "decoded BGR host array through resize, tensor transfer, model, native postprocess and host Nx6 array",
+    "hardware": {
+      "job_id": "12035833",
+      "host": "c210-5",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "compute_capability": [
+        8,
+        0
+      ],
+      "cuda_runtime": "12.1",
+      "nvidia_driver": "580.178.04",
+      "cpu": "Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz"
+    }
+  }
+}

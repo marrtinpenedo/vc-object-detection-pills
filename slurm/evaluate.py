@@ -33,6 +33,7 @@ def arguments(argv):
     examples.add_argument("--examples", type=int, help="Máximo por tipo (5); 0 desactiva los ejemplos")
     examples.add_argument("--example-image-id", type=int, action="append", metavar="ID",
                           help="ID COCO de una imagen común a todos los brazos; repetible")
+    parser.add_argument("--selection", type=Path, help="Registro certificado de los dos finalistas")
     parser.add_argument("--check-slurm", action="store_true",
                         help="Exige COMPLETED y 0:0 al último trabajo de entrenamiento con sacct")
 
@@ -118,6 +119,43 @@ def paired_examples(args, truth, output, data):
             (folder / f"{kind}-{ident}.jpg").rename(target)
 
 
+def final_contract(args, data, manifest, truth, runs):
+    from scripts.baseline_data import read_json, sha256
+    from scripts.baseline_metrics import OPERATING_IOU, OPERATING_SCORE
+    from scripts.campaign import verify_source
+    from scripts.verify_baseline import require
+
+    selection = read_json(args.selection)
+    require(selection["c_slurm_accounting_verified"] is True and selection["status"] == "pendiente_sha256_fisico",
+            "La selección final requiere la contabilidad C certificada")
+    require((args.split, args.checkpoint, args.benchmark, args.warmup, args.iterations, args.check_slurm)
+            == ("test", "best", True, 20, 100, True) and set(dict(runs)) == set(BACKENDS)
+            and len(runs) == 2, "Protocolo final distinto del fijado")
+    require(selection["operating_point"] == {"score": OPERATING_SCORE, "iou": OPERATING_IOU},
+            "Punto operativo distinto del fijado")
+    require(len(truth["images"]) == manifest["splits"]["test"]["images"] == 45
+            and len(truth["categories"]) == len(manifest["classes"]) == 8
+            and sha256(data / "manifest.json") == selection["dataset_manifest_sha256"]
+            and sha256(data / "coco" / "test.json") == selection["test_coco_expected_sha256_from_manifest"],
+            "La partición final difiere de los 45 ejemplos y ocho clases fijados")
+    _, snapshot = verify_source(selection["yolo"]["code_snapshot_sha256"])
+    require(snapshot["sha256"]["scripts/evaluate_baseline.py"] == selection["evaluation_entrypoint_sha256"],
+            "Evaluador distinto del fijado")
+    return selection
+
+
+def check_final_weights(selection, name, path, run, status, checkpoint, checkpoint_sha, slurm_job):
+    from scripts.verify_baseline import require
+
+    frozen = selection[name]
+    stride = 1 if name == "yolo" else 79
+    require((Path(frozen["checkpoint_path"]), frozen["checkpoint_sha256"], frozen["training_job"], frozen["recipe"],
+             frozen["validation"]["best_epoch"] * stride) ==
+            (checkpoint, checkpoint_sha, slurm_job, run["config"], status["best_step"])
+            and checkpoint.is_relative_to(path) and run["backend"] == name,
+            f"{name}: el checkpoint físico, su época o su receta difieren del registro fijado")
+
+
 def evaluate(args, legacy):
     # The launcher may be deployed separately. Use the modules of the submission checkout.
     sys.path.insert(0, str(Path.cwd()))
@@ -147,6 +185,8 @@ def evaluate(args, legacy):
     require(set(args.example_image_id or []) <= {image["id"] for image in truth["images"]},
             f"Hay IDs de ejemplo que no pertenecen a {args.split}")
     images = [image["file_name"] for image in truth["images"][:16]]
+    selection = final_contract(args, data, manifest, truth, runs) if args.selection else None
+    selection_hash = sha256(args.selection) if selection else None
 
     entries = {}
     for name, path in runs:
@@ -167,6 +207,8 @@ def evaluate(args, legacy):
                 f"{name}: checkpoint {args.checkpoint} ausente o fuera del entrenamiento")
         checkpoint_sha = verify_run(path, digest)[1] if legacy else sha256(selected)
         train_job = training_job(status)
+        if selection:
+            check_final_weights(selection, name, path, run, status, selected, checkpoint_sha, train_job)
         entries[name] = {
             "run": str(path), "backend": backend, "python": str(python),
             "checkpoint": str(selected), "checkpoint_sha256": checkpoint_sha,
@@ -193,6 +235,7 @@ def evaluate(args, legacy):
         "split": args.split, "checkpoint_kind": args.checkpoint, "benchmark": args.benchmark,
         "warmup": args.warmup, "iterations": args.iterations, "examples": examples,
         "example_image_ids": args.example_image_id, "runs": entries,
+        **({"selection_sha256": selection_hash} if selection else {}),
     })
     common = ["--data", str(data), "--split", args.split, "--checkpoint", args.checkpoint,
               "--warmup", str(args.warmup), "--iterations", str(args.iterations), "--examples", str(examples)]
@@ -211,6 +254,9 @@ def evaluate(args, legacy):
                 and metrics["checkpoint_sha256"] == entry["checkpoint_sha256"],
                 f"{name}: la evaluación no corresponde al checkpoint seleccionado")
         require(metrics["hardware"]["job_id"] == job_id, f"{name}: asignación SLURM distinta")
+        if selection:
+            require(metrics["model_config"] == selection[name]["recipe"] and sha256(args.selection) == selection_hash,
+                    f"{name}: la receta o el registro cambiaron durante la evaluación")
         current = benchmark_signature(metrics, args, [entry["imgsz"]] * 2, images)
         require(signature is None or signature == current, f"{name}: benchmark no comparable")
         signature = current
