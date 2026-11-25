@@ -1,0 +1,9 @@
+[
+  {
+    "step": 1,
+    "changed": {
+      "model.0.conv.weight": true,
+      "model.23.one2one_cv3.0.0.0.conv.weight": true
+    }
+  }
+]

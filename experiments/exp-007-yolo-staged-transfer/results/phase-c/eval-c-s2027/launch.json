@@ -1,0 +1,102 @@
+{
+  "job_id": "12006708",
+  "job_name": "exp007-eval-c-s2027",
+  "submission": "/mnt/netapp2/Home_FT2/home/usc/cursos/curso1014/vc-object-detection-pills-ed7f9a6ef75a",
+  "launcher_sha256": {
+    "evaluate.sh": "c158dce6c0882ffbc32be655720e190430fda6b039e1a09a167c1ee20c0c485b",
+    "evaluate.py": "b1f01212383408a7414eff0c262c440c8b085aab1f726737c1b9de5b23bc505f"
+  },
+  "data": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld/data",
+  "dataset_manifest_sha256": "79987cbeab9737d1377e3f056b745c8f0fb5845eb915ff12c32741b12e43bda9",
+  "coco_sha256": "8da7dc75022c67fe9e4d806559e8110f89a2cbb8850948f1d89ce5208cdead7c",
+  "split": "valid",
+  "checkpoint_kind": "best",
+  "benchmark": true,
+  "warmup": 20,
+  "iterations": 100,
+  "examples": 0,
+  "example_image_ids": [
+    57,
+    61,
+    80
+  ],
+  "runs": {
+    "control": {
+      "run": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld/s2027/control/train",
+      "backend": "yolo",
+      "python": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/envs/yolo/bin/python",
+      "checkpoint": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld/s2027/control/train/weights/best.pt",
+      "checkpoint_sha256": "84da05d6bdc1067a27a28e3684482873fd98147a196eac5eae40d84687a3c6c3",
+      "training_git_head": null,
+      "training_job_id": "12006693",
+      "training_slurm": "COMPLETED|0:0",
+      "imgsz": 640
+    },
+    "freeze-5": {
+      "run": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld-extension/s2027/freeze-5/train",
+      "backend": "yolo",
+      "python": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/envs/yolo/bin/python",
+      "checkpoint": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld-extension/s2027/freeze-5/train/weights/best.pt",
+      "checkpoint_sha256": "a19a290383f1d6668275b356215000423dafcc50ec812af0fd3fdbd0646c2ded",
+      "training_git_head": null,
+      "training_job_id": "12006703",
+      "training_slurm": "COMPLETED|0:0",
+      "imgsz": 640
+    },
+    "freeze-10": {
+      "run": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld-extension/s2027/freeze-10/train",
+      "backend": "yolo",
+      "python": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/envs/yolo/bin/python",
+      "checkpoint": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld-extension/s2027/freeze-10/train/weights/best.pt",
+      "checkpoint_sha256": "f727e1dc5fec9e86bad0251aa8df5b1930a508cbd3733f9372ae1ffc5cb28a32",
+      "training_git_head": null,
+      "training_job_id": "12006704",
+      "training_slurm": "COMPLETED|0:0",
+      "imgsz": 640
+    },
+    "freeze-15": {
+      "run": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld/s2027/freeze-15/train",
+      "backend": "yolo",
+      "python": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/envs/yolo/bin/python",
+      "checkpoint": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld/s2027/freeze-15/train/weights/best.pt",
+      "checkpoint_sha256": "0bf141f565409f0aa1950cfee5b1ffe460955469ece12afa21e6d24ad8502e2d",
+      "training_git_head": null,
+      "training_job_id": "12006694",
+      "training_slurm": "COMPLETED|0:0",
+      "imgsz": 640
+    },
+    "freeze-20": {
+      "run": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld-extension/s2027/freeze-20/train",
+      "backend": "yolo",
+      "python": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/envs/yolo/bin/python",
+      "checkpoint": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld-extension/s2027/freeze-20/train/weights/best.pt",
+      "checkpoint_sha256": "f23f6515c39897c83e53ebcdf75c085ee991eca4f69d44913bb49bde6413780e",
+      "training_git_head": null,
+      "training_job_id": "12006705",
+      "training_slurm": "COMPLETED|0:0",
+      "imgsz": 640
+    },
+    "freeze-25": {
+      "run": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld-extension/s2027/freeze-25/train",
+      "backend": "yolo",
+      "python": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/envs/yolo/bin/python",
+      "checkpoint": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld-extension/s2027/freeze-25/train/weights/best.pt",
+      "checkpoint_sha256": "8151683e42be644b6fee4b9457f8fac5a1f575f9b1ba65f1294601842b4029eb",
+      "training_git_head": null,
+      "training_job_id": "12006706",
+      "training_slurm": "COMPLETED|0:0",
+      "imgsz": 640
+    },
+    "freeze-30": {
+      "run": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld-extension/s2027/freeze-30/train",
+      "backend": "yolo",
+      "python": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/envs/yolo/bin/python",
+      "checkpoint": "/mnt/netapp2/Store_uni/home/usc/cursos/curso1014/pills-baseline/results/exp-007-yolo-staged-HhuHld-extension/s2027/freeze-30/train/weights/best.pt",
+      "checkpoint_sha256": "e5530c8a54a05484b47dfa7a49dec1bda237222c2acfb4db3fa628a6e84bb5f0",
+      "training_git_head": null,
+      "training_job_id": "12006707",
+      "training_slurm": "COMPLETED|0:0",
+      "imgsz": 640
+    }
+  }
+}

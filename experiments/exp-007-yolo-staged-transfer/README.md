@@ -1,6 +1,6 @@
 # EXP-007 · Fine-tuning por etapas de YOLOv10-S
 
-**Estado** Fase A verificada. B y C pendientes.
+**Estado** Cerrado en `valid`. B confirma `freeze-15`. La ampliación C selecciona `freeze-20` y deja `freeze-30` como alternativa de menor coste.
 
 [Hallazgos](findings.md) · [Inventario de evidencias](results/README.md)
 
@@ -60,15 +60,15 @@ Examinar la consistencia por clase y el benchmark al aplicar la decisión. Esta 
 
 | Brazo | Épocas congelado | Épocas descongelado | Semilla 2026 | Semilla 2027 | Semilla 2028 |
 | --- | ---: | ---: | --- | --- | --- |
-| control | 0 | 30 | A, hecho | B | B |
-| freeze-5 | 5 | 25 | A, hecho | C | C |
-| freeze-10 | 10 | 20 | A, hecho | C | C |
-| freeze-15 | 15 | 15 | A, hecho | B | B |
+| control | 0 | 30 | A | B | B |
+| freeze-5 | 5 | 25 | A | C | C |
+| freeze-10 | 10 | 20 | A | C | C |
+| freeze-15 | 15 | 15 | A | B | B |
 | [freeze-20](../../configs/experiments/yolo-freeze-20.json) | 20 | 10 | C | C | C |
 | [freeze-25](../../configs/experiments/yolo-freeze-25.json) | 25 | 5 | C | C | C |
 | [freeze-30](../../configs/experiments/yolo-freeze-30.json) | 30 | 0 | C | C | C |
 
-Son 21 entrenamientos únicos, cuatro recuperados de A, cuatro pendientes en B y 13 pendientes en C. En C se evalúan siete checkpoints por semilla en una misma asignación, con el protocolo común y solo en `valid`. Los AP, curvas PR y punto operativo de los checkpoints reutilizados deben reproducir exactamente los de A o B. Si difieren, se detiene el análisis para investigar. Las latencias de una asignación previa se conservan aparte.
+Se completaron 21 entrenamientos únicos, cuatro de A, cuatro de B y 13 de C. En C se evaluaron siete checkpoints por semilla en una misma asignación, con el protocolo común y solo en `valid`. El analizador exige reproducir exactamente los AP, las curvas PR y el punto operativo de los checkpoints reutilizados de A y B. Las latencias de las asignaciones previas se conservan aparte.
 
 C considera candidatas las variantes con Δ medio de mAP oficial ≥ 0,01, Δ medio de mAP de siete clases ≥ 0, mejora oficial en al menos dos semillas y pérdida media de recall ≤ 0,02 frente al control. Se ordenan por mAP oficial medio, mAP de siete clases medio, recall medio y menor duración. El resultado es una selección descriptiva con las mismas semillas usadas para buscar la duración. La confirmación independiente de la decisión exploratoria sobre `freeze-15` sigue siendo B.
 
@@ -87,6 +87,8 @@ A y B usan el commit `ed7f9a6ef75afa9c66673bf8f03d34be2fa0c228` para entrenar y 
 Los 13 entrenamientos nuevos de C usan el checkout de la ampliación. Las evaluaciones de C se ejecutan con el código histórico para que sean comparables con A y B. Antes de enviar, el plan verifica todas las huellas de scripts, lanzadores y configuraciones. Autoriza solamente el cambio de dos líneas que acepta N igual al presupuesto y los tres JSON que añaden duraciones. El entrenador, la regla de transición, el predictor y el evaluador conservan sus bytes. La condición N < presupuesto sigue siendo válida para los cuatro brazos originales y el control conserva la ruta sin congelación. El análisis comprueba además esas huellas contra los blobs de Git. [Política de revisiones](provenance.py)
 
 ### Desplegar y encolar la campaña
+
+La campaña de ampliación ya terminó. Sus 23 trabajos completados corresponden a 17 entrenamientos, cinco evaluaciones y el smoke de congelación permanente. El procedimiento siguiente documenta su lanzamiento. Para verificar las evidencias sin ejecutar modelos, usar la reproducción local.
 
 Ejecutar en Bash desde el clon local después de versionar la revisión aprobada. Definir `CESGA_SSH` como en la [guía de transferencia](../../docs/cesga.md#transferencia-y-actualización-del-código). Se transfiere un checkout nuevo y se conserva intacta la copia histórica.
 
@@ -128,7 +130,7 @@ Para consultar el avance, usar `sacct -j ID --format=JobID,JobName,State,ExitCod
 
 ## Recuperación y reproducción local
 
-Recuperar B y C por separado con el inventario. Definir `PHASE_B` y `PHASE_C` con las rutas locales a las descargas verificadas o a los archivos publicados. Sin esas variables se reproduce A. Con solo `PHASE_B` se reproducen A y la decisión de B. Ejecutar el bloque en Bash desde el clon local con `valid/_annotations.coco.json` del dataset original.
+Ejecutar en Bash desde el clon local con `valid/_annotations.coco.json` del dataset original. El bloque utiliza las tres fases archivadas. `PHASE_B` y `PHASE_C` permiten utilizar las descargas brutas verificadas.
 
 ```bash
 (
@@ -137,15 +139,8 @@ Recuperar B y C por separado con el inventario. Definir `PHASE_B` y `PHASE_C` co
   base="$root/experiments/exp-007-yolo-staged-transfer/results"
   a="$base/phase-a"
   data=$(realpath "${EXP_DATASET:-data/pills-sxdht}")
-  confirmation=()
-  if [[ -n ${PHASE_B:-} ]]; then
-    b=$(realpath "$PHASE_B")
-    confirmation=(--confirmation "$b")
-  fi
-  if [[ -n ${PHASE_C:-} ]]; then
-    : "${PHASE_B:?Para reproducir C se requieren los artefactos de B}"
-    c=$(realpath "$PHASE_C")
-  fi
+  b=$(realpath "${PHASE_B:-$base/phase-b}")
+  c=$(realpath "${PHASE_C:-$base/phase-c}")
   old=$(mktemp -d)
   new=$(mktemp -d)
   trap 'rm -rf -- "$old" "$new"' EXIT
@@ -156,15 +151,13 @@ Recuperar B y C por separado con el inventario. Definir `PHASE_B` y `PHASE_C` co
       --with pillow==10.4.0 --with matplotlib==3.9.4 python -m)
   export MPLBACKEND=Agg
   "${py[@]}" experiments.exp-007-yolo-staged-transfer.analyze \
-    --source "$a" "${confirmation[@]}" --original-checkout "$old" --data "$data" --output "$out/original"
-  if [[ -n ${c:-} ]]; then
-    revision=$(git -C "$root" rev-parse --verify "$(cat "$c/source-commit")^{commit}")
-    git -C "$root" archive "$revision" | tar -x -C "$new"
-    cd "$new"
-    "${py[@]}" experiments.exp-007-yolo-staged-transfer.analyze_c --source "$a" \
-      --confirmation "$b" --extension "$c" --original-checkout "$old" --git-repo "$root" \
-      --data "$data" --output "$out/c"
-  fi
+    --source "$a" --confirmation "$b" --original-checkout "$old" --data "$data" --output "$out/original"
+  revision=$(git -C "$root" rev-parse --verify "$(cat "$c/source-commit")^{commit}")
+  git -C "$root" archive "$revision" | tar -x -C "$new"
+  cd "$new"
+  "${py[@]}" experiments.exp-007-yolo-staged-transfer.analyze_c --source "$a" \
+    --confirmation "$b" --extension "$c" --original-checkout "$old" --git-repo "$root" \
+    --data "$data" --output "$out/c"
   printf '%s\n' "$out"
 )
 ```

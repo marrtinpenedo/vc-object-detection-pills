@@ -9,7 +9,7 @@
 | EXP-003 | Augmentación geométrica moderada | Planificado, sujeto a viabilidad |
 | EXP-004 | Ensemble de YOLOv10-S y Cascade R-CNN | Propuesto con predicciones guardadas |
 | [EXP-006](exp-006-yolo-warmup/README.md) | YOLOv10-S, duración del warm-up con LR inicial fijo | `cerrado` en fase A. Se conserva el warm-up de referencia · [hallazgos](exp-006-yolo-warmup/findings.md) |
-| [EXP-007](exp-007-yolo-staged-transfer/README.md) | YOLOv10-S, duración de la congelación del backbone | A verificada, B y C pendientes · [hallazgos](exp-007-yolo-staged-transfer/findings.md) |
+| [EXP-007](exp-007-yolo-staged-transfer/README.md) | YOLOv10-S, duración de la congelación del backbone | `cerrado` en `valid`. B confirma 15 épocas y C selecciona 20 · [hallazgos](exp-007-yolo-staged-transfer/findings.md) |
 
 [Metodología de los baselines](baseline/README.md) · [Resultados, diagnósticos y decisiones](baseline/findings.md)
 
