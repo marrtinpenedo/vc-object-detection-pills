@@ -136,7 +136,7 @@ def history_diagnostics(rows, backend):
                "post_best_epochs": sum("val/map" in row for row in tail)}
 
 
-def plot_history(rows, backend, output):
+def plot_history(rows, backend, output, labels=None):
     from matplotlib import pyplot as plt
 
     if backend == "yolo":
@@ -156,7 +156,7 @@ def plot_history(rows, backend, output):
             points = [(row["step"] / result["stride"], factor * row[key])
                       for row in result["history"] if key in row]
             if points:
-                ax.plot(*zip(*points), label=arm.upper(), color=ARM_COLORS[arm], linewidth=1.3)
+                ax.plot(*zip(*points), label=labels[arm] if labels else arm.upper(), color=ARM_COLORS[arm], linewidth=1.3)
             if key == "val/map":
                 values = result["values"]
                 ax.scatter(values["best_epoch"], 100 * values["best_validation_map_history"],

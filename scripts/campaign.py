@@ -1,4 +1,4 @@
-"""Bundle, launch, monitor and export the EXP-003–005 campaign."""
+"""Bundle, launch, monitor and export reproducible GPU campaigns."""
 import argparse
 import fcntl
 import hashlib
@@ -16,6 +16,7 @@ from scripts.baseline_data import read_json, sha256, write_json
 from scripts.baseline_run import REPO, load_config
 
 PLAN = Path("configs/campaign/exp-003-005.json")
+EXP008 = Path("configs/campaign/exp-008.json")
 BATCH = Path("slurm/campaign.sh")
 SNAPSHOT = Path("snapshot.json")
 LEDGER = Path("jobs.json")
@@ -27,9 +28,9 @@ FAILED = {"BOOT_FAIL", "CANCELLED", "DEADLINE", "FAILED", "NODE_FAIL", "OUT_OF_M
           "PREEMPTED", "REVOKED", "TIMEOUT"}
 EXPORT_FILES = {
     "preflight": ("run.json", "status.json", "initialization.json", "ultralytics_runtime.json",
-                  "cascade_runtime.json", "detectron2.yaml", "weight_transfer.json"),
+                  "cascade_runtime.json", "detectron2.yaml", "weight_transfer.json", "cascade_freezing.json", "smoke.json"),
     "train": ("run.json", "status.json", "history.csv", "ultralytics_runtime.json", "cascade_runtime.json",
-              "detectron2.yaml", "weight_transfer.json", "parameter_updates.json", "best.sha256"),
+              "detectron2.yaml", "weight_transfer.json", "parameter_updates.json", "best.sha256", "cascade_freezing.json"),
     "eval": ("metrics.json", "predictions.json", "pr_curves.json"),
 }
 
@@ -39,8 +40,8 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def bundle(output):
-    sources = [PLAN, BATCH, Path("tests/test_geometry.py"),
+def bundle(output, plan_path=PLAN):
+    sources = [plan_path, BATCH, Path("tests/test_geometry.py"),
                *(Path("configs/baseline") / f"{backend}.json" for backend in BACKENDS),
                *(file.relative_to(REPO) for file in sorted((REPO / "scripts").glob("*.py")))]
     identity = {"base_commit": subprocess.check_output(
@@ -74,13 +75,17 @@ def verify_source(expected=None):
 
 def condition_config(plan, condition):
     backend = condition["backend"]
-    spec = load_config(backend, None, {"epochs": condition["epochs"], "seed": plan["seed"]})
-    if condition["geometric"]:
+    overrides = {"epochs": condition["epochs"], "seed": plan["seed"]}
+    if "freeze_backbone_epochs" in condition:
+        require(plan.get("experiment") == "EXP-008" and backend == "cascade", "Freezing fuera de EXP-008")
+        overrides["freeze_backbone_epochs"] = condition["freeze_backbone_epochs"]
+    spec = load_config(backend, None, overrides)
+    if condition.get("geometric"):
         from scripts.geometric import validate_geometric
 
         validate_geometric(plan["geometric"])
         spec["geometric"] = plan["geometric"]
-    if condition["mosaic"]:
+    if condition.get("mosaic"):
         probability = plan["mosaic_probability"]
         require(backend == "yolo" and condition["geometric"] and 0 < probability <= 1,
                 "Mosaic requiere YOLO y la política geométrica")
@@ -90,10 +95,12 @@ def condition_config(plan, condition):
 
 def graph(plan):
     nodes = {}
-    for backend in BACKENDS:
+    for backend in plan["packages"]:
         nodes[f"preflight-{backend}"] = {"stage": "preflight", "backend": backend, "requires": None,
                                         "probes": [c["name"] for c in plan["conditions"]
                                                    if c["backend"] == backend and c["epochs"] == 30]}
+    if plan.get("experiment") == "EXP-008":
+        nodes["preflight-cascade"]["probes"] = ["e030-f000", "smoke"]
     for condition in plan["conditions"]:
         name, backend = condition["name"], condition["backend"]
         nodes[f"train-{name}"] = {"stage": "train", "backend": backend, "condition": name,
@@ -103,9 +110,9 @@ def graph(plan):
     return nodes
 
 
-def deployment(work):
+def deployment(work, plan_path=PLAN):
     digest, _ = verify_source()
-    plan = read_json(REPO / PLAN)
+    plan = read_json(REPO / plan_path)
     data = work / plan["dataset_relpath"]
     require(sha256(data / "manifest.json") == plan["dataset_manifest_sha256"]
             and sha256(data / "coco/valid.json") == plan["valid_coco_sha256"], "Datos preparados inesperados")
@@ -204,8 +211,8 @@ def disposition(root, node, record, states, manifest):
     return "UNKNOWN"
 
 
-def launch(work, root, retry=False, failed_yolo_preflight=None):
-    current = deployment(work)
+def launch(work, root, retry=False, failed_yolo_preflight=None, plan_path=PLAN):
+    current = deployment(work, plan_path)
     manifest = current
     recovery = failed_yolo_preflight is not None
     require(not recovery or (root / "manifest.json").is_file(), "La recuperación YOLO requiere una campaña existente")
@@ -270,10 +277,11 @@ def launch(work, root, retry=False, failed_yolo_preflight=None):
             attempts.append(entry)
             # Persist intent before sbatch. A transport failure can be ambiguous.
             write_json(ledger_path, ledger)
+            campaign_option = ["exp008"] if plan_path == EXP008 else []
             command = ["sbatch", "--parsable", "--export=NONE", "--no-requeue", f"--job-name={job_name}",
                        "--time=" + ("06:00:00" if node["stage"] == "train" else "01:00:00"),
                        f"--output={root}/logs/%x-%j.out", f"--error={root}/logs/%x-%j.err",
-                       *dependencies, str(REPO / BATCH), "job", str(work), node["backend"], str(root),
+                       *dependencies, str(REPO / BATCH), *campaign_option, "job", str(work), node["backend"], str(root),
                        name, str(attempt)]
             result = subprocess.run(command, cwd=REPO, text=True, capture_output=True)
             if result.returncode or not re.fullmatch(r"\d+(?:;[\w.-]+)?", result.stdout.strip()):
@@ -295,7 +303,7 @@ def run_module(module, *args, **kwargs):
     subprocess.run([sys.executable, "-m", module, *map(str, args)], cwd=REPO, check=True, **kwargs)
 
 
-def job(work, backend, root, name, attempt):
+def job(work, backend, root, name, attempt, plan_path=PLAN):
     ident = os.environ.get("SLURM_JOB_ID")
     require(ident and ident.isdecimal(), "Usa sbatch para los trabajos GPU")
     manifest = read_json(root / "manifest.json")
@@ -309,7 +317,7 @@ def job(work, backend, root, name, attempt):
     snapshot_file(root, manifest, digest)
     verify_source(digest)
     plan, data = manifest["plan"], Path(manifest["data"])
-    require(plan == read_json(REPO / PLAN) and manifest["nodes"] == graph(plan),
+    require(plan == read_json(REPO / plan_path) and manifest["nodes"] == graph(plan),
             "El manifiesto de lanzamiento difiere del snapshot")
     require(data == work / plan["dataset_relpath"]
             and sha256(data / "manifest.json") == plan["dataset_manifest_sha256"]
@@ -338,11 +346,17 @@ def job(work, backend, root, name, attempt):
         require(package_version(package) == version, f"Se requiere {package}=={version}")
         if backend == "cascade":
             import detectron2._C  # noqa: F401
-        checked_env = {**os.environ, "PYTHONPATH": str(REPO / "tests")}
-        native_test = ("YoloGeometryLoaderTest" if backend == "yolo" else "CascadeGeometryLoaderTest")
-        run_module("test_geometry", native_test, env=checked_env)
+        if plan_path != EXP008:
+            checked_env = {**os.environ, "PYTHONPATH": str(REPO / "tests")}
+            native_test = ("YoloGeometryLoaderTest" if backend == "yolo" else "CascadeGeometryLoaderTest")
+            run_module("test_geometry", native_test, env=checked_env)
         for condition in node["probes"]:
-            train(root, manifest, condition, backend, data, weights, output / condition, initialize=True)
+            if condition == "smoke" and plan_path == EXP008:
+                require(sha256(weights) == plan["weights"][backend]["sha256"], "Pesos COCO alterados")
+                run_module("scripts.cascade_staged_smoke", "--data", data, "--weights", weights, "--output", output / "smoke")
+                require(read_json(output / "smoke/smoke.json")["status"] == "complete", "Smoke sin transición")
+            else:
+                train(root, manifest, condition, backend, data, weights, output / condition, initialize=True)
     elif node["stage"] == "train":
         train(root, manifest, node["condition"], backend, data, weights, output / "training")
     else:
@@ -468,6 +482,7 @@ def reconcile(root, name, job_id, confirmed_not_submitted):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--exp008", action="store_true", help="Campaña de freezing Cascade")
     subs = parser.add_subparsers(dest="mode", required=True)
     pack = subs.add_parser("bundle")
     pack.add_argument("output", type=Path)
@@ -494,19 +509,21 @@ def main():
     sub.add_argument("name")
     sub.add_argument("attempt", type=int)
     args = parser.parse_args()
+    plan_path = EXP008 if args.exp008 else PLAN
     if args.mode == "bundle":
-        bundle(args.output)
+        bundle(args.output, plan_path)
         return
     if args.mode == "plan":
-        plan = read_json(REPO / PLAN)
+        plan = read_json(REPO / plan_path)
         print(json.dumps({"plan": plan, "nodes": graph(plan)}, indent=2))
         return
     work = args.work.resolve()
-    root = args.root.resolve() if args.root else work / "results/campaign-003-005"
+    default_root = "results/exp-008-freezing" if args.exp008 else "results/campaign-003-005"
+    root = args.root.resolve() if args.root else work / default_root
     if args.mode == "launch":
-        launch(work, root, args.retry_failed)
+        launch(work, root, args.retry_failed, plan_path=plan_path)
     elif args.mode == "recover-yolo":
-        require(args.failed_preflight.isdecimal(), "ID SLURM inválido")
+        require(not args.exp008 and args.failed_preflight.isdecimal(), "Recuperación YOLO incompatible")
         launch(work, root, retry=True, failed_yolo_preflight=args.failed_preflight)
     elif args.mode == "status":
         status(root)
@@ -515,7 +532,7 @@ def main():
     elif args.mode == "reconcile":
         reconcile(root, args.node, args.job_id, args.confirmed_not_submitted)
     else:
-        job(work, args.backend, root, args.name, args.attempt)
+        job(work, args.backend, root, args.name, args.attempt, plan_path)
 
 
 if __name__ == "__main__":

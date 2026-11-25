@@ -192,9 +192,10 @@ class EpochValidation(HookBase):
         self.best_step = state_dict["best_step"]
 
     def before_train(self):
-        self.updates = UpdateCheck(
-            self.trainer.model, self.output, ("backbone.bottom_up.", "roi_heads.box_predictor.0.cls_score."),
-        )
+        prefixes = ("backbone.bottom_up.", "roi_heads.box_predictor.0.cls_score.")
+        if isinstance(self.trainer, StagedCascadeTrainer):
+            prefixes = ("backbone.fpn_lateral", "proposal_generator.", prefixes[1])
+        self.updates = UpdateCheck(self.trainer.model, self.output, prefixes)
 
     def after_step(self):
         step = self.trainer.iter + 1
@@ -319,6 +320,21 @@ class CascadeTrainer(DefaultTrainer):
         return CascadeEvaluator(dataset_name)
 
 
+class CascadeFreezeHook(HookBase):
+    def before_step(self):
+        self.trainer.freeze_audit.before_step(self.trainer)
+
+    def after_step(self):
+        self.trainer.freeze_audit.after_step(self.trainer)
+
+
+class StagedCascadeTrainer(CascadeTrainer):
+    def build_hooks(self):
+        ordered = super().build_hooks()
+        ordered.insert(2, CascadeFreezeHook())
+        return ordered
+
+
 def make_predictor(cfg, model):
     resize = T.ResizeShortestEdge(
         [cfg.INPUT.MIN_SIZE_TEST], cfg.INPUT.MAX_SIZE_TEST, sample_style="choice",
@@ -359,7 +375,9 @@ def train(args, spec, manifest):
     if args.resume and (not effective.is_file() or effective.read_text(encoding="utf-8") != cfg.dump()):
         raise ValueError("La configuración efectiva de Detectron2 cambió al reanudar")
     effective.write_text(cfg.dump(), encoding="utf-8")
-    trainer = CascadeTrainer(cfg, (args.pause_after or 0) * iterations)
+    freeze = spec.get("freeze_backbone_epochs", 0)
+    trainer_type = StagedCascadeTrainer if freeze else CascadeTrainer
+    trainer = trainer_type(cfg, (args.pause_after or 0) * iterations)
     if args.resume:
         if not trainer.checkpointer.has_checkpoint() or not Path(trainer.checkpointer.get_checkpoint_file()).is_file():
             raise FileNotFoundError("Falta el checkpoint local indicado por last_checkpoint")
@@ -376,13 +394,19 @@ def train(args, spec, manifest):
 
     inventory = parameters(trainer.model)
     if any(p["name"].startswith("backbone.") for p in inventory["frozen"]):
-        raise RuntimeError("Hay parámetros del backbone Cascade congelados")
+        raise RuntimeError("Hay parámetros del backbone Cascade congelados antes de la intervención")
+    if freeze:
+        from scripts.cascade_staged import CascadeFreeze
+
+        trainer.freeze_audit = CascadeFreeze(trainer, args.output, freeze, iterations)
+        inventory = parameters(trainer.model)
     if trainer.model.roi_heads.num_classes != len(manifest["classes"]) or cfg.MODEL.MASK_ON:
         raise RuntimeError("Cabeza Cascade incorrecta")
     write_json(args.output / "parameters.json", inventory)
     write_json(args.output / "cascade_runtime.json", {
         "official_checkpoint": official_url, "iterations_per_epoch": iterations, "max_iter": cfg.SOLVER.MAX_ITER,
         "effective_batch": cfg.SOLVER.IMS_PER_BATCH, "warmup_iters": cfg.SOLVER.WARMUP_ITERS,
+        **({"freeze_backbone_epochs": freeze} if freeze else {}),
     })
     if args.initialize:
         from detectron2.data.detection_utils import read_image
@@ -396,6 +420,8 @@ def train(args, spec, manifest):
         if result.ndim != 2 or result.shape[1] != 6 or not np.isfinite(result).all():
             raise RuntimeError("Salida de inferencia Cascade inválida")
         model.train()
+        if freeze:
+            model.backbone.bottom_up.eval()
         with EventStorage(0):
             losses = model(batch)
         loss = sum(losses.values())
@@ -403,7 +429,8 @@ def train(args, spec, manifest):
             raise RuntimeError("Pérdida Cascade no finita")
         loss.backward()
         gradients = check_gradients(torch, model)
-        for prefix in ("backbone.", "roi_heads.box_predictor.", "proposal_generator."):
+        backbone = "backbone.fpn_lateral" if freeze else "backbone."
+        for prefix in (backbone, "roi_heads.box_predictor.", "proposal_generator."):
             if not any(name.startswith(prefix) and value == "nonzero" for name, value in gradients.items()):
                 raise RuntimeError(f"Cascade: faltan gradientes útiles en {prefix}")
         write_json(args.output / "initialization.json", {

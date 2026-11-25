@@ -88,7 +88,9 @@ def verify_runtime(folder, backend, spec, n_train):
                 and not cfg["TEST"]["AUG"]["ENABLED"] and cfg["TEST"]["EVAL_PERIOD"] == iterations
                 and cfg["SEED"] == spec["seed"] and cfg["DATASETS"]["TRAIN"] == ["pills_baseline_train"]
                 and cfg["DATASETS"]["TEST"] == ["pills_baseline_valid"] and cfg["MODEL"]["ROI_HEADS"]["NUM_CLASSES"] == 8
-                and not cfg["MODEL"]["MASK_ON"] and summary["max_iter"] == solver["MAX_ITER"], f"Receta efectiva: {folder}")
+                and not cfg["MODEL"]["MASK_ON"] and summary["max_iter"] == solver["MAX_ITER"]
+                and summary.get("freeze_backbone_epochs") == spec.get("freeze_backbone_epochs"),
+                f"Receta efectiva: {folder}")
         del solver["MAX_ITER"], cfg["OUTPUT_DIR"]
         image.pop("GEOMETRIC", None)
         effective = cfg
@@ -125,6 +127,8 @@ def evaluate_condition(root, manifest, snapshots, ledger, states, condition, tru
     evaluated = job_record(root, digest, evaluation_name, ev_job)
     require(probe and training and evaluated, f"Faltan recibos de la cadena: {name}")
     for initialized in manifest["nodes"][probe_name]["probes"]:
+        if plan.get("experiment") == "EXP-008" and initialized == "smoke":
+            continue  # EXP-008 verifies the audit of the real optimizer steps separately.
         folder = probe / initialized
         status = read_json(folder / "status.json")
         run = read_json(folder / "run.json")

@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "seed": 2026,
+  "dataset": "Francesco/pills-sxdht",
+  "dataset_relpath": "data/pills-prepared",
+  "dataset_manifest_sha256": "79987cbeab9737d1377e3f056b745c8f0fb5845eb915ff12c32741b12e43bda9",
+  "valid_coco_sha256": "8da7dc75022c67fe9e4d806559e8110f89a2cbb8850948f1d89ce5208cdead7c",
+  "evaluation": {
+    "split": "valid",
+    "checkpoint": "best",
+    "warmup": 20,
+    "iterations": 100
+  },
+  "experiment": "EXP-008",
+  "weights": {
+    "cascade": {
+      "path": "checkpoints/model_final_480dd8.pkl",
+      "sha256": "ae0899c187f60af3d7d00b410766f267754d26dd596c98035dae91029dea8a77"
+    }
+  },
+  "packages": {
+    "cascade": [
+      "detectron2",
+      "0.6"
+    ]
+  },
+  "conditions": [
+    {
+      "name": "e030-f000",
+      "backend": "cascade",
+      "epochs": 30
+    },
+    {
+      "name": "e030-f010",
+      "backend": "cascade",
+      "epochs": 30,
+      "freeze_backbone_epochs": 10
+    },
+    {
+      "name": "e030-f020",
+      "backend": "cascade",
+      "epochs": 30,
+      "freeze_backbone_epochs": 20
+    },
+    {
+      "name": "e030-f030",
+      "backend": "cascade",
+      "epochs": 30,
+      "freeze_backbone_epochs": 30
+    },
+    {
+      "name": "e100-f000",
+      "backend": "cascade",
+      "epochs": 100
+    },
+    {
+      "name": "e100-f020",
+      "backend": "cascade",
+      "epochs": 100,
+      "freeze_backbone_epochs": 20
+    },
+    {
+      "name": "e100-f050",
+      "backend": "cascade",
+      "epochs": 100,
+      "freeze_backbone_epochs": 50
+    },
+    {
+      "name": "e100-f100",
+      "backend": "cascade",
+      "epochs": 100,
+      "freeze_backbone_epochs": 100
+    }
+  ]
+}

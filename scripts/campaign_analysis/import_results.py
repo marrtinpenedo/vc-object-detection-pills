@@ -32,7 +32,7 @@ def import_results(source, target):
     target.parent.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix=".import-campaign-", dir=target.parent) as tmp:
         staged = Path(tmp)
-        with tarfile.open(source, "r:gz") as tar:
+        with tarfile.open(source, "r:*") as tar:
             names = set()
             for entry in tar:
                 name = Path(entry.name)
