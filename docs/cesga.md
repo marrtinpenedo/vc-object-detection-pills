@@ -275,6 +275,11 @@ La interfaz posicional `sbatch slurm/evaluate.sh DATOS RUN_CASCADE RUN_YOLO SALI
 
 Para evaluar desde una revisión histórica, puede desplegar juntos `evaluate.sh` y `evaluate.py` en una carpeta nueva. Envíe el trabajo desde la raíz del código histórico, con `PILLS_EVAL_LAUNCHER_DIR` exportada y con la ruta absoluta del lanzador en `sbatch`. El evaluador, el verificador y los hashes de `scripts/*.py` proceden de esa raíz. Conserve la carpeta del lanzador durante el trabajo. [Ejemplo con EXP-006](../experiments/exp-006-yolo-warmup/README.md#evaluar-sobre-la-misma-gpu)
 
+## Campañas reproducibles
+
+- [EXP-003 a EXP-005](campaigns/exp-003-005/README.md) registra el lanzamiento, los artefactos y la recuperación de YOLO.
+- [EXP-008](campaigns/exp-008.md) conserva el despliegue histórico, el preflight de Cascade y la exportación selectiva para el análisis local.
+
 ## Recuperar resultados
 
 Desde la raíz del proyecto en CESGA, indique las dos ejecuciones completas y su evaluación conjunta, todas bajo `$BASELINE_RESULTS`. El exportador comprueba el ZIP antes de publicarlo. Incluye los informes, historiales, gráficas, predicciones y hasta cinco ejemplos correctos y cinco fallidos por detector. Los checkpoints y logs se conservan en CESGA.
