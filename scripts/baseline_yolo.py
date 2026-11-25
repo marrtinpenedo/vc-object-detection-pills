@@ -10,7 +10,7 @@ import numpy as np
 import torch
 import ultralytics
 from torch.utils.data import get_worker_info
-from ultralytics.data.augment import LetterBox
+from ultralytics.data.augment import LetterBox, Mosaic
 from ultralytics.data.dataset import YOLODataset
 from ultralytics.models.yolo.detect import DetectionTrainer, DetectionValidator
 from ultralytics.nn.tasks import attempt_load_one_weight
@@ -22,6 +22,7 @@ from scripts.baseline_run import (
     PauseTraining, UpdateCheck, check_gradients, parameters, publish_copy, save_history,
 )
 from scripts.photometric import PhotometricSampler, adjust_luminance
+from scripts.geometric import GeometrySampler, warp
 from scripts.yolo_staged import StagedBackbone, layout
 
 VERSION = "8.3.161"
@@ -87,12 +88,50 @@ class YoloPhotometric:
         return labels
 
 
+class YoloMosaic:
+    def __init__(self, dataset, size, probability):
+        self.mosaic = Mosaic(dataset, imgsz=size, p=probability, n=4)
+        # The baseline loader does not maintain the native augmentation image buffer.
+        self.mosaic.buffer_enabled = False
+
+    def __call__(self, labels):
+        labels = self.mosaic(labels)
+        if labels.pop("mosaic_border", None) is not None:
+            # Keep the full native canvas for LetterBox, and the same keys when
+            # collating with non-Mosaic samples. Train has no inverse ratio/pad.
+            labels["ratio_pad"] = None
+        return labels
+
+
+class YoloGeometry:
+    def __init__(self, spec, seed):
+        self.sampler = GeometrySampler(spec, seed)
+
+    def __call__(self, labels):
+        image = labels["img"]
+        height, width = image.shape[:2]
+        instances = labels["instances"]
+        instances.convert_bbox(format="xyxy")
+        instances.denormalize(width, height)
+        sample = self.sampler.sample(width, height, instances.bboxes, get_worker_info())
+        if sample is not None:
+            matrix, boxes = sample
+            labels["img"] = warp(image, matrix)
+            instances.update(bboxes=boxes.astype(np.float32))
+        return labels
+
+
 class YoloTrainer(DetectionTrainer):
-    def __init__(self, args, truth, classes, summary, photometric=None):
+    geometric = None
+    mosaic_probability = 0.0
+
+    def __init__(self, args, truth, classes, summary, photometric=None, geometric=None, mosaic=0.0):
         self.truth = truth
         self.classes = classes
         self.summary = summary
         self.photometric = photometric
+        self.geometric = geometric
+        self.mosaic_probability = mosaic
         super().__init__(overrides=args)
 
     def build_dataset(self, img_path, mode="train", batch=None):
@@ -125,6 +164,13 @@ class YoloTrainer(DetectionTrainer):
             if [type(transform).__name__ for transform in transforms] != ["LetterBox", "Format"]:
                 raise RuntimeError("EXP-002 requiere la cadena base LetterBox → Format")
             transforms.insert(0, YoloPhotometric(self.photometric, self.args.seed))
+        if mode == "train" and self.geometric is not None:
+            transforms = dataset.transforms.transforms
+            if [type(transform).__name__ for transform in transforms] != ["LetterBox", "Format"]:
+                raise RuntimeError("La geometría requiere LetterBox → Format")
+            transforms.insert(0, YoloGeometry(self.geometric, self.args.seed))
+            if self.mosaic_probability:
+                transforms.insert(0, YoloMosaic(dataset, self.args.imgsz, self.mosaic_probability))
         return dataset
 
     def get_model(self, cfg=None, weights=None, verbose=True):
@@ -252,6 +298,7 @@ def ultralytics_args(args, spec, resume_path):
         "single_cls": False, "fraction": 1.0, "cache": False, "agnostic_nms": False,
         "plots": False, "conf": MIN_SCORE, "max_det": MAX_DETECTIONS,
         **DISABLED_AUGMENTATIONS,
+        "mosaic": spec.get("mosaic", 0.0),
     }
 
 
@@ -266,13 +313,11 @@ def record_runtime(trainer, args):
     write_json(args.output / "parameters.json", inventory)
     batches = len(trainer.train_loader)
     warmup = trainer.args.warmup_epochs
-    photometric = {}
-    if trainer.photometric is not None:
+    augmentations = {key: value for key in ("photometric", "geometric")
+                     if (value := getattr(trainer, key)) is not None}
+    if augmentations:
         transforms = trainer.train_loader.dataset.transforms.transforms
-        photometric = {
-            "photometric": trainer.photometric,
-            "train_transforms": [type(transform).__name__ for transform in transforms],
-        }
+        augmentations["train_transforms"] = [type(transform).__name__ for transform in transforms]
     write_json(args.output / "ultralytics_runtime.json", {
         "args": vars(trainer.args),
         "iterations_per_epoch": batches, "nominal_max_iterations": batches * trainer.epochs,
@@ -284,7 +329,7 @@ def record_runtime(trainer, args):
             for g in trainer.optimizer.param_groups
         ],
         **({"freeze_backbone_epochs": staged.duration} if staged is not None else {}),
-        **photometric,
+        **augmentations,
     })
 
 
@@ -353,7 +398,8 @@ def train(args, spec, manifest):
         trim_csv(args.output / "results.csv", completed_epochs)
     freeze = spec.get("freeze_backbone_epochs", 0)
     trainer_type = StagedYoloTrainer if freeze else YoloTrainer
-    trainer = trainer_type(overrides, truth, manifest["classes"], manifest["splits"], spec.get("photometric"))
+    trainer = trainer_type(overrides, truth, manifest["classes"], manifest["splits"],
+                           spec.get("photometric"), spec.get("geometric"), spec.get("mosaic", 0.0))
     if trainer.save_dir.resolve() != args.output:
         raise ValueError(f"Ultralytics usaría una salida diferente: {trainer.save_dir}")
     if trainer.data["names"] != {item["internal_id"]: item["name"] for item in manifest["classes"]}:

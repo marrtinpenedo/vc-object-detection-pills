@@ -1,0 +1,25 @@
+{
+  "split": "valid",
+  "coco_sha256": "8da7dc75022c67fe9e4d806559e8110f89a2cbb8850948f1d89ce5208cdead7c",
+  "source_commit": "66ac3471594aa95411a92244b5cf03517ec7672d",
+  "inputs": {
+    "cascade": {
+      "predictions_sha256": "9197aacb67386ebba9f3a9c3363f691da9235c1670b6c4ef43981c478a4583ab",
+      "checkpoint_sha256": "38c01cad530fa7d8abde3b8b3b6e64445d5ea1c69c888327cda145a24eea2ab8",
+      "job_id": "11987778"
+    },
+    "yolo": {
+      "predictions_sha256": "dd72f0b19e2205e618f96b3a36055aeda06f7c0a464af0652f09c6a448f3501b",
+      "checkpoint_sha256": "78615ba2da0db9cf3c56cae932ac0bcb6ffd843c9f8a94d660a420df92ee2d71",
+      "job_id": "11987778"
+    }
+  },
+  "fusion_code_sha256": "1d640dc45e784e53c4b2cc5f0b2f86393de92937762a283dad04adc1147e8796",
+  "iou": 0.55,
+  "yolo_single_weight": 0.5,
+  "prediction_counts": {
+    "cascade": 847,
+    "yolo": 238,
+    "ensemble": 869
+  }
+}

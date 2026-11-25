@@ -3,6 +3,7 @@
 import json
 import math
 import re
+from copy import copy
 from pathlib import Path
 
 import numpy as np
@@ -16,6 +17,7 @@ from detectron2.data.datasets import register_coco_instances
 from detectron2.engine import DefaultTrainer, HookBase, hooks
 from detectron2.evaluation import DatasetEvaluator
 from detectron2.modeling import build_model
+from detectron2.structures import BoxMode
 from detectron2.utils.env import seed_all_rng
 from detectron2.utils.events import EventStorage
 from detectron2.utils.logger import setup_logger
@@ -27,6 +29,7 @@ from scripts.baseline_run import (
     PauseTraining, UpdateCheck, check_gradients, parameters, publish_copy, save_history,
 )
 from scripts.photometric import PhotometricSampler, adjust_luminance
+from scripts.geometric import GeometrySampler, transform_coords, warp
 
 PREFIX = "roi_heads.box_predictor."
 EXPECTED_CLASSIFIERS = {
@@ -254,6 +257,36 @@ class CascadePhotometric(T.Augmentation):
         return LuminanceTransform(*gains) if gains is not None else T.NoOpTransform()
 
 
+class CascadeAffine(T.Transform):
+    def __init__(self, matrix):
+        self.matrix = matrix
+
+    def apply_image(self, image):
+        return warp(image, self.matrix)
+
+    def apply_coords(self, coords):
+        return transform_coords(coords, self.matrix)
+
+
+class CascadeGeometryMapper:
+    def __init__(self, cfg):
+        self.mapper = DatasetMapper(cfg, is_train=True)
+        self.resize = self.mapper.augmentations.augs
+        if [type(transform).__name__ for transform in self.resize] != ["ResizeShortestEdge"]:
+            raise RuntimeError("La geometría requiere ResizeShortestEdge como preprocesado base")
+        self.sampler = GeometrySampler(cfg.INPUT.GEOMETRIC, cfg.SEED)
+
+    def __call__(self, record):
+        boxes = [BoxMode.convert(ann["bbox"], ann["bbox_mode"], BoxMode.XYXY_ABS)
+                 for ann in record.get("annotations", []) if not ann.get("iscrowd", 0)]
+        sample = self.sampler.sample(record["width"], record["height"], boxes, get_worker_info())
+        if sample is None:
+            return self.mapper(record)
+        mapper = copy(self.mapper)
+        mapper.augmentations = T.AugmentationList([CascadeAffine(sample[0]), *self.resize])
+        return mapper(record)
+
+
 class CascadeTrainer(DefaultTrainer):
     def __init__(self, cfg, stop_step):
         self.stop_step = stop_step
@@ -270,6 +303,8 @@ class CascadeTrainer(DefaultTrainer):
 
     @classmethod
     def build_train_loader(cls, cfg):
+        if "GEOMETRIC" in cfg.INPUT:
+            return build_detection_train_loader(cfg, mapper=CascadeGeometryMapper(cfg))
         if "PHOTOMETRIC" not in cfg.INPUT:
             return super().build_train_loader(cfg)
         mapper = DatasetMapper(cfg, is_train=True)
@@ -316,6 +351,8 @@ def train(args, spec, manifest):
     )
     if "photometric" in spec:
         cfg.INPUT.PHOTOMETRIC = CfgNode(spec["photometric"])
+    if "geometric" in spec:
+        cfg.INPUT.GEOMETRIC = CfgNode(spec["geometric"])
     register_training_data(cfg, args.data, manifest)
     (args.output / "best").mkdir(exist_ok=True)
     effective = args.output / "detectron2.yaml"
