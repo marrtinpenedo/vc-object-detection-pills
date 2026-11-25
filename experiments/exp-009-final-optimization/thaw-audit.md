@@ -1,0 +1,28 @@
+# EXP-009 A · Auditoría de la descongelación de YOLO
+
+Se inspeccionaron el inventario original de A, los 14 historiales, las trazas de los 12 brazos con freezing, las predicciones de los 14 `best` y sus huellas. El snapshot nativo es `8254e3e0bfa68bebfd6e8a8090b8c8a55fb759989bdf345b6954762357114ef3`. Los mAP por época proceden de las evaluaciones internas de entrenamiento. El mAP oficial y el de siete clases se reprodujeron desde las predicciones de `best`. [Hallazgos de A](findings.md)
+
+## La caída aparece al reactivar el backbone
+
+| Primera época activa | LR de AdamW | mAP antes → después, sin geometría | mAP antes → después, con geometría | mAP a esa época con freezing permanente, sin/con geometría |
+| ---: | ---: | ---: | ---: | ---: |
+| 11 | 9,768e−4 | 0,7233 → 0,000003 | 0,6050 → 0 | 0,6983 / 0,6610 |
+| 21 | 9,093e−4 | 0,6741 → 0,000002 | 0,7090 → 0 | 0,6505 / 0,6771 |
+| 41 | 6,718e−4 | 0,8057 → 0 | 0,6713 → 0 | 0,8255 / 0,6783 |
+| 61 | 3,782e−4 | 0,7142 → 0,2393 | 0,6851 → 0,4488 | 0,7037 / 0,6957 |
+| 81 | 1,407e−4 | 0,7120 → 0,6156 | 0,6764 → 0,6501 | 0,7146 / 0,6875 |
+
+Los 30 contrastes posibles entre prefijos congelados de la misma política coinciden en todas las métricas, pérdidas y LR del historial. La pérdida de clasificación de validación salta de 1,22 a 184 184 en freeze-20 sin geometría y de 0,89 a 3,97 en freeze-40 con geometría. Tras los seis colapsos, la segunda época activa recupera entre 0,0932 y 0,4210 mAP. La coincidencia temporal, la pérdida finita pero extrema y la recuperación son compatibles con una perturbación transitoria al entrenar un extractor hasta entonces fijo.
+
+- **AdamW.** El optimizador se construye antes de congelar y sus tres grupos contienen todos los parámetros. La auditoría exige los mismos grupos al descongelar y conserva la identidad de AdamW y de los estados observados de neck y cabezas. Esas regiones suman 40 pasos por época. El parámetro de control del backbone tiene cero pasos antes y 40 tras su primera época activa, con gradiente finito y cambio efectivo de pesos. Los momentos de AdamW del backbone se crean al recibir sus primeros gradientes. Los pesos DFL fijos conservan su huella.
+- **Scheduler y LR.** La época n tiene contador n−1 y los tres LR registrados concuerdan con el historial. El warm-up global terminó en el índice de lote 100. Al volver el backbone se incorpora al coseno vigente, sin rampa local. Las cinco duraciones y sus LR de entrada están ligados entre sí.
+- **BatchNorm.** Los parámetros y buffers del backbone conservan su huella mientras está congelado. Cada BN de esa región pasa de cero a 40 actualizaciones de estadísticas por época al descongelar. AdamW y BN cambian de fase en el mismo límite. El export permite comprobar contadores y huellas, y carece de distribuciones de activaciones, magnitudes de los momentos y estadísticas BN por lote.
+- **EMA.** Se conserva la instancia de EMA y acumula 40 actualizaciones por época. En freeze-80 pasa de 3 200 a 3 240; en ese mismo límite el backbone pasa de 0 a 40 y neck y cabezas de 3 200 a 3 240. Ultralytics actualiza los tensores flotantes de EMA tras cada paso y valida con sus pesos. Los contadores descartan un reinicio, pero no miden cuánto del salto proviene de EMA o de sus buffers. [Auditoría del entrenador](../../scripts/yolo_staged.py) · [Bucle de entrenamiento Ultralytics 8.3.161](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/engine/trainer.py#L341-L389) · [ModelEMA](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/utils/torch_utils.py) · [Validador](https://github.com/ultralytics/ultralytics/blob/v8.3.161/ultralytics/engine/validator.py)
+
+La evidencia respalda que la transición ejecuta la receta programada. La hipótesis de trabajo es un desajuste temporal entre extractor, neck y cabezas cuando el backbone empieza a recibir gradientes y cambian sus estadísticas. Las caídas mayores coinciden con un LR más alto, un menor tiempo de adaptación del resto del detector y un estado de EMA más temprano. El diseño de A no separa esos factores. Un LR menor solo para el backbone o una rampa corta serían intervenciones nuevas, con su propio control emparejado e instrumentación por lote, fuera de B.
+
+## Checkpoints coincidentes y estabilidad de freeze-80
+
+Freeze-40/60/100 sin geometría eligen la época 37, dentro de su prefijo común y todavía congelado, con mAP interno 0,831848. Sus predicciones y curvas PR de `best` son idénticas byte a byte. Las tres huellas del archivo de checkpoint son distintas. El serializador incluye metadatos además de tensores. El export ligero certifica la equivalencia de las salidas de inferencia de validación, y no permite comparar directamente los tensores de los archivos excluidos. Freeze-10/20 sin geometría muestra la misma pauta con `best` en la época 10.
+
+Con afín + Mosaic, freeze-80 logra 0,857821 en la época 89. Es la única época a menos de 1 pp de su pico. La época 86 obtiene 0,84534, a 1,25 pp del pico. Esas dos superan el mejor 0,820008 de freeze-0 + geometría, y las demás quedan por debajo. El promedio de las diez últimas épocas es 0,79670 y el último valor es 0,75671. Por tanto, la mejora observada se sostiene en dos puntos altos y **la ventaja máxima de 3,78 pp depende de la época 89**. La sensibilidad oficial a siete clases de ese checkpoint mejora 4,32 pp respecto a freeze-0 + geometría. El export conserva solo el AP de `best` por clase y no permite repetir esa comprobación para la época 86. Freeze-80 sin geometría muestra cuatro épocas a menos de 1 pp de su propio máximo interno, incluyendo dos antes y dos después del thaw. B reutiliza `best` bajo el mismo criterio. C estima cuánto se repite la ganancia entre semillas.
