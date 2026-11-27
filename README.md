@@ -3,7 +3,6 @@
 Estudio comparativo de dos arquitecturas de detección de objetos, Cascade R-CNN (two-stage) y YOLOv10-S (one-stage), preentrenadas en MS COCO y ajustadas mediante fine-tuning sobre el conjunto de datos `pills-sxdht`. El proyecto establece baselines y compara distintas estrategias de entrenamiento, aumento de datos y congelación de capas mediante experimentos reproducibles ejecutados en el supercomputador FinisTerrae III del CESGA, con gestión de trabajos mediante SLURM. La evaluación incluye precisión, recall, AP, latencia y análisis de errores.
 
 **Autores:** Martín Rodríguez Penedo y Santiago Pereira Olmeda.  
-**Equipo:** I.
 
 ## Documentación
 
