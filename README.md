@@ -1,6 +1,6 @@
 # Detección de pastillas
 
-Práctica de Visión por Computador del Grado en Inteligencia Artificial de la USC, curso 2026–2027. El equipo I estudia dos detectores preentrenados en MS COCO, Cascade R-CNN y YOLOv10-S, sobre `pills-sxdht`. El proyecto establece baselines y evalúa mejoras mediante precisión, recall, AP, latencia y análisis de errores.
+Estudio comparativo de dos arquitecturas de detección de objetos, Cascade R-CNN (two-stage) y YOLOv10-S (one-stage), preentrenadas en MS COCO y ajustadas mediante fine-tuning sobre el conjunto de datos `pills-sxdht`. El proyecto establece baselines y compara distintas estrategias de entrenamiento, aumento de datos y congelación de capas mediante experimentos reproducibles ejecutados en el supercomputador FinisTerrae III del CESGA, con gestión de trabajos mediante SLURM. La evaluación incluye precisión, recall, AP, latencia y análisis de errores.
 
 **Autores:** Martín Rodríguez Penedo y Santiago Pereira Olmeda.  
 **Equipo:** I.
